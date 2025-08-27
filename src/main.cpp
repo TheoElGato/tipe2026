@@ -2,6 +2,7 @@
 #include <map>
 #include <cmath>
 
+#include "physics.h"
 
 void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<std::string, float>& stats)
 {
@@ -41,7 +42,7 @@ void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<st
 int main()
 {
     auto window = sf::RenderWindow(sf::VideoMode({1050u, 750u}), "URSAFSIM");
-    window.setFramerateLimit(144);
+    window.setFramerateLimit(1440);
 
     // Load Textures
     sf::Font font("assets/fonts/arial.ttf");
@@ -53,6 +54,9 @@ int main()
     // Manage Clock
     sf::Clock clock;
     float fps = 0.0f;
+
+    // TEEST OF PHYSICS
+    Point p1(0.0f, 0.0f, 1.0f);
 
     while (window.isOpen())
     {
