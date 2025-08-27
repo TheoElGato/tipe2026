@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "physics.h"
+#include "creature.h"
 
 void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<std::string, float>& stats)
 {
@@ -42,7 +43,7 @@ void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<st
 int main()
 {
     auto window = sf::RenderWindow(sf::VideoMode({1050u, 750u}), "URSAFSIM");
-    window.setFramerateLimit(1440);
+    window.setFramerateLimit(60);
 
     // Load Textures
     sf::Font font("assets/fonts/arial.ttf");
@@ -56,11 +57,12 @@ int main()
     float fps = 0.0f;
 
     // TEEST OF PHYSICS
-    Point p1(0.0f, 0.0f, 1.0f);
+    Creature creature(100,100,0,"");
 
     while (window.isOpen())
     {
         sf::Time frameStart = clock.restart();
+        float dt = frameStart.asSeconds();
 
 
         while (const std::optional event = window.pollEvent())
@@ -77,6 +79,10 @@ int main()
         window.clear();
 
         window.draw(backgroundSprite);
+
+        creature.update(dt);
+        creature.draw(window);
+
         drawStats(window, font, {{"FPS", std::round(fps)}, {"nb_agent", 0.0f}, {"selected", 0.0f}, {"gen", 0.0f}, {"tps", 0.0f}, {"evolution", 0.0f}});
 
         window.display();

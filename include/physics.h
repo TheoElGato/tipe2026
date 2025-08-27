@@ -33,8 +33,9 @@ public:
     Spring(Point& a, Point& b, float restLength, float springStrength);
     Point* pointA;
     Point* pointB;
-    float springStrength;
     float restLength;
+    float springStrength;
+    
 };
 
 class PhysicsWorker {
