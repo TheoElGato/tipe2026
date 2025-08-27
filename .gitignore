@@ -37,7 +37,8 @@
 *.out
 *.app
 
-build/
+build/*
+.vscode/
 
 # debug information files
 *.dwo

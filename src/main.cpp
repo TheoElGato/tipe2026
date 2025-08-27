@@ -2,8 +2,14 @@
 
 int main()
 {
-    auto window = sf::RenderWindow(sf::VideoMode({1920u, 1080u}), "CMake SFML Project");
+    auto window = sf::RenderWindow(sf::VideoMode({1050u, 750u}), "URSAFSIM");
     window.setFramerateLimit(144);
+
+    // Load Textures
+    sf::Texture backgroundTexture("assets/textures/background.png");
+
+    // Create Sprite
+    sf::Sprite backgroundSprite(backgroundTexture);
 
     while (window.isOpen())
     {
@@ -15,7 +21,11 @@ int main()
             }
         }
 
+
         window.clear();
+        
+        window.draw(backgroundSprite);
+
         window.display();
     }
 }
