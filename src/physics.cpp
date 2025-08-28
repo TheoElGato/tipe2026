@@ -131,6 +131,9 @@ sf::Vector2f PhysicsWorker::springForce(Point a, Point b, float springConstant, 
 {
     //calcule la force d'un ressort entre deux points
     //et renvoie le vecteur force de a vers b (ou - de b vers a)
+
+    // /!\ ATTENTION si il y a des problème de perf on peut se permettre d'enlever ces vérifications
+
     float l = distance(a, b);
     sf::Vector2f n;
     if (l != 0) {
