@@ -54,10 +54,10 @@ Creature::Creature(float sx, float sy, int bodyColorSeed, std::string brainFile)
     // Couleur de la creature
     this->colors = {
         sf::Color(0, 0, 255),
-        unique_color_from_single_number(bodyColorSeed),
         sf::Color(0, 255, 255),
         sf::Color(255, 0, 255),
-        sf::Color(34, 0, 25)
+        sf::Color(34, 0, 25),
+        unique_color_from_single_number(bodyColorSeed)
     };
 }
 
@@ -137,7 +137,7 @@ void Creature::draw(sf::RenderWindow &window)
 
     // Dessin du corps
     static sf::CircleShape body(20);
-    body.setFillColor(this->colors[1]);
+    body.setFillColor(this->colors[4]);
     body.setOrigin({20, 20});
     body.setPosition(this->vertices[0].position);
     window.draw(body);

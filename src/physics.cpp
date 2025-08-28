@@ -39,26 +39,30 @@ float PhysicsWorker::distance(Point a, Point b)
 
 
 
-void PhysicsWorker::PBD(std::vector<Point*> &objects, std::vector<Link> &links, std::vector<Spring> &springs, int numsubstep, float dt)
+void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, std::vector<Spring> springs, int numsubstep, float dt)
 {
     float h = dt / numsubstep;
-    int n = objects.size();
-    std::vector<sf::Vector2f> xprev;
-    std::vector<sf::Vector2f> fext;
+    int n = objects->size();
+    std::vector<sf::Vector2f> xprev(n);
+    std::vector<sf::Vector2f> fext(n);
 
     for (int i = 0; i < n; i++) {
-        objects[i]->setId(i);
+        (*objects)[i].setId(i);
     }
+
 
     for (int k = 0; k < numsubstep; k++) {
         
         for (int i = 0; i < n; i++) {
-            xprev[i] = objects[i]->position;
+            xprev[i] = (*objects)[i].position;
             fext[i] = {0, 0};
         }
 
+        
+
         //gestion des ressorts possibles
         for (const auto& spring : springs) {
+            
             sf::Vector2f force = springForce(*spring.pointA, *spring.pointB, spring.springStrength, spring.restLength);
 
             // Trouver les indexes des points
@@ -69,50 +73,53 @@ void PhysicsWorker::PBD(std::vector<Point*> &objects, std::vector<Link> &links, 
             if (idxB != -1) fext[idxB] -= force;
         }
 
+        
+
         //sauvegarde des positions précédentes
         //calculs des nouvelles positions en fonction de la vitesse à l'aide de la méthode d'Euler
         for (int i = 0; i < n; i++) {
-            objects[i]->velocity += h * fext[i] / objects[i]->mass; 
-            if (!objects[i]->fixed) {
-                objects[i]->velocity.x *= 0.98;
-                objects[i]->velocity.y *= 0.98; 
+            (*objects)[i].velocity += h * fext[i] / (*objects)[i].mass;
+            if (!(*objects)[i].fixed) {
+                (*objects)[i].velocity.x *= 0.98;
+                (*objects)[i].velocity.y *= 0.98;
             } else {
-                objects[i]->velocity.x *= 0.12; 
-                objects[i]->velocity.y *= 0.12; 
-                
+                (*objects)[i].velocity.x *= 0.12; 
+                (*objects)[i].velocity.y *= 0.12; 
             }
 
-            objects[i]->position += objects[i]->velocity * h;
+            (*objects)[i].position += (*objects)[i].velocity * h;
 
         }
-
+        
         // gestion des liens solides (SolvePosition)
         for (const auto& link : links) {
-            Point& a = *link.pointA;
-            Point& b = *link.pointB;
+            Point* a = link.pointA;
+            Point* b = link.pointB;
             float l = link.restLength;
 
-            sf::Vector2f delta = objects[a.id]->position - objects[b.id]->position;
-            float delta_len = sqrt(delta.x * delta.x + delta.y * delta.y);
+
+            sf::Vector2f delta = a->position - b->position;
+            float delta_len = delta.length();
             float diff = (delta_len - l) / delta_len;
 
             // si les points sont fixes, on ne les bouge pas
-            if (a.fixed && b.fixed) {
-                objects[a.id]->position -= delta * diff * 0.5f;
-                objects[b.id]->position += delta * diff * 0.5f;
-            } else if (!a.fixed && b.fixed) {
-                objects[a.id]->position -= delta * diff;
-            } else if (a.fixed && !b.fixed) {
-                objects[b.id]->position += delta * diff;
-            } else if (!a.fixed && !b.fixed) {
-                objects[a.id]->position -= delta * diff * 0.5f;
-                objects[b.id]->position += delta * diff * 0.5f;
+            if (a->fixed && b->fixed) {
+                a->position -= delta * diff * 0.5f;
+                b->position += delta * diff * 0.5f;
+            } else if (!a->fixed && b->fixed) {
+                a->position -= delta * diff;
+            } else if (a->fixed && !b->fixed) {
+                b->position += delta * diff;
+            } else if (!a->fixed && !b->fixed) {
+                a->position -= delta * diff * 0.5f;
+                b->position += delta * diff * 0.5f;
             }
         }
 
+
         // mise à jour des vitesses en fonction des positions précédentes et des nouvelles positions
         for (int i = 0; i < n; i++) {
-            objects[i]->velocity = (objects[i]->position - xprev[i]) / h;
+            (*objects)[i].velocity = ((*objects)[i].position - xprev[i]) / h;
         }
 
     }

@@ -18,7 +18,7 @@ void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<st
 
     sf::Vector2u size = window.getSize();
     float rectangleWidth = 200.f;
-    float rectangleHeight = 50.f + stats.size() * 25.f;
+    float rectangleHeight = 50.f + stats.size() * 20.f;
 
     float margin = 10.f;
     float rectX = size.x - rectangleWidth - margin;
@@ -84,7 +84,7 @@ int main()
     int SIM_TIME = 100;
     float EVOLUTION = 0.375;
     int NB_BRAIN = 200;
-    int FACTEUR = 4;
+    int FACTEUR = 2;
     int NB_AGENT = NB_BRAIN*FACTEUR;
     float BR_ACC = 0.5;
     int NB_HIDDEN_LAYER = 100;
@@ -101,6 +101,9 @@ int main()
     int MINDIST = 200;
     int NB_GOAL = 3;
     ///////////////////
+
+    //// Position de depart
+    sf::Vector2i start = sf::Vector2i(523, 375);
 
     ////// variable de l'état de la simulation ///////
     bool running = true;
@@ -131,7 +134,7 @@ int main()
     else
     {
         // Initialize simulation state
-        init_agents_and_brain(NB_AGENT, NB_BRAIN, 100, 100, &agents, &brain_agent);
+        init_agents_and_brain(NB_AGENT, NB_BRAIN, start.x, start.y, &agents, &brain_agent);
     }
 
     auto window = sf::RenderWindow(sf::VideoMode({1050u, 750u}), "URSAFSIM");
@@ -147,6 +150,8 @@ int main()
     // Manage Clock
     sf::Clock clock;
     float fps = 0.0f;
+
+    PhysicsWorker mainPhysics;
 
     while (window.isOpen())
     {
@@ -189,11 +194,15 @@ int main()
         }
 
         // On gere la physique des créatures
-        // TODO: Implement creature physics
-
+        for (auto &agent : agents) {
+            std::vector<Point>* vertices = &agent.vertices;
+            agent.leg_up = {false, false, false, false};
+            mainPhysics.PBD(vertices, agent.links, agent.muscles, 10,dt);
+            //agent.update(dt);
+        }
         
 
-        fps = 1.0f / frameStart.asSeconds();
+        
 
 
         window.clear();
@@ -212,6 +221,7 @@ int main()
 
         drawStats(window, font, {{"FPS", std::round(fps)}, {"nb_agent", agents.size()}, {"selected", selected_agent}, {"gen", generation},{"sous-gen", sous_sim},{"tps", simu_time}, {"evolution", evolution}});
 
+        fps = 1.0f / frameStart.asSeconds();
         window.display();
     }
 }
