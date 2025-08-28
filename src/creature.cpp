@@ -102,21 +102,19 @@ void Creature::update(float dt)
 
 void Creature::draw(sf::RenderWindow &window)
 {
-    // Dessin des pattes
-    for (int i = 0; i < 4; ++i) {
-        sf::CircleShape paw;
-        paw.setFillColor(this->colors[i]);
-        paw.setOrigin({10, 10}); // pour centrer le cercle sur la position
+    // Préparer les formes à l'avance pour éviter les allocations répétées
+    sf::CircleShape pawUp(5);
+    pawUp.setOrigin({5, 5});
+    sf::CircleShape pawDown(10);
+    pawDown.setOrigin({10, 10});
 
-        if (this->leg_up[i]) {
-            paw.setRadius(5);
-            paw.setOrigin({5, 5});
-        } else {
-            paw.setRadius(10);
-            paw.setOrigin({10, 10});
-        }
-        paw.setPosition(this->vertices[i+1].position);
-        window.draw(paw);
+    // Dessin des pattes et des lignes corps-patte
+    
+    for (int i = 0; i < 4; ++i) {
+        sf::CircleShape* paw = this->leg_up[i] ? &pawUp : &pawDown;
+        paw->setFillColor(this->colors[i]);
+        paw->setPosition(this->vertices[i+1].position);
+        window.draw(*paw);
 
         // Ligne entre le corps et la patte
         std::array line =
@@ -124,55 +122,44 @@ void Creature::draw(sf::RenderWindow &window)
             sf::Vertex{this->vertices[0].position, this->colors[i]},
             sf::Vertex{this->vertices[i+1].position, this->colors[i]}
         };
-
         window.draw(line.data(), line.size(), sf::PrimitiveType::Lines);
-
-        
     }
 
-    // Dessin des muscles
-    
+    // Dessin des muscles (lignes simples)
     for (int i = 0; i < 2; ++i) {
-        float width = std::get<0>(this->muscle_con) * 5 + 1;
-        // SFML ne gère pas la largeur de ligne, donc on dessine une ligne simple
-       
         std::array line =
         {
             sf::Vertex{this->vertices[i*2+1].position, this->colors[i]},
             sf::Vertex{this->vertices[i*2+2].position, this->colors[i]}
         };
-
         window.draw(line.data(), line.size(), sf::PrimitiveType::Lines);
     }
-    
 
     // Dessin du corps
-    sf::CircleShape body(20);
+    static sf::CircleShape body(20);
     body.setFillColor(this->colors[1]);
     body.setOrigin({20, 20});
     body.setPosition(this->vertices[0].position);
     window.draw(body);
 
-    // Dessin des yeux
+    // Dessin des yeux (réutilisation des formes)
     float eye_offset1 = this->dir - 0.3f;
     float eye_offset2 = this->dir + 0.3f;
     sf::Vector2f center = this->vertices[0].position;
     sf::Vector2f eye1 = center + sf::Vector2f(20 * std::cos(eye_offset1), 20 * std::sin(eye_offset1));
     sf::Vector2f eye2 = center + sf::Vector2f(20 * std::cos(eye_offset2), 20 * std::sin(eye_offset2));
 
-    sf::CircleShape eyeWhite(8);
+    static sf::CircleShape eyeWhite(8);
     eyeWhite.setFillColor(sf::Color::White);
     eyeWhite.setOrigin({8, 8});
-
     eyeWhite.setPosition(eye1);
     window.draw(eyeWhite);
     eyeWhite.setPosition(eye2);
     window.draw(eyeWhite);
 
-    sf::CircleShape eyeBlack(2);
+    static sf::CircleShape eyeBlack(2);
     eyeBlack.setFillColor(sf::Color::Black);
     eyeBlack.setOrigin({2, 2});
-
     eyeBlack.setPosition(eye1);
     window.draw(eyeBlack);
     eyeBlack.setPosition(eye2);
