@@ -3,13 +3,10 @@
 #include <map>
 #include <cmath>
 #include <thread>
-
+#include <iostream>
 
 #include "physics.h"
 #include "creature.h"
-
-
-#include <iostream>
 
 void log(const std::string& message, const std::string& level = "INFO")
 {
@@ -52,9 +49,6 @@ void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<st
         count += 25.f;
         window.draw(text);
     }
-    
-
-    
 }
 
 void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::vector<Creature>* agents, std::vector<std::string>* brains, std::string brainFile="")
@@ -149,6 +143,8 @@ int main()
     if (LOAD_FROM_FILE)
     {
         // Load simulation state from file
+        init_agents_and_brain(NB_AGENT, NB_BRAIN, start.x, start.y, &agents, &brain_agent, LOAD_NAME);
+
     }
     else
     {
