@@ -5,6 +5,10 @@
 #include <cmath>
 #include <map>
 
+
+class Creature; // Forward declaration
+
+
 class Point {
 public:
     Point(float x, float y, float mass);
@@ -41,6 +45,7 @@ public:
 class PhysicsWorker {
 public:
     PhysicsWorker();
+
 
     sf::Vector2f springForce(Point a, Point b, float springConstant, float restLength);
     void PBD(std::vector<Point>* objects, std::vector<Link> links, std::vector<Spring> springs, int numsubstep, float dt);
