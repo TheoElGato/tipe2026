@@ -27,6 +27,7 @@ Spring::Spring(Point &a, Point &b, float restLength, float springStrength)
 
 PhysicsWorker::PhysicsWorker()
 {
+
 }
 
 float PhysicsWorker::distance(Point a, Point b)
