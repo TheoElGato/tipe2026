@@ -7,6 +7,45 @@
 
 #include "physics.h"
 #include "creature.h"
+#include "brain.h"
+
+/// SETTINGS ///
+std::string DEVICE = "cpu"; // "cpu" or "gpu"
+int THREADS = 8;
+
+bool LOAD_FROM_FILE = false;
+std::string LOAD_NAME = "test2_20250513_221021";
+
+std::string SIM_NAME = "test2";
+
+// SIM //
+int SIM_TIME = 100;
+float EVOLUTION = 0.375;
+int NB_BRAIN = 1000;
+int FACTEUR = 4;
+int NB_AGENT = NB_BRAIN*FACTEUR;
+float BR_ACC = 0.5;
+int NB_HIDDEN_LAYER = 100;
+int SOUS_SIM = 40/FACTEUR;
+
+//SCORE_FUNCTION = reproduction.score_distance
+
+// AUTOSAVE //
+bool AUTOSAVE = true;
+int AUTOSAVE_FREQ = 1;
+
+// GOAL //
+int MAXDIST = 300;
+int MINDIST = 200;
+int NB_GOAL = 3;
+
+//// Position de depart
+sf::Vector2i start = sf::Vector2i(523, 375);
+///////////////////
+
+
+
+
 
 void log(const std::string& message, const std::string& level = "INFO")
 {
@@ -84,39 +123,7 @@ void physicsUpdate(PhysicsWorker& physics, std::vector<Creature*> agents, float 
 int main()
 {
 
-    /// SETTINGS ///
-    std::string DEVICE = "cpu"; // "cpu" or "gpu"
-    int THREADS = 8;
-
-    bool LOAD_FROM_FILE = false;
-    std::string LOAD_NAME = "test2_20250513_221021";
-
-    std::string SIM_NAME = "test2";
-
-    // SIM //
-    int SIM_TIME = 100;
-    float EVOLUTION = 0.375;
-    int NB_BRAIN = 1000;
-    int FACTEUR = 4;
-    int NB_AGENT = NB_BRAIN*FACTEUR;
-    float BR_ACC = 0.5;
-    int NB_HIDDEN_LAYER = 100;
-    int SOUS_SIM = 40/FACTEUR;
-
-    //SCORE_FUNCTION = reproduction.score_distance
-
-    // AUTOSAVE //
-    bool AUTOSAVE = true;
-    int AUTOSAVE_FREQ = 1;
-
-    // GOAL //
-    int MAXDIST = 300;
-    int MINDIST = 200;
-    int NB_GOAL = 3;
-    ///////////////////
-
-    //// Position de depart
-    sf::Vector2i start = sf::Vector2i(523, 375);
+    
 
     ////// variable de l'état de la simulation ///////
     bool running = true;
@@ -184,6 +191,7 @@ int main()
     sf::Clock clock;
     float fps = 0.0f;
 
+    Brain test(1,1,1);
 
     while (window.isOpen())
     {
