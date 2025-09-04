@@ -12,9 +12,9 @@ Creature::Creature(float sx, float sy, int bodyColorSeed, std::string brainFile)
     // initialisation des positions et vecteurs
     // longueur des membres de la creature
     this->muscle_strength = 100.0f;
-    this->muscle_con = std::make_tuple(0.0f, 0.0f);
-    this->muscle_len = std::make_tuple(50.0f, 37.5f);
-    this->leg_len = std::make_tuple(35.35f, 31.25f);
+    this->muscle_con = {0.0f, 0.0f};
+    this->muscle_len = {50.0f, 37.5f};
+    this->leg_len = {35.35f, 31.25f};
     this->struc_len = 50.0f;
     
     // corps, pattes 1-4
@@ -34,10 +34,10 @@ Creature::Creature(float sx, float sy, int bodyColorSeed, std::string brainFile)
 
     // tableau des liens entre les points et leur longueur
     this->links = {
-        Link(this->vertices[0], this->vertices[1], std::get<0>(this->muscle_len)),
-        Link(this->vertices[0], this->vertices[2], std::get<0>(this->muscle_len)),
-        Link(this->vertices[0], this->vertices[3], std::get<0>(this->muscle_len)),
-        Link(this->vertices[0], this->vertices[4], std::get<0>(this->muscle_len)),
+        Link(this->vertices[0], this->vertices[1], this->muscle_len[0]),
+        Link(this->vertices[0], this->vertices[2], this->muscle_len[0]),
+        Link(this->vertices[0], this->vertices[3], this->muscle_len[0]),
+        Link(this->vertices[0], this->vertices[4], this->muscle_len[0]),
         Link(this->vertices[1], this->vertices[3], this->struc_len),
         Link(this->vertices[2], this->vertices[4], this->struc_len)
     };
@@ -48,7 +48,7 @@ Creature::Creature(float sx, float sy, int bodyColorSeed, std::string brainFile)
     };
 
     this->dir = 0.0f;
-    this->leg_up = {false, false, false, false};
+    this->leg_up = {0, 0, 0, 0};
 
 
     // Couleur de la creature
@@ -66,24 +66,52 @@ sf::Color Creature::unique_color_from_single_number(int number)
     return sf::Color((50*number+96)%255, (69*number+24)%255, (42*number+93)%255);
 }
 
+void Creature::brainUpdate(sf::Vector2f target, Brain * brain)
+{
+    float dx = target.x - this->vertices[0].position.x;
+    float dy = target.y - this->vertices[0].position.y;
+
+    float dist = std::sqrt(dx * dx + dy * dy);
+
+    sf::Vector2f to_target = (target - this->vertices[0].position).normalized();
+    sf::Vector2f dire = sf::Vector2f(std::cos(this->dir), std::sin(this->dir));
+
+    float ddx = dire.dot(to_target);
+
+    sf::Angle ninety_deg = sf::degrees(90);
+
+    float ddy = dire.rotatedBy(ninety_deg).dot(to_target);
+
+    // InputTensor
+    torch::Tensor inputTensor = torch::tensor({dist,ddx, ddy, this->leg_up[0], this->leg_up[1], this->leg_up[2], this->leg_up[3], this->muscle_con[0], this->muscle_con[1]});
+    torch::Tensor  output = brain->forward(inputTensor);
+
+    for(int i=0;i<4;i++) {
+        this->leg_up[i] = output[i].item<float>()>0.5f ? 1.0f : 0.0f;
+    }
+    for(int i=0;i<2;i++) {
+        this->muscle_con[i] = output[i+4].item<float>()>0.0f ? 1.0f : 0.0f;
+    }
+}
+
 void Creature::update(float dt)
 {
     // gestion de la longueur des pattes
-    this->links[0].restLength = std::get<0>(this->leg_len);
+    this->links[0].restLength = this->leg_len[0];
     this->vertices[1].fixed = !this->leg_up[0];
 
-    this->links[1].restLength = std::get<0>(this->leg_len);
+    this->links[1].restLength = this->leg_len[0];
     this->vertices[2].fixed = !this->leg_up[1];
 
-    this->links[2].restLength = std::get<1>(this->leg_len);
+    this->links[2].restLength = this->leg_len[1];
     this->vertices[3].fixed = !this->leg_up[2];
 
-    this->links[3].restLength = std::get<1>(this->leg_len);
+    this->links[3].restLength = this->leg_len[1];
     this->vertices[4].fixed = !this->leg_up[3];
 
     // gestion de la longueur des muscles
-    this->muscles[0].restLength = std::get<0>(this->muscle_len);
-    this->muscles[1].restLength = std::get<1>(this->muscle_len);
+    this->muscles[0].restLength = this->muscle_len[0];
+    this->muscles[1].restLength = this->muscle_len[1];
 
         // Calcul du milieu entre la patte avant droite (1) et arrière droite (3)
     sf::Vector2f mid = sf::Vector2f(

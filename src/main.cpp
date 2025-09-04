@@ -21,7 +21,7 @@ std::string SIM_NAME = "test2";
 // SIM //
 int SIM_TIME = 100;
 float EVOLUTION = 0.375;
-int NB_BRAIN = 1000;
+int NB_BRAIN = 300;
 int FACTEUR = 4;
 int NB_AGENT = NB_BRAIN*FACTEUR;
 float BR_ACC = 0.5;
@@ -40,7 +40,7 @@ int MINDIST = 200;
 int NB_GOAL = 3;
 
 //// Position de depart
-sf::Vector2i start = sf::Vector2i(523, 375);
+sf::Vector2f start = sf::Vector2f(523, 375);
 ///////////////////
 
 
@@ -90,7 +90,7 @@ void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<st
     }
 }
 
-void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::vector<Creature>* agents, std::vector<std::string>* brains, std::string brainFile="")
+void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::vector<Creature>* agents, std::vector<Brain>* brains, std::string brainFile="")
 {
     if (brainFile == "")
     {
@@ -101,7 +101,7 @@ void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::
         }
         for (int i=0; i<countBrains; i++)
         {
-            brains->emplace_back("");
+            brains->emplace_back(9,6,DEVICE,"",NB_HIDDEN_LAYER);
         }
         // Initialize agents with default brain
     } else {
@@ -132,18 +132,19 @@ int main()
     float br_acc = BR_ACC/FACTEUR;
     float evolution = EVOLUTION;
     int generation = 0;
-    int acc = 0;
-    int acu = 0;
+    float acc = 0;
+    float acu = 0;
     int cyl = 0;
     int sous_sim = 1;
     float inputdelay = inputdelayBase;
     int selected_agent = 0;
     bool drawall = false;
     std::vector<float> fpsM;
+    float dt = 0.016f;
 
     std::vector<float> score_agent(NB_BRAIN, 0);
     std::vector<float> agents_objectif(NB_AGENT, 0);
-    std::vector<std::string> brain_agent;
+    std::vector<Brain> brain_agent;
     std::vector<Creature> agents;
     int cycle = 0;
 
@@ -191,12 +192,13 @@ int main()
     sf::Clock clock;
     float fps = 0.0f;
 
-    Brain test(1,1,1);
+    sf::Vector2f goal(250, 250);
 
     while (window.isOpen())
     {
-        sf::Time frameStart = clock.restart();
-        float dt = frameStart.asSeconds();
+        //sf::Time frameStart = clock.restart();
+        if (dt < 1e-6f) dt = 1e-6f;
+        fps = 1.0f / dt;
 
 
         while (const std::optional event = window.pollEvent())
@@ -233,7 +235,7 @@ int main()
             inputdelay +=1;
         }
 
-        
+        // Physics update
         std::vector<std::thread> threads;
         for (size_t i = 0; i < physicsWorkers.size(); ++i) {
             threads.emplace_back(physicsUpdate, std::ref(physicsWorkers[i]), agentPartitions[i], dt);
@@ -242,12 +244,28 @@ int main()
         for (auto& thread : threads) {
             thread.join();
         }
-
         // Delete threads
         threads.clear();
 
-        window.clear();
+        // Ticking Brain
+        if (br_acc <= acc) {
 
+            if (cycle>=FACTEUR) {
+                cycle=0;
+            }
+
+            for(int i=NB_BRAIN*cycle;i<NB_BRAIN*(cycle+1);i++) {
+                agents[i].brainUpdate(goal,&brain_agent[i%NB_BRAIN]);
+                agents[i].update(dt);
+            }
+
+            cycle += 1;
+            acc = 0;
+
+        }
+        
+        
+        window.clear();
         window.draw(backgroundSprite);
 
         // Affichage créatures
@@ -259,10 +277,13 @@ int main()
             agents[selected_agent].draw(window);
         }
 
+        drawStats(window, font, {{"FPS", std::round(fps)}, {"nb_agent", agents.size()}, {"selected", selected_agent}, {"gen", generation},{"sous_gen", sous_sim},{"tps",round(acu)},{"tps_max", simu_time}, {"evolution", evolution}});
 
-        drawStats(window, font, {{"FPS", std::round(fps)}, {"nb_agent", agents.size()}, {"selected", selected_agent}, {"gen", generation},{"sous-gen", sous_sim},{"tps", simu_time}, {"evolution", evolution}});
-
-        fps = 1.0f / frameStart.asSeconds();
         window.display();
+
+        acc += dt;
+        acu += dt;
+        dt = clock.restart().asSeconds();
+
     }
 }
