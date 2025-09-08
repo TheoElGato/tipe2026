@@ -7,6 +7,8 @@
 #include <tuple>
 
 #include "physics.h"
+#include "brain.h"
+
 
 class Creature {
 public:
@@ -15,22 +17,23 @@ public:
     float body_mass;
     float paw_mass;
     float muscle_strength;
-    std::tuple<float, float> muscle_con;
-    std::tuple<float, float> muscle_len;
-    std::tuple<float, float> leg_len;
+    std::vector<float> muscle_con;
+    std::vector<float> muscle_len;
+    std::vector<float> leg_len;
     float struc_len;
 
     std::vector<Point> vertices;
     std::vector<Link> links;
     std::vector<Spring> muscles;
     float dir;
-    std::vector<bool> leg_up;
+    std::vector<float> leg_up;
     std::vector<sf::Color> colors;
 
 
 
-
+    void brainUpdate(sf::Vector2f goal, Brain* brain);
     void update(float dt);
+    void moveTo(float x, float y);
     void draw(sf::RenderWindow& window);
 
 
@@ -38,5 +41,8 @@ public:
 private:
     sf::Color unique_color_from_single_number(int number);
 };
+
+
+float score_distance(Creature* agent, sf::Vector2f goal);
 
 #endif // CREATURE_H
