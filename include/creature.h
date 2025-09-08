@@ -33,6 +33,7 @@ public:
 
     void brainUpdate(sf::Vector2f goal, Brain* brain);
     void update(float dt);
+    void moveTo(float x, float y);
     void draw(sf::RenderWindow& window);
 
 
@@ -40,5 +41,8 @@ public:
 private:
     sf::Color unique_color_from_single_number(int number);
 };
+
+
+float score_distance(Creature* agent, sf::Vector2f goal);
 
 #endif // CREATURE_H

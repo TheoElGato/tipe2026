@@ -263,8 +263,50 @@ int main()
             acc = 0;
 
         }
-        
-        
+
+        // Changement de sous sim / sim:
+        if (acu >= simu_time) {
+
+            // Changement de sous sim :
+            if (sous_sim < SOUS_SIM) {
+
+                // Calcul des scores de chaque agent
+                // Et renitialisation de leur position
+                for(int cyc=0;cyc<FACTEUR;cyc++) {
+                    for (int i = NB_BRAIN * cyc; i < NB_BRAIN * (cyc + 1); i++) {
+                        score_agent[i % NB_BRAIN] += score_distance(&agents[i], goal);
+                        agents[i].moveTo(start.x, start.y);
+                    }
+                }
+
+                sous_sim += 1;
+
+
+            } else {
+                // Changement de sim :
+                Creature best_agent = agents[std::distance(score_agent.begin(), std::max_element(score_agent.begin(), score_agent.end()))];
+                float FPSm = 0.0f;
+                for (const auto& fps : fpsM) {
+                        FPSm += fps;
+                }
+                if (FPSm > 0.0f) {
+                    FPSm /= fpsM.size();
+                }
+
+                // Sauvegarde automatique
+                if (AUTOSAVE && generation % AUTOSAVE_FREQ == 0) {
+                    // TODO: implement autosave
+                    log("Autosave is not implemented yet.", "WARNING");
+                }
+            }
+
+            acu = 0;
+
+        }
+
+
+
+
         window.clear();
         window.draw(backgroundSprite);
 

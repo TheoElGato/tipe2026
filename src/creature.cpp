@@ -1,5 +1,9 @@
 #include "creature.h"
 
+float score_distance(Creature* agent, sf::Vector2f goal) {
+    return (std::sqrt(std::pow(agent->vertices[0].position.x - goal.x, 2) + std::pow(agent->vertices[0].position.y - goal.y, 2)));
+}
+
 Creature::Creature(float sx, float sy, int bodyColorSeed, std::string brainFile)
 {   
     /// initialisation des paramètres de la créature
@@ -127,6 +131,28 @@ void Creature::update(float dt)
 
     this->dir = angl;
 }
+
+void Creature::moveTo(float x, float y) {
+
+    // Déplacer le corps principal
+    this->vertices[0].position = sf::Vector2f(x, y);
+    this->vertices[1].position = sf::Vector2f(x + this->struc_len/2, y - this->struc_len/2);
+    this->vertices[2].position = sf::Vector2f(x - this->struc_len/2, y - this->struc_len/2);
+    this->vertices[3].position = sf::Vector2f(x + this->struc_len/2, y + this->struc_len/2);
+    this->vertices[4].position = sf::Vector2f(x - this->struc_len/2, y + this->struc_len/2);
+
+    // Réinitialiser les vitesses
+    this->vertices[0].velocity = sf::Vector2f(0.0f, 0.0f);
+    this->vertices[1].velocity = sf::Vector2f(0.0f, 0.0f);
+    this->vertices[2].velocity = sf::Vector2f(0.0f, 0.0f);
+    this->vertices[3].velocity = sf::Vector2f(0.0f, 0.0f);
+    this->vertices[4].velocity = sf::Vector2f(0.0f, 0.0f);
+
+    this->leg_up = {0, 0, 0, 0};
+    this->muscle_con = {0, 0};
+    this->dir = 0.0f;
+}
+
 
 void Creature::draw(sf::RenderWindow &window)
 {

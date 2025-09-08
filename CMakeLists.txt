@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
 
-set(CMAKE_CUDA_COMPILER /opt/cuda/bin/nvcc)
-
 project(TIPE2026 LANGUAGES CXX)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
