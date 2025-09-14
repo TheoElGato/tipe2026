@@ -38,17 +38,17 @@ Creature::Creature(float sx, float sy, int bodyColorSeed, std::string brainFile)
 
     // tableau des liens entre les points et leur longueur
     this->links = {
-        Link(this->vertices[0], this->vertices[1], this->muscle_len[0]),
-        Link(this->vertices[0], this->vertices[2], this->muscle_len[0]),
-        Link(this->vertices[0], this->vertices[3], this->muscle_len[0]),
-        Link(this->vertices[0], this->vertices[4], this->muscle_len[0]),
-        Link(this->vertices[1], this->vertices[3], this->struc_len),
-        Link(this->vertices[2], this->vertices[4], this->struc_len)
+        Link(0, 1, this->leg_len[0]),
+        Link(0, 2, this->leg_len[0]),
+        Link(0, 3, this->leg_len[0]),
+        Link(0, 4, this->leg_len[0]),
+        Link(1, 3, this->struc_len),
+        Link(2, 4, this->struc_len)
     };
 
     this->muscles = {
-        Spring(this->vertices[1], this->vertices[2], this->struc_len, this->muscle_strength),
-        Spring(this->vertices[3], this->vertices[4], this->struc_len, this->muscle_strength)
+        Spring(1, 2, this->struc_len, this->muscle_strength),
+        Spring(3, 4, this->struc_len, this->muscle_strength)
     };
 
     this->dir = 0.0f;

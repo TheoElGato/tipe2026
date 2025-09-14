@@ -26,17 +26,17 @@ public:
 
 class Link {
 public:
-    Link(Point &a, Point &b, float restLength);
-    Point* pointA;
-    Point* pointB;
+    Link(int a, int b, float restLength);
+    int pointA;
+    int pointB;
     float restLength;
 };
 
 class Spring {
 public:
-    Spring(Point& a, Point& b, float restLength, float springStrength);
-    Point* pointA;
-    Point* pointB;
+    Spring(int a, int b, float restLength, float springStrength);
+    int pointA;
+    int pointB;
     float restLength;
     float springStrength;
     

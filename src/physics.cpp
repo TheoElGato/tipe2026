@@ -9,17 +9,17 @@ Point::Point(float x, float y, float mass)
 
 }
 
-Link::Link(Point &a, Point &b, float restLength)
+Link::Link(int a, int b, float restLength)
 {
-    this->pointA = &a;
-    this->pointB = &b;
+    this->pointA = a;
+    this->pointB = b;
     this->restLength = restLength;
 }
 
-Spring::Spring(Point &a, Point &b, float restLength, float springStrength)
+Spring::Spring(int a, int b, float restLength, float springStrength)
 {
-    this->pointA = &a;
-    this->pointB = &b;
+    this->pointA = a;
+    this->pointB = b;
     this->restLength = restLength;
     this->springStrength = springStrength;
 }
@@ -47,11 +47,6 @@ void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, st
     std::vector<sf::Vector2f> xprev(n);
     std::vector<sf::Vector2f> fext(n);
 
-    for (int i = 0; i < n; i++) {
-        (*objects)[i].setId(i);
-    }
-
-
     for (int k = 0; k < numsubstep; k++) {
         
         for (int i = 0; i < n; i++) {
@@ -64,11 +59,11 @@ void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, st
         //gestion des ressorts possibles
         for (const auto& spring : springs) {
             
-            sf::Vector2f force = springForce(*spring.pointA, *spring.pointB, spring.springStrength, spring.restLength);
+            sf::Vector2f force = springForce((*objects)[spring.pointA], (*objects)[spring.pointB], spring.springStrength, spring.restLength);
 
             // Trouver les indexes des points
-            int idxA = spring.pointA->id;
-            int idxB = spring.pointB->id;
+            int idxA = spring.pointA;
+            int idxB = spring.pointB;
 
             if (idxA != -1) fext[idxA] += force;
             if (idxB != -1) fext[idxB] -= force;
@@ -94,8 +89,8 @@ void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, st
         
         // gestion des liens solides (SolvePosition)
         for (const auto& link : links) {
-            Point* a = link.pointA;
-            Point* b = link.pointB;
+            Point* a = &(*objects)[link.pointA];
+            Point* b = &(*objects)[link.pointB];
             float l = link.restLength;
 
 
