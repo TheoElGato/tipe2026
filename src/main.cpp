@@ -207,9 +207,6 @@ int main()
             {
                 window.close();
             }
-
-            
-
         }
 
         // Gestion des touches :

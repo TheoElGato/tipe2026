@@ -10,6 +10,7 @@ public:
     torch::Tensor forward(torch::Tensor x);
     void saveFile(const std::string& file);
     void loadFile(const std::string& file);
+    void mutate(float a);
 
 
     //void train(const std::vector<torch::Tensor>& inputs, const std::vector<torch::Tensor>& targets);

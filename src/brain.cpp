@@ -65,9 +65,12 @@ void Brain::load(torch::serialize::InputArchive& archive) {
 
 torch::Tensor Brain::forward(torch::Tensor x) {
     x = x.to(this->device);
-    x = this->fc1->forward(x);
-    x = this->fc2->forward(x);
-    x = this->fc3->forward(x);
-    x = this->out->forward(x);
+    x = torch::nn::functional::softsign(this->fc1->forward(x));
+    x = torch::nn::functional::softsign(this->fc2->forward(x));
+    x = torch::nn::functional::softsign(this->fc3->forward(x));
+    x = torch::nn::functional::softsign(this->out->forward(x));
     return x;
 }
+
+
+
