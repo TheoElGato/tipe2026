@@ -101,21 +101,21 @@ void Creature::brainUpdate(sf::Vector2f target, Brain * brain)
 void Creature::update(float dt)
 {
     // gestion de la longueur des pattes
-    this->links[0].restLength = this->leg_len[0];
+    this->links[0].restLength = this->leg_len[(int) this->muscle_con[0]];
     this->vertices[1].fixed = !this->leg_up[0];
 
-    this->links[1].restLength = this->leg_len[0];
+    this->links[1].restLength = this->leg_len[(int) this->muscle_con[0]];
     this->vertices[2].fixed = !this->leg_up[1];
 
-    this->links[2].restLength = this->leg_len[1];
+    this->links[2].restLength = this->leg_len[(int) this->muscle_con[1]];
     this->vertices[3].fixed = !this->leg_up[2];
 
-    this->links[3].restLength = this->leg_len[1];
+    this->links[3].restLength = this->leg_len[(int) this->muscle_con[1]];
     this->vertices[4].fixed = !this->leg_up[3];
 
     // gestion de la longueur des muscles
-    this->muscles[0].restLength = this->muscle_len[0];
-    this->muscles[1].restLength = this->muscle_len[1];
+    this->muscles[0].restLength = this->muscle_len[(int) this->muscle_con[0]];
+    this->muscles[1].restLength = this->muscle_len[(int) this->muscle_con[1]];
 
         // Calcul du milieu entre la patte avant droite (1) et arrière droite (3)
     sf::Vector2f mid = sf::Vector2f(
