@@ -105,7 +105,7 @@ void Creature::brainUpdate(sf::Vector2f target, Brain * brain)
     torch::Tensor  output = brain->forward(inputTensor);
 
     for(int i=0;i<4;i++) {
-        this->leg_up[i] = output[i].item<float>()>0.5f ? 1.0f : 0.0f;
+        this->leg_up[i] = output[i].item<float>()>0.0f ? 1.0f : 0.0f;
     }
     for(int i=0;i<2;i++) {
         this->muscle_con[i] = output[i+4].item<float>()>0.0f ? 1.0f : 0.0f;
