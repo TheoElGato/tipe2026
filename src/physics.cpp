@@ -95,7 +95,7 @@ void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, st
 
 
             sf::Vector2f delta = a->position - b->position;
-            float delta_len = delta.length();
+            float delta_len = delta.x * delta.x + delta.y * delta.y;
             float diff = (delta_len - l) / delta_len;
 
             // si les points sont fixes, on ne les bouge pas

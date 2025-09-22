@@ -77,14 +77,28 @@ void Creature::brainUpdate(sf::Vector2f target, Brain * brain)
 
     float dist = std::sqrt(dx * dx + dy * dy);
 
-    sf::Vector2f to_target = (target - this->vertices[0].position).normalized();
+    sf::Vector2f to_target = target - this->vertices[0].position;
+    float to_target_length = std::sqrt(to_target.x * to_target.x + to_target.y * to_target.y);
+    if (to_target_length != 0.0f) {
+        to_target /= to_target_length;
+    }
     sf::Vector2f dire = sf::Vector2f(std::cos(this->dir), std::sin(this->dir));
 
-    float ddx = dire.dot(to_target);
+    float ddx = dire.x * to_target.x + dire.y * to_target.y;
 
-    sf::Angle ninety_deg = sf::degrees(90);
+    // Helper function to rotate a vector by an angle in radians
+    auto rotatedBy = [](const sf::Vector2f& v, float angleRad) -> sf::Vector2f {
+        float cosA = std::cos(angleRad);
+        float sinA = std::sin(angleRad);
+        return sf::Vector2f(
+            v.x * cosA - v.y * sinA,
+            v.x * sinA + v.y * cosA
+        );
+    };
 
-    float ddy = dire.rotatedBy(ninety_deg).dot(to_target);
+    float ninety_deg = 3.14159265f / 2.0f; // 90 degrees in radians
+
+    float ddy = rotatedBy(dire,ninety_deg).x * to_target.x + rotatedBy(dire,ninety_deg).y * to_target.y;
 
     // InputTensor
     torch::Tensor inputTensor = torch::tensor({dist,ddx, ddy, this->leg_up[0], this->leg_up[1], this->leg_up[2], this->leg_up[3], this->muscle_con[0], this->muscle_con[1]});

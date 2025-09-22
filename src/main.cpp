@@ -79,7 +79,8 @@ void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<st
     for (const auto& [key, value] : stats)
     {
         // Create a text object for each statistic
-        sf::Text text(font);
+        sf::Text text;
+        text.setFont(font);
 
         text.setString(key + ": " + nozero(value));
         text.setCharacterSize(20);
@@ -182,8 +183,10 @@ int main()
     window.setFramerateLimit(60);
 
     // Load Textures
-    sf::Font font("assets/fonts/arial.ttf");
-    sf::Texture backgroundTexture("assets/textures/background.png");
+    sf::Font font;
+    font.loadFromFile("assets/fonts/arial.ttf");
+    sf::Texture backgroundTexture;
+    backgroundTexture.loadFromFile("assets/textures/background.png");
 
     // Create Sprite
     sf::Sprite backgroundSprite(backgroundTexture);
@@ -200,10 +203,10 @@ int main()
         if (dt < 1e-6f) dt = 1e-6f;
         fps = 1.0f / dt;
 
-
-        while (const std::optional event = window.pollEvent())
+        sf::Event event;
+        while (window.pollEvent(event))
         {
-            if (event->is<sf::Event::Closed>())
+            if (event.type == sf::Event::Closed)
             {
                 window.close();
             }

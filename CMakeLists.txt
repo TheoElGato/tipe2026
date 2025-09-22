@@ -8,7 +8,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 include(FetchContent)
 FetchContent_Declare(SFML
     GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG 3.0.1
+    GIT_TAG 2.6.2
     GIT_SHALLOW ON
     EXCLUDE_FROM_ALL
     SYSTEM)
@@ -22,10 +22,11 @@ add_executable(main
     src/physics.cpp
     src/creature.cpp
     src/brain.cpp
+    src/threadsmg.cpp
 )
 target_include_directories(main PRIVATE include)
 target_compile_features(main PRIVATE cxx_std_17)
-target_link_libraries(main PRIVATE SFML::Graphics "${TORCH_LIBRARIES}")
+target_link_libraries(main PRIVATE sfml-graphics "${TORCH_LIBRARIES}")
 
 # The following code block is suggested to be used on Windows.
 # According to https://github.com/pytorch/pytorch/issues/25457,
