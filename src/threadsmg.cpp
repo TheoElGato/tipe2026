@@ -1,19 +1,33 @@
 #include "threadsmg.h"
 
-void handleThread(PhysicsWorker &physics, std::vector<Creature *> agents, std::vector<float> objectives, float dt, float time)
+void handleThread(PhysicsWorker &physics, std::vector<Creature *> agents, 
+                  sf::Vector2f objectif, std::vector<Brain*> brains,float* dt, float time)
 {
     
     // Run the physics simulation for the specified time duration
-    // This case use a fixed timestep approach to simplify the implementation
     float acc = 0.0f;
     while (acc < time) {
-        for (auto &agent : agents) {
+        for (int i = 0; i < agents.size(); ++i) {
+            Creature* agent = agents[i];
+
+            // handle physics update for each agent
             std::vector<Point> *vertices = &agent->vertices;
-            physics.PBD(vertices, agent->links, agent->muscles, 10, dt);
+            physics.PBD(vertices, agent->links, agent->muscles, 10, *dt);
+
+            // handle brain update for each agent
+            agent->brainUpdate(objectif, brains[i]);
+            agent->update(*dt);
         }
-        acc += dt;
+        acc += *dt;
     }
 
     // Evaluation of the simulation results
-
+    for (int i = 0; i < agents.size(); ++i) {
+        Creature* agent = agents[i];
+        float dx = objectif.x - agent->vertices[0].position.x;
+        float dy = objectif.y - agent->vertices[0].position.y;
+        float dist = std::sqrt(dx * dx + dy * dy);
+        // Here you can store or print the distance or any other evaluation metric
+        // For example, you might want to log it or update a shared data structure
+    }
 }

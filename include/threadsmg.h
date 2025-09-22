@@ -7,6 +7,6 @@
 #include "physics.h"
 #include "creature.h"
 
-void handleThread(PhysicsWorker &physics, std::vector<Creature *> agents, std::vector<float> objectives, float dt, float time)
+void handleThread(PhysicsWorker &physics, std::vector<Creature *> agents, sf::Vector2f objectif, std::vector<Brain*> brains,float* dt, float time);
 
 #endif // THREADSMG_H
