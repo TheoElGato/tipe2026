@@ -39,6 +39,7 @@
 
 build/*
 .vscode/
+buildrun.sh
 
 # debug information files
 *.dwo

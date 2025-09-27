@@ -8,6 +8,7 @@
 #include "physics.h"
 #include "creature.h"
 #include "brain.h"
+#include "threadsmg.h"
 
 /// SETTINGS ///
 std::string DEVICE = "cpu"; // "cpu" or "gpu"
@@ -22,12 +23,13 @@ std::string SIM_NAME = "test2";
 int SIM_TIME = 100;
 float EVOLUTION = 0.375;
 int NB_BRAIN = 300;
-int FACTEUR = 4;
-int NB_AGENT = NB_BRAIN*FACTEUR;
+int FACTEUR = 4;            // TODO Enlever facteur, devenu inutile.
+int NB_AGENT = NB_BRAIN;
 float BR_ACC = 0.5;
 int NB_HIDDEN_LAYER = 100;
-int SOUS_SIM = 40/FACTEUR;
+int SOUS_SIM = 20;
 
+// Pourquoi on a encore besoin de ça ?
 //SCORE_FUNCTION = reproduction.score_distance
 
 // AUTOSAVE //
@@ -149,6 +151,12 @@ int main()
     std::vector<Creature> agents;
     int cycle = 0;
 
+    std::vector<std::thread> sous_sim_threads;
+    std::vector<bool> groups_avail(THREADS, true);
+    int threads_used = 0;
+    int sous_sim_next_index = 0;
+    int sous_sim_total = SOUS_SIM;
+
     if (LOAD_FROM_FILE)
     {
         // Load simulation state from file
@@ -177,6 +185,10 @@ int main()
             agentPartitions[i].push_back(&(*it));
         }
         log("Created partition " + std::to_string(i) + " with " + std::to_string(agentPartitions[i].size()) + " agents.");
+    }
+
+    for(int i=0; i<sous_sim_total; i++) {
+        sous_sim_threads.emplace_back(std::thread());
     }
 
     auto window = sf::RenderWindow(sf::VideoMode({1050u, 750u}), "URSAFSIM");
@@ -235,6 +247,37 @@ int main()
             inputdelay +=1;
         }
 
+
+        while(threads_used < THREADS) {
+            // Un thread ou plus de libres
+            int group_index = -1;
+            for (int i = 0; i < groups_avail.size(); i++) {
+                if (groups_avail[i]) {
+                    group_index = i;
+                    groups_avail[i] = false;
+                    break;
+                }
+            }
+            if (group_index == -1) log("No group available. Have you made a mistake ???","FATAL"); // Pas de groupe libre
+
+            // making a Vector of Brain pointers for the group
+            std::vector<Brain*> brain_agent_ptrs;
+            for (auto& b : brain_agent) brain_agent_ptrs.push_back(&b);
+
+            sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, std::ref(physicsWorkers[group_index]), agentPartitions[group_index], start, goal, brain_agent_ptrs, &dt, simu_time, br_acc);
+            sous_sim_threads[sous_sim_next_index].detach(); // Détacher le thread pour qu'il s'exécute indépendamment
+
+            threads_used += 1;
+            sous_sim_next_index += 1;
+        }
+
+        if(sous_sim_next_index == sous_sim_total) {
+            // TODO: Changement de sim
+        }
+
+
+
+        /*
         // Physics update
         std::vector<std::thread> threads;
         for (size_t i = 0; i < physicsWorkers.size(); ++i) {
@@ -246,24 +289,9 @@ int main()
         }
         // Delete threads
         threads.clear();
+        */
 
-        // Ticking Brain
-        if (br_acc <= acc) {
-
-            if (cycle>=FACTEUR) {
-                cycle=0;
-            }
-
-            for(int i=NB_BRAIN*cycle;i<NB_BRAIN*(cycle+1);i++) {
-                agents[i].brainUpdate(goal,&brain_agent[i%NB_BRAIN]);
-                agents[i].update(dt);
-            }
-
-            cycle += 1;
-            acc = 0;
-
-        }
-
+        /*
         // Changement de sous sim / sim:
         if (acu >= simu_time) {
 
@@ -303,6 +331,7 @@ int main()
             acu = 0;
 
         }
+        */
 
 
 
@@ -312,8 +341,8 @@ int main()
 
         // Affichage créatures
         if (drawall) {
-            for ( auto& agent : agents) {
-                agent.draw(window);
+            for ( Creature* agent : agentPartitions[selected_agent]) {
+                agent->draw(window);
             }
         } else {
             agents[selected_agent].draw(window);

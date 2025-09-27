@@ -1,11 +1,17 @@
 #include "threadsmg.h"
 
-void handleThread(PhysicsWorker &physics, std::vector<Creature *> agents, 
-                  sf::Vector2f objectif, std::vector<Brain*> brains,float* dt, float time)
+void handleThread(PhysicsWorker &physics, std::vector<Creature *> agents, sf::Vector2f start,
+                  sf::Vector2f objectif, std::vector<Brain*> brains,float* dt, float time, float brainAcc)
 {
     
     // Run the physics simulation for the specified time duration
     float acc = 0.0f;
+    float accbrain = 0.0f;
+
+    for (int i = 0; i < agents.size(); ++i) {
+        agents[i]->moveTo(start.x, start.y);
+    }
+
     while (acc < time) {
         for (int i = 0; i < agents.size(); ++i) {
             Creature* agent = agents[i];
@@ -14,10 +20,16 @@ void handleThread(PhysicsWorker &physics, std::vector<Creature *> agents,
             std::vector<Point> *vertices = &agent->vertices;
             physics.PBD(vertices, agent->links, agent->muscles, 10, *dt);
 
-            // handle brain update for each agent
-            agent->brainUpdate(objectif, brains[i]);
-            agent->update(*dt);
+            if(brainAcc <= accbrain) 
+            {
+                // handle brain update for each agent
+                agent->brainUpdate(objectif, brains[i]);
+                agent->update(*dt);
+                accbrain = 0;
+
+            }
         }
+        accbrain += *dt;
         acc += *dt;
     }
 
