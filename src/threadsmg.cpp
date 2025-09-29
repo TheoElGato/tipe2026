@@ -1,4 +1,5 @@
 #include "threadsmg.h"
+#include <iostream>
 
 void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Vector2f start, 
                   sf::Vector2f objectif, std::vector<Brain*> brains, int* state, 
@@ -27,7 +28,6 @@ void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Ve
                 agent->brainUpdate(objectif, brains[i]);
                 agent->update(*dt);
                 accbrain = 0;
-
             }
         }
         accbrain += *dt;
@@ -39,9 +39,7 @@ void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Ve
         Creature* agent = agents[i];
         float dx = objectif.x - agent->vertices[0].position.x;
         float dy = objectif.y - agent->vertices[0].position.y;
-        (*scores)[i] = 1/(1+std::sqrt(dx * dx + dy * dy));
-        // Here you can store or print the distance or any other evaluation metric
-        // For example, you might want to log it or update a shared data structure
+        (*scores).push_back(1/(1+std::sqrt(dx * dx + dy * dy)));
     }
 
 
