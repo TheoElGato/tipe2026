@@ -24,7 +24,7 @@ int SIM_TIME = 100;
 float EVOLUTION = 0.375;
 int NB_BRAIN = 300;
 int FACTEUR = 4;            // TODO Enlever facteur, devenu inutile.
-int NB_AGENT = NB_BRAIN;
+int NB_AGENT = NB_BRAIN*THREADS;
 float BR_ACC = 0.5;
 int NB_HIDDEN_LAYER = 100;
 int SOUS_SIM = 20;
@@ -140,7 +140,7 @@ int main()
     int cyl = 0;
     int sous_sim = 1;
     float inputdelay = inputdelayBase;
-    int selected_agent = 0;
+    int selected_agents = 0;
     bool drawall = false;
     std::vector<float> fpsM;
     float dt = 0.016f;
@@ -229,12 +229,12 @@ int main()
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
             {
-                selected_agent = (selected_agent - 1) % agents.size();
+                selected_agents = (selected_agents - 1) % agentPartitions.size();
                 inputdelay = 0;
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::E))
             {
-                selected_agent = (selected_agent + 1) % agents.size();
+                selected_agents = (selected_agents + 1) % agentPartitions.size();
                 inputdelay = 0;
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F))
@@ -341,14 +341,12 @@ int main()
 
         // Affichage créatures
         if (drawall) {
-            for ( Creature* agent : agentPartitions[selected_agent]) {
+            for ( Creature* agent : agentPartitions[selected_agents]) {
                 agent->draw(window);
             }
-        } else {
-            agents[selected_agent].draw(window);
         }
 
-        drawStats(window, font, {{"FPS", std::round(fps)}, {"nb_agent", agents.size()}, {"selected", selected_agent}, {"gen", generation},{"sous_gen", sous_sim},{"tps",round(acu)},{"tps_max", simu_time}, {"evolution", evolution}});
+        drawStats(window, font, {{"FPS", std::round(fps)}, {"nb_agent", agents.size()}, {"selected", selected_agents}, {"gen", generation},{"sous_gen", sous_sim},{"tps",round(acu)},{"tps_max", simu_time}, {"evolution", evolution}});
 
         window.display();
 
