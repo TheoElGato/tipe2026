@@ -286,9 +286,11 @@ int main()
             std::vector<Brain*> brain_agent_ptrs;
             for (auto& b : brain_agent) brain_agent_ptrs.push_back(&b);
 
+            
+
             log("Starting sous-sim " + std::to_string(sous_sim_next_index) + " on group " + std::to_string(group_index) + " with " + std::to_string(agentPartitions[group_index].size()) + " agents.", "THREAD");
 
-            sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, std::ref(physicsWorkers[group_index]), agentPartitions[group_index], start, goal, brain_agent_ptrs, &dt, simu_time, br_acc);
+            sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goal, brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &dt, simu_time, br_acc);
             sous_sim_threads[sous_sim_next_index].detach(); // Détacher le thread pour qu'il s'exécute indépendamment
 
             sous_sim_state[sous_sim_next_index] = 1; // Marquer comme en cours d'exécution
