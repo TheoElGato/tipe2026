@@ -155,7 +155,7 @@ int main()
     std::vector<int> sous_sim_state(SOUS_SIM, 0);
     std::vector<std::vector<float>> sous_sim_scores(SOUS_SIM);
 
-    std::vector<bool> groups_avail(THREADS, true);
+    std::vector<int> groups_avail(THREADS, -1); // -1 means available
     int threads_used = 0;
     int sous_sim_next_index = 0;
     int sous_sim_total = SOUS_SIM;
@@ -250,14 +250,31 @@ int main()
             inputdelay +=1;
         }
 
+        // Check if any sous-sim thread has finished
+        for(int i = 0; i < sous_sim_total; i++) {
+            if(sous_sim_state[i] == 2) {
+                // Thread has finished
+                threads_used -= 1;
+
+                // Search what group it was using
+                for (int j = 0; j < groups_avail.size(); j++) {
+                    if (groups_avail[j] == i) {
+                        groups_avail[j] = -1; // Mark group as available
+                        break;
+                    }
+                }
+                
+            }
+        }
+
 
         while(threads_used < THREADS) {
             // Un thread ou plus de libres
             int group_index = -1;
             for (int i = 0; i < groups_avail.size(); i++) {
-                if (groups_avail[i]) {
+                if (groups_avail[i] == -1) { // Group is available
                     group_index = i;
-                    groups_avail[i] = false;
+                    groups_avail[i] = sous_sim_next_index; // Mark group as used
                     break;
                 }
             }
@@ -269,6 +286,9 @@ int main()
 
             sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, std::ref(physicsWorkers[group_index]), agentPartitions[group_index], start, goal, brain_agent_ptrs, &dt, simu_time, br_acc);
             sous_sim_threads[sous_sim_next_index].detach(); // Détacher le thread pour qu'il s'exécute indépendamment
+
+            sous_sim_state[sous_sim_next_index] = 1; // Marquer comme en cours d'exécution
+
 
             threads_used += 1;
             sous_sim_next_index += 1;
