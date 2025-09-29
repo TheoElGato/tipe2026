@@ -151,7 +151,10 @@ int main()
     std::vector<Creature> agents;
     int cycle = 0;
 
-    std::vector<std::thread> sous_sim_threads;
+    std::vector<std::thread> sous_sim_threads(SOUS_SIM);
+    std::vector<int> sous_sim_state(SOUS_SIM, 0);
+    std::vector<std::vector<float>> sous_sim_scores(SOUS_SIM);
+
     std::vector<bool> groups_avail(THREADS, true);
     int threads_used = 0;
     int sous_sim_next_index = 0;
