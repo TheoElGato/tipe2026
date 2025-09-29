@@ -1,7 +1,8 @@
 #include "threadsmg.h"
 
-void handleThread(PhysicsWorker &physics, std::vector<Creature *> agents, sf::Vector2f start,
-                  sf::Vector2f objectif, std::vector<Brain*> brains,float* dt, float time, float brainAcc)
+void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Vector2f start, 
+                  sf::Vector2f objectif, std::vector<Brain*> brains, int* state, 
+                  std::vector<float>* scores, float* dt, float time,float brainAcc)
 {
     
     // Run the physics simulation for the specified time duration
@@ -18,7 +19,7 @@ void handleThread(PhysicsWorker &physics, std::vector<Creature *> agents, sf::Ve
 
             // handle physics update for each agent
             std::vector<Point> *vertices = &agent->vertices;
-            physics.PBD(vertices, agent->links, agent->muscles, 10, *dt);
+            physics->PBD(vertices, agent->links, agent->muscles, 10, *dt);
 
             if(brainAcc <= accbrain) 
             {
@@ -38,8 +39,12 @@ void handleThread(PhysicsWorker &physics, std::vector<Creature *> agents, sf::Ve
         Creature* agent = agents[i];
         float dx = objectif.x - agent->vertices[0].position.x;
         float dy = objectif.y - agent->vertices[0].position.y;
-        float dist = std::sqrt(dx * dx + dy * dy);
+        (*scores)[i] = 1/(1+std::sqrt(dx * dx + dy * dy));
         // Here you can store or print the distance or any other evaluation metric
         // For example, you might want to log it or update a shared data structure
     }
+
+
+    // Mark the thread as finished
+    *state = 2; // 2 means finished
 }
