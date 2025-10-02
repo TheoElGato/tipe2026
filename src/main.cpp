@@ -161,6 +161,7 @@ int main()
     int threads_used = 0;
     int sous_sim_next_index = 0;
     int sous_sim_total = SOUS_SIM;
+    int sous_sim_started = 0;
     int sous_sim_completed = 0;
 
     if (LOAD_FROM_FILE)
@@ -263,7 +264,7 @@ int main()
                 for (int j = 0; j < groups_avail.size(); j++) {
                     if (groups_avail[j] == i) {
                         groups_avail[j] = -1; // Mark group as available
-                        log("Sous-sim " + std::to_string(i) + " finished; with group" + std::to_string(j), "THREAD");
+                        log("Sous-sim " + std::to_string(i) + " finished with group " + std::to_string(j), "THREAD");
                         break;
                     }
                 }
@@ -275,13 +276,18 @@ int main()
         }
         
         
-        if(sous_sim_completed >= sous_sim_total) {
-            log("Generation finished. Processing...", "INFO");
+        if(sous_sim_started >= sous_sim_total) {
+            
+            // Waiting for threads to finish
+            
+            if (sous_sim_completed >= sous_sim_total) {
+                // All of it is finished
+                log("Generation finished. Processing...", "INFO");
+            }
         } else {
             
 
             while(threads_used < THREADS) {
-                log(std::to_string(sous_sim_completed),"DEBUG");
                 // Un thread ou plus de libres
                 int group_index = -1;
                 for (int i = 0; i < groups_avail.size(); i++) {
@@ -302,13 +308,13 @@ int main()
                 for (auto& b : brain_agent) brain_agent_ptrs.push_back(&b);
     
                 
-    
+                sous_sim_started+=1;
                 log("Starting sous-sim " + std::to_string(sous_sim_next_index) + " on group " + std::to_string(group_index) + " with " + std::to_string(agentPartitions[group_index].size()) + " agents.", "THREAD");
                 //log("threads used: " + std::to_string(threads_used) + "/" + std::to_string(THREADS), "THREAD");
     
                 
     
-                sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goal, brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ssdt, simu_time/10, br_acc);
+                sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goal, brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ssdt, simu_time, br_acc);
                 sous_sim_threads[sous_sim_next_index].detach(); // Détacher le thread pour qu'il s'exécute indépendamment
     
                 sous_sim_state[sous_sim_next_index] = 1; // Marquer comme en cours d'exécution
@@ -403,7 +409,6 @@ int main()
     }
 
     log("Exiting simulation.", "INFO");
-    log("something something", "DEBUG");
 
     return 0;
 }
