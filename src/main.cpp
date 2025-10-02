@@ -280,9 +280,25 @@ int main()
             
             if (sous_sim_completed >= sous_sim_total) {
                 // All of it is finished
+                // Changement de sim :
+
                 log("Generation finished. Processing...", "INFO");
                 
-                // Changement de sim :
+                for(int i=0;i<sous_sim_scores.size();i++) {
+                    for(int j=0;j<NB_BRAIN;j++) {
+                        score_agent[j] += sous_sim_scores[i][j];
+                    }
+                }
+                
+                for(int j=0;j<NB_BRAIN;j++) {
+                        if(score_agent[j] != 0) score_agent[j] /= sous_sim_total;
+                }
+                
+                log(std::to_string(score_agent[0]),"DEBUG");
+                log(std::to_string(score_agent[1]),"DEBUG");
+                log(std::to_string(score_agent[2]),"DEBUG");
+
+                
                 Creature best_agent = agents[std::distance(score_agent.begin(), std::max_element(score_agent.begin(), score_agent.end()))];
 
                 // Sauvegarde automatique

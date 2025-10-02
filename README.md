@@ -11,7 +11,7 @@ On cherche à faire varier les paramètres variables suivants dans la simulation
 - Score & récompenses/malus
 - % de sélection
 - Temps de simulation par série (constant ou variable)
-- taille du réseau de neurone (+ petit -> plus rapide)(+ gros -> comportement + complexe)
+- Taille du réseau de neurone (+ petit -> plus rapide)(+ gros -> comportement + complexe)
 - Méthode d’initialisation du réseau
 
 **Paramètres fixes:**
@@ -19,13 +19,13 @@ On cherche à faire varier les paramètres variables suivants dans la simulation
 - Objectif/Distance totale à atteindre
 - Point de départ
 - Noeuds d’entrée et de sortie du réseau
-- fonction des neurones (Relu, Tangente hyperbolique)
+- Fonction des neurones (Relu, Tangente hyperbolique)
 - Créature
 
 **Variables observables :**
 - Temps de simulation total
-- méthode utilisé par la créature (allure de marche)
-- facteur aléatoire (répéter plusieur fois sur les même paramètres)
+- Méthode utilisé par la créature (allure de marche)
+- Facteur aléatoire (répéter plusieur fois sur les même paramètres)
 
 
 **Module utilisé**
