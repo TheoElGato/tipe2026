@@ -161,6 +161,7 @@ int main()
     int threads_used = 0;
     int sous_sim_next_index = 0;
     int sous_sim_total = SOUS_SIM;
+    int sous_sim_completed = 0;
 
     if (LOAD_FROM_FILE)
     {
@@ -268,50 +269,57 @@ int main()
                 }
 
                 sous_sim_state[i] = 3; // Mark as collected
+                sous_sim_completed += 1;
                 
             }
         }
+        
+        
+        if(sous_sim_completed >= sous_sim_total) {
+            log("Generation finished. Processing...", "INFO");
+        } else {
+            
 
-
-        while(threads_used < THREADS) {
-            // Un thread ou plus de libres
-            int group_index = -1;
-            for (int i = 0; i < groups_avail.size(); i++) {
-                if (groups_avail[i] == -1) { // Group is available
-                    group_index = i;
-                    groups_avail[i] = sous_sim_next_index; // Mark group as used
-                    break;
+            while(threads_used < THREADS) {
+                log(std::to_string(sous_sim_completed),"DEBUG");
+                // Un thread ou plus de libres
+                int group_index = -1;
+                for (int i = 0; i < groups_avail.size(); i++) {
+                    if (groups_avail[i] == -1) { // Group is available
+                        group_index = i;
+                        groups_avail[i] = sous_sim_next_index; // Mark group as used
+                        break;
+                    }
                 }
+    
+                if (group_index == -1){ 
+                    log("No group available. Have you made a mistake ???","FATAL"); // Pas de groupe libre
+                    return 1;
+                }
+    
+                // making a Vector of Brain pointers for the group
+                std::vector<Brain*> brain_agent_ptrs;
+                for (auto& b : brain_agent) brain_agent_ptrs.push_back(&b);
+    
+                
+    
+                log("Starting sous-sim " + std::to_string(sous_sim_next_index) + " on group " + std::to_string(group_index) + " with " + std::to_string(agentPartitions[group_index].size()) + " agents.", "THREAD");
+                //log("threads used: " + std::to_string(threads_used) + "/" + std::to_string(THREADS), "THREAD");
+    
+                
+    
+                sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goal, brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ssdt, simu_time/10, br_acc);
+                sous_sim_threads[sous_sim_next_index].detach(); // Détacher le thread pour qu'il s'exécute indépendamment
+    
+                sous_sim_state[sous_sim_next_index] = 1; // Marquer comme en cours d'exécution
+    
+                threads_used += 1;
+                sous_sim_next_index += 1;
             }
-
-            if (group_index == -1){ 
-                log("No group available. Have you made a mistake ???","FATAL"); // Pas de groupe libre
-                return 1;
-            }
-
-            // making a Vector of Brain pointers for the group
-            std::vector<Brain*> brain_agent_ptrs;
-            for (auto& b : brain_agent) brain_agent_ptrs.push_back(&b);
-
-            
-
-            log("Starting sous-sim " + std::to_string(sous_sim_next_index) + " on group " + std::to_string(group_index) + " with " + std::to_string(agentPartitions[group_index].size()) + " agents.", "THREAD");
-            log("threads used: " + std::to_string(threads_used) + "/" + std::to_string(THREADS), "THREAD");
-
-            
-
-            sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goal, brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ssdt, simu_time, br_acc);
-            sous_sim_threads[sous_sim_next_index].detach(); // Détacher le thread pour qu'il s'exécute indépendamment
-
-            sous_sim_state[sous_sim_next_index] = 1; // Marquer comme en cours d'exécution
-
-            threads_used += 1;
-            sous_sim_next_index += 1;
+        
         }
 
-        if(sous_sim_next_index == sous_sim_total) {
-            // TODO: Changement de sim
-        }
+        
 
 
 
@@ -384,7 +392,7 @@ int main()
             }
         }
 
-        drawStats(window, font, {{"FPS", std::round(fps)}, {"nb_agent", agents.size()}, {"selected", selected_agents}, {"gen", generation},{"sous_gen", sous_sim},{"tps",round(acu)},{"tps_max", simu_time}, {"evolution", evolution}});
+        drawStats(window, font, {{"FPS", std::round(fps)}, {"nb_agent", agents.size()}, {"SGEN Selected", selected_agents}, {"gen", generation},{"sous_gen", sous_sim},{"tps",round(acu)},{"tps_max", simu_time}, {"evolution", evolution}});
 
         window.display();
 

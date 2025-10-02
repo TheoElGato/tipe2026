@@ -37,6 +37,8 @@
 *.out
 *.app
 
+.cache
+.ecode
 build/*
 .vscode/
 buildrun.sh
