@@ -264,7 +264,7 @@ int main()
                 for (int j = 0; j < groups_avail.size(); j++) {
                     if (groups_avail[j] == i) {
                         groups_avail[j] = -1; // Mark group as available
-                        log("Sous-sim " + std::to_string(i) + " finished with group " + std::to_string(j), "THREAD");
+                        //log("Sous-sim " + std::to_string(i) + " finished with group " + std::to_string(j), "THREAD");
                         break;
                     }
                 }
@@ -283,12 +283,28 @@ int main()
             if (sous_sim_completed >= sous_sim_total) {
                 // All of it is finished
                 log("Generation finished. Processing...", "INFO");
+                generation += 1;
+                
+                sous_sim_next_index = 0;
+                sous_sim_started = 0;
+                sous_sim_completed = 0;
+                sous_sim_threads.clear();
+                sous_sim_state.clear();
+                for(int i=0; i<sous_sim_total; i++) {
+                    sous_sim_threads.emplace_back(std::thread());
+                    sous_sim_state.emplace_back(0);
+                }
+                
             }
         } else {
             
 
             while(threads_used < THREADS) {
                 // Un thread ou plus de libres
+                
+                // Just more checks 
+                if(sous_sim_started >= sous_sim_total) break;
+                
                 int group_index = -1;
                 for (int i = 0; i < groups_avail.size(); i++) {
                     if (groups_avail[i] == -1) { // Group is available
@@ -314,7 +330,7 @@ int main()
     
                 
     
-                sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goal, brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ssdt, simu_time, br_acc);
+                sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goal, brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ssdt, simu_time/10, ssdt*4);
                 sous_sim_threads[sous_sim_next_index].detach(); // Détacher le thread pour qu'il s'exécute indépendamment
     
                 sous_sim_state[sous_sim_next_index] = 1; // Marquer comme en cours d'exécution
@@ -330,15 +346,7 @@ int main()
 
 
         /*
-        // Physics update
-        std::vector<std::thread> threads;
-        for (size_t i = 0; i < physicsWorkers.size(); ++i) {
-            threads.emplace_back(physicsUpdate, std::ref(physicsWorkers[i]), agentPartitions[i], dt);
-        }
 
-        for (auto& thread : threads) {
-            thread.join();
-        }
         // Delete threads
         threads.clear();
         */
