@@ -140,11 +140,9 @@ int main()
     float acc = 0;
     float acu = 0;
     int cyl = 0;
-    int sous_sim = 1;
     float inputdelay = inputdelayBase;
     int selected_agents = 0;
     bool drawall = false;
-    std::vector<float> fpsM;
     float dt = 0.016f;
 
     std::vector<float> score_agent(NB_BRAIN, 0);
@@ -283,7 +281,15 @@ int main()
             if (sous_sim_completed >= sous_sim_total) {
                 // All of it is finished
                 log("Generation finished. Processing...", "INFO");
-                generation += 1;
+                
+                // Changement de sim :
+                Creature best_agent = agents[std::distance(score_agent.begin(), std::max_element(score_agent.begin(), score_agent.end()))];
+
+                // Sauvegarde automatique
+                if (AUTOSAVE && generation % AUTOSAVE_FREQ == 0) {
+                    // TODO: implement autosave
+                    log("Autosave is not implemented yet.", "WARNING");
+                }
                 
                 sous_sim_next_index = 0;
                 sous_sim_started = 0;
@@ -294,6 +300,10 @@ int main()
                     sous_sim_threads.emplace_back(std::thread());
                     sous_sim_state.emplace_back(0);
                 }
+                
+                acu = 0;
+                generation += 1;
+
                 
             }
         } else {
@@ -341,61 +351,6 @@ int main()
         
         }
 
-        
-
-
-
-        /*
-
-        // Delete threads
-        threads.clear();
-        */
-
-        /*
-        // Changement de sous sim / sim:
-        if (acu >= simu_time) {
-
-            // Changement de sous sim :
-            if (sous_sim < SOUS_SIM) {
-
-                // Calcul des scores de chaque agent
-                // Et renitialisation de leur position
-                for(int cyc=0;cyc<FACTEUR;cyc++) {
-                    for (int i = NB_BRAIN * cyc; i < NB_BRAIN * (cyc + 1); i++) {
-                        score_agent[i % NB_BRAIN] += score_distance(&agents[i], goal);
-                        agents[i].moveTo(start.x, start.y);
-                    }
-                }
-
-                sous_sim += 1;
-
-
-            } else {
-                // Changement de sim :
-                Creature best_agent = agents[std::distance(score_agent.begin(), std::max_element(score_agent.begin(), score_agent.end()))];
-                float FPSm = 0.0f;
-                for (const auto& fps : fpsM) {
-                        FPSm += fps;
-                }
-                if (FPSm > 0.0f) {
-                    FPSm /= fpsM.size();
-                }
-
-                // Sauvegarde automatique
-                if (AUTOSAVE && generation % AUTOSAVE_FREQ == 0) {
-                    // TODO: implement autosave
-                    log("Autosave is not implemented yet.", "WARNING");
-                }
-            }
-
-            acu = 0;
-
-        }
-        */
-
-
-
-
         window.clear();
         window.draw(backgroundSprite);
 
@@ -406,11 +361,11 @@ int main()
             }
         }
 
-        drawStats(window, font, {{"FPS", std::round(fps)}, {"nb_agent", agents.size()}, {"SGEN Selected", selected_agents}, {"gen", generation},{"sous_gen", sous_sim},{"tps",round(acu)},{"tps_max", simu_time}, {"evolution", evolution}});
+        drawStats(window, font, {{"FPS", std::round(fps)}, {"Nb agents", agents.size()}, {"SGen Selected", selected_agents}, {"Current Gen", generation},{"Current SGen", sous_sim_started},{"Tps",round(acu)},{"Tps max", simu_time}, {"Evolution", evolution}});
 
         window.display();
 
-        acc += dt;
+        //acc += dt;
         acu += dt;
         dt = clock.restart().asSeconds();
 
