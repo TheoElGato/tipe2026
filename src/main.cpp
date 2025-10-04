@@ -55,6 +55,13 @@ void log(const std::string& message, const std::string& level = "INFO")
     std::cout << "[" << level << "] " << message << std::endl;
 }
 
+void error(const std::string& message)
+{
+    // Standardized error function
+    log(message, "ERROR");
+    exit(EXIT_FAILURE);
+}
+
 std::string nozero(float value) {
     std::ostringstream oss;
     oss << std::setprecision(8) << std::noshowpoint << value;
@@ -249,7 +256,8 @@ int main()
         {
             if (event.type == sf::Event::Closed)
             {
-                window.close();
+                running = false;
+                log("Waiting for threads to finish...", "THREAD");
             }
         }
 
@@ -305,6 +313,11 @@ int main()
             if (sous_sim_completed >= sous_sim_total) {
                 // All of it is finished
                 // Changement de sim :
+
+                if (!running){
+                    window.close();
+                    break;
+                }
 
                 log("Generation finished. Processing...", "INFO");
                 
@@ -366,8 +379,7 @@ int main()
                 }
     
                 if (group_index == -1){ 
-                    log("No group available. Have you made a mistake ???","FATAL"); // Pas de groupe libre
-                    return 1;
+                    error("No group available. Have you made a mistake ???"); // Pas de groupe libre
                 }
     
                 // making a Vector of Brain pointers for the group
@@ -377,7 +389,7 @@ int main()
                 
                 sous_sim_started+=1;
                 log("Starting sous-sim " + std::to_string(sous_sim_next_index) + " on group " + std::to_string(group_index) + " with " + std::to_string(agentPartitions[group_index].size()) + " agents.", "THREAD");
-                log("threads used: " + std::to_string(threads_used) + "/" + std::to_string(THREADS), "THREAD");
+                //log("threads used: " + std::to_string(threads_used) + "/" + std::to_string(THREADS), "THREAD");
     
                 
     
