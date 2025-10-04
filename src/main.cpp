@@ -353,6 +353,9 @@ int main()
             while(threads_used < THREADS) {
                 // There is one or more free thread
                 
+                // Avoid starting sous-sim that don't exist
+                if(sous_sim_started >= sous_sim_total) break;
+
                 int group_index = -1;
                 for (int i = 0; i < groups_avail.size(); i++) {
                     if (groups_avail[i] == -1) { // Group is available
@@ -374,7 +377,7 @@ int main()
                 
                 sous_sim_started+=1;
                 log("Starting sous-sim " + std::to_string(sous_sim_next_index) + " on group " + std::to_string(group_index) + " with " + std::to_string(agentPartitions[group_index].size()) + " agents.", "THREAD");
-                //log("threads used: " + std::to_string(threads_used) + "/" + std::to_string(THREADS), "THREAD");
+                log("threads used: " + std::to_string(threads_used) + "/" + std::to_string(THREADS), "THREAD");
     
                 
     
