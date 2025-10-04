@@ -11,6 +11,7 @@
 #include "threadsmg.h"
 
 /// SETTINGS ///
+
 std::string DEVICE = "cpu"; // "cpu" or "gpu"
 int THREADS = 8;
 
@@ -20,28 +21,27 @@ std::string LOAD_NAME = "test2_20250513_221021";
 std::string SIM_NAME = "test2";
 
 // SIM //
+
 int SIM_TIME = 100;
 float EVOLUTION = 0.375;
 int NB_BRAIN = 300;
-int FACTEUR = 4;            // TODO Enlever facteur, devenu inutile.
 int NB_AGENT = NB_BRAIN*THREADS;
-float BR_ACC = 0.5;
 int NB_HIDDEN_LAYER = 100;
 int SOUS_SIM = 20;
 
-// Pourquoi on a encore besoin de ça ?
-//SCORE_FUNCTION = reproduction.score_distance
 
 // AUTOSAVE //
+
 bool AUTOSAVE = true;
 int AUTOSAVE_FREQ = 1;
 
 // GOAL //
+
 int MAXDIST = 300;
 int MINDIST = 200;
 int NB_GOAL = 3;
 
-//// Position de depart
+//// Start position
 sf::Vector2f start = sf::Vector2f(523, 375);
 ///////////////////
 
@@ -50,7 +50,8 @@ sf::Vector2f start = sf::Vector2f(523, 375);
 
 
 void log(const std::string& message, const std::string& level = "INFO")
-{
+{   
+    // Standardized logging function
     std::cout << "[" << level << "] " << message << std::endl;
 }
 
@@ -127,35 +128,56 @@ int main()
 {
 
     /// temp
-    float ssdt = 1/60.f;
+    float ss_dt = 1/60.f;
     
 
-    ////// variable de l'état de la simulation ///////
+    ////// variable related to the state of simulation ///////
     bool running = true;
+
+    // var input handling
     int inputdelayBase = 10;
+    float inputdelay = (float)inputdelayBase;
+    
+    // var simulation gestion
     int simu_time = SIM_TIME;
-    float br_acc = BR_ACC/FACTEUR;
     float evolution = EVOLUTION;
     int generation = 0;
-    float acc = 0;
+
+    // accumulators
+    float acc = 0; // unused
     float acu = 0;
     int cyl = 0;
-    float inputdelay = inputdelayBase;
+
+    // selected agent
     int selected_agents = 0;
     bool drawall = false;
+
+    // temp
     float dt = 0.016f;
 
+    // data for agents and brains
     std::vector<float> score_agent(NB_BRAIN, 0);
     std::vector<float> agents_objectif(NB_AGENT, 0);
     std::vector<Brain> brain_agent;
     std::vector<Creature> agents;
-    int cycle = 0;
 
     std::vector<std::thread> sous_sim_threads(SOUS_SIM);
-    std::vector<int> sous_sim_state(SOUS_SIM, 0);
     std::vector<std::vector<float>> sous_sim_scores(SOUS_SIM);
 
-    std::vector<int> groups_avail(THREADS, -1); // -1 means available
+    // State of each sous-sim: 
+    // 0 = not started
+    // 1 = running, the thread is doing its job
+    //     (the main thread will check if it's finished)
+    //     (the thread will change its state to 2 when finished)
+    // 2 = finished, the thread marked itself as finished
+    // 3 = collected, the main thread collected the results and processed them
+    std::vector<int> sous_sim_state(SOUS_SIM, 0);
+    
+    // -1 means available
+    // else it contains the index of the sous-sim using it
+    std::vector<int> groups_avail(THREADS, -1); 
+    
+    // variable to track the threads and their state
     int threads_used = 0;
     int sous_sim_next_index = 0;
     int sous_sim_total = SOUS_SIM;
@@ -175,12 +197,13 @@ int main()
     }
 
     
-    // Repartition des agents dans leur PhysicsWorker
+    // Distribute agents among PhysicsWorkers
     std::vector<PhysicsWorker> physicsWorkers;
     for(int i = 0; i < THREADS; i++) {
         physicsWorkers.emplace_back();
     }
     
+    // Partition agents for each thread
     std::vector<std::vector<Creature*>> agentPartitions(THREADS);
     for(int i = 0; i < THREADS; i++)
     {
@@ -212,6 +235,7 @@ int main()
     sf::Clock clock;
     float fps = 0.0f;
 
+    // dummy goal
     sf::Vector2f goal(250, 250);
 
     while (window.isOpen())
@@ -307,6 +331,7 @@ int main()
                     log("Autosave is not implemented yet.", "WARNING");
                 }
                 
+                // initialization the variables for the next generation
                 sous_sim_next_index = 0;
                 sous_sim_started = 0;
                 sous_sim_completed = 0;
@@ -324,12 +349,9 @@ int main()
             }
         } else {
             
-
+            // Not all sous-sim started yet
             while(threads_used < THREADS) {
-                // Un thread ou plus de libres
-                
-                // Just more checks 
-                if(sous_sim_started >= sous_sim_total) break;
+                // There is one or more free thread
                 
                 int group_index = -1;
                 for (int i = 0; i < groups_avail.size(); i++) {
@@ -356,7 +378,7 @@ int main()
     
                 
     
-                sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goal, brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ssdt, simu_time/10, ssdt*4);
+                sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goal, brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ss_dt, simu_time/10, ss_dt*4);
                 sous_sim_threads[sous_sim_next_index].detach(); // Détacher le thread pour qu'il s'exécute indépendamment
     
                 sous_sim_state[sous_sim_next_index] = 1; // Marquer comme en cours d'exécution
@@ -370,7 +392,7 @@ int main()
         window.clear();
         window.draw(backgroundSprite);
 
-        // Affichage créatures
+        // Drawing of the agents
         if (drawall) {
             for ( Creature* agent : agentPartitions[selected_agents]) {
                 agent->draw(window);
