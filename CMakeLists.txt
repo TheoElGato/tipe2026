@@ -4,15 +4,26 @@ project(TIPE2026 LANGUAGES CXX)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+set(PcLycee FALSE)
+
+if(PcLycee)
+    set(SFML_DIR "/nfs/home/rbenichou/Documents/TIPE/SFML-2.5.1/lib/cmake/SFML/")
+    set(SFML_FIND_COMPONENTS system window graphics audio network)
+    find_package(SFML 2 REQUIRED COMPONENTS graphics window system audio network)
+else()
+    include(FetchContent)
+    FetchContent_Declare(SFML
+        GIT_REPOSITORY https://github.com/SFML/SFML.git
+        GIT_TAG 2.5.1
+        GIT_SHALLOW ON
+        EXCLUDE_FROM_ALL
+        SYSTEM)
+    FetchContent_MakeAvailable(SFML)
+endif()
 
 include(FetchContent)
-FetchContent_Declare(SFML
-    GIT_REPOSITORY https://github.com/SFML/SFML.git
-    GIT_TAG 2.5.1
-    GIT_SHALLOW ON
-    EXCLUDE_FROM_ALL
-    SYSTEM)
-FetchContent_MakeAvailable(SFML)
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz)
+FetchContent_MakeAvailable(json)
 
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
@@ -27,7 +38,7 @@ add_executable(main
 )
 target_include_directories(main PRIVATE include)
 target_compile_features(main PRIVATE cxx_std_17)
-target_link_libraries(main PRIVATE sfml-graphics "${TORCH_LIBRARIES}")
+target_link_libraries(main PRIVATE sfml-graphics "${TORCH_LIBRARIES}" nlohmann_json::nlohmann_json)
 
 # The following code block is suggested to be used on Windows.
 # According to https://github.com/pytorch/pytorch/issues/25457,
