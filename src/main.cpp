@@ -344,7 +344,7 @@ int main()
                     log("Autosave is not implemented yet.", "WARNING");
                 }
                 
-                // initialization the variables for the next generation
+                // Initialization the variables for the next generation
                 sous_sim_next_index = 0;
                 sous_sim_started = 0;
                 sous_sim_completed = 0;
