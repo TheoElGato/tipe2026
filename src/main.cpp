@@ -4,7 +4,6 @@
 #include <cmath>
 #include <thread>
 #include <iostream>
-#include <nlohmann/json.hpp>
 
 #include "physics.h"
 #include "creature.h"
