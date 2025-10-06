@@ -8,8 +8,8 @@
 #include "creature.h"
 
 
-void reproduce(std::vector<Creature>& agents, std::vector<float>& score_agent, int NB_BRAIN, float EVOLUTION);
-
-
+void reproduce(std::vector<Brain*> agents, std::vector<float*> score_agent, int NB_BRAIN, float EVOLUTION, int bestKeep, int worstKill);
+void partition(std::vector<Brain*> tab, std::vector<float> score_tab, int low, int high, int* pivotIndex);
+void reverse_sorting_brain(std::vector<Brain*> tab, std::vector<float> score_tab, int low, int high);
 
 #endif // REPRODUCTION_H
