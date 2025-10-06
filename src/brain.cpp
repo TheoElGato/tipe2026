@@ -72,5 +72,16 @@ torch::Tensor Brain::forward(torch::Tensor x) {
     return x;
 }
 
+void Brain::mutate(float valeur) {
+    torch::NoGradGuard no_grad;
+    this->fc1->weight += valeur * torch::randn_like(this->fc1->weight);
+    this->fc1->bias += valeur * torch::randn_like(this->fc1->bias);
+    this->fc2->weight += valeur * torch::randn_like(this->fc2->weight);
+    this->fc2->bias += valeur * torch::randn_like(this->fc2->bias);
+    this->fc3->weight += valeur * torch::randn_like(this->fc3->weight);
+    this->fc3->bias += valeur * torch::randn_like(this->fc3->bias);
+    this->out->weight += valeur * torch::randn_like(this->out->weight);
+    this->out->bias += valeur * torch::randn_like(this->out->bias);
+}
 
 
