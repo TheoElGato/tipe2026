@@ -245,6 +245,14 @@ int main()
     // dummy goal
     sf::Vector2f goal(250, 250);
 
+
+    // Initialisation of score variables
+    for(int i = 0; i < SOUS_SIM; i++) {
+        sous_sim_scores[i] = std::vector<float>(NB_BRAIN, 0.0f);
+    }
+    
+    log("All variable initialized. Starting main loop.", "INFO");
+
     while (window.isOpen())
     {
         //sf::Time frameStart = clock.restart();
