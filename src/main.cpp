@@ -17,7 +17,7 @@ std::string DEVICE = "cpu"; // "cpu" or "gpu"
 int THREADS = 8;
 
 bool LOAD_FROM_FILE = false;
-std::string LOAD_NAME = "test2_20250513_221021";
+std::string LOAD_NAME = "test2_20251010_211915";
 
 std::string SIM_NAME = "test2";
 

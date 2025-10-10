@@ -25,7 +25,6 @@ Brain::Brain(int input_size, int output_size, std::string file, std::string devi
 
     // Load model from file if provided
     if (file!="") {
-        std::cout << file << std::endl;
         try {
             this->loadFile(file);
             this->nb_hidden_neurones = this->fc1->weight.size(0);
