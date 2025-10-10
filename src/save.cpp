@@ -24,11 +24,11 @@ SimDataStruct::SimDataStruct(std::string path, std::string name, int generation,
 	std::string host_name = hostname;
 	// Cry about it.
 
-	name = generate_name(name);
+	this->name = generate_name(name);
 	
 	std::filesystem::path part1 = path;
-	std::filesystem::path part2 = name;
-	std::filesystem::path fullpath = part1 / part2;
+	std::filesystem::path part2 = this->name;
+	this->fullpath = part1 / part2;
 	
 	if (!std::filesystem::exists(fullpath))
     {
@@ -36,7 +36,7 @@ SimDataStruct::SimDataStruct(std::string path, std::string name, int generation,
     }
 	
 	data = {
-        {"name", "name"},
+        {"name", name},
         {"host_name", host_name},
         {"generation", generation},
         {"simu_time", simu_time},
@@ -46,6 +46,10 @@ SimDataStruct::SimDataStruct(std::string path, std::string name, int generation,
         {"train_sessions",train_sessions}
     };
     
+    save();
+}
+
+void SimDataStruct::save() {
     // write pretty~~ JSON to another file :)
 	std::ofstream o(fullpath / (name+".json"));
 	o << std::setw(4) << data << std::endl;
