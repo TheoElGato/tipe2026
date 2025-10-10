@@ -35,7 +35,7 @@ add_executable(main
     src/brain.cpp
     src/threadsmg.cpp
     src/reproduction.cpp
-    src/save.cpp
+    src/filemanager.cpp
 )
 target_include_directories(main PRIVATE include)
 target_compile_features(main PRIVATE cxx_std_17)

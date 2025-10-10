@@ -9,7 +9,7 @@
 #include "creature.h"
 #include "brain.h"
 #include "threadsmg.h"
-#include "save.h"
+#include "filemanager.h"
 
 /// SETTINGS ///
 
@@ -104,21 +104,26 @@ void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<st
 
 void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::vector<Creature>* agents, std::vector<Brain>* brains, std::string brainFile="")
 {
+    for(int i=0; i<countAgents; i++)
+    {
+        agents->emplace_back(x, y, i);
+
+    }
     if (brainFile == "")
     {
-        for(int i=0; i<countAgents; i++)
-        {
-            agents->emplace_back(x, y, i);
-
-        }
+        // Initialize agents with default brain
         for (int i=0; i<countBrains; i++)
         {
-            brains->emplace_back(9,6,DEVICE,"",NB_HIDDEN_LAYER);
+            brains->emplace_back(9,6,"",DEVICE,NB_HIDDEN_LAYER);
         }
-        // Initialize agents with default brain
     } else {
         // Initialize agents with brain from file
-        log("Loading brains from file is not implemented yet.", "WARNING");
+        for (int i=0; i<countBrains; i++)
+        {
+            std::string istring = std::to_string(i);
+            log("Loading brain"+istring+" from file.");
+            brains->emplace_back(9,6,brainFile+istring+".pt",DEVICE,NB_HIDDEN_LAYER);
+        }
     }
 
     
@@ -134,6 +139,7 @@ void physicsUpdate(PhysicsWorker& physics, std::vector<Creature*> agents, float 
 
 int main()
 {
+    log("Welcome to the USRAF Sim");
 
     /// temp
     float ss_dt = 1/60.f;
@@ -147,6 +153,8 @@ int main()
     float inputdelay = (float)inputdelayBase;
     
     // var simulation gestion
+    int nb_agent = NB_AGENT;
+    int nb_brain = NB_BRAIN;
     int simu_time = SIM_TIME;
     float evolution = EVOLUTION;
     int generation = 0;
@@ -162,13 +170,42 @@ int main()
 
     // temp
     float dt = 0.016f;
-
-    // data for agents and brains
-    std::vector<float> score_agent(NB_BRAIN, 0);
-    std::vector<float> agents_objectif(NB_AGENT, 0);
+    
+    // Some necessery data for brains and agents
     std::vector<Brain> brain_agent;
     std::vector<Creature> agents;
+    
+    // Init the SimDataStruct
+    std::string sim_name = SIM_NAME;
+    if (LOAD_FROM_FILE) sim_name=LOAD_NAME;
+    SimDataStruct sds("save",sim_name,0,0,evolution,nb_brain,nb_agent,1);
+    
+    // If needed, load the sim
+    if (LOAD_FROM_FILE) {
+        // Load simulation state from file
+        log("Loading the sim","WARNING");
+        sds.loadFromFile(LOAD_NAME);
+        
+        nb_agent = sds.data["agents-number"];
+        nb_brain = sds.data["brains-number"];
+        generation = sds.data["generation"];
+        simu_time = sds.data["simu_time"];
+        evolution = sds.data["evolution"];
+        sds.data["train_sessions"] += 1;
+        
+        init_agents_and_brain(nb_agent, nb_brain, start.x, start.y, &agents, &brain_agent, sds.getFullPath());
+    }
+    else {
+        // Initialize simulation state
+        init_agents_and_brain(nb_agent, nb_brain, start.x, start.y, &agents, &brain_agent);
+    }
+    sds.save();
 
+    // data for agents and brains
+    std::vector<float> score_agent(nb_brain, 0);
+    std::vector<float> agents_objectif(nb_agent, 0);
+    
+    // Data for sous sim
     std::vector<std::thread> sous_sim_threads(SOUS_SIM);
     std::vector<std::vector<float>> sous_sim_scores(SOUS_SIM);
 
@@ -191,20 +228,6 @@ int main()
     int sous_sim_total = SOUS_SIM;
     int sous_sim_started = 0;
     int sous_sim_completed = 0;
-
-    if (LOAD_FROM_FILE)
-    {
-        // Load simulation state from file
-        init_agents_and_brain(NB_AGENT, NB_BRAIN, start.x, start.y, &agents, &brain_agent, LOAD_NAME);
-
-    }
-    else
-    {
-        // Initialize simulation state
-        init_agents_and_brain(NB_AGENT, NB_BRAIN, start.x, start.y, &agents, &brain_agent);
-        SimDataStruct sds("save",SIM_NAME,0,0,evolution,NB_BRAIN,NB_AGENT,0);
-    }
-
     
     // Distribute agents among PhysicsWorkers
     std::vector<PhysicsWorker> physicsWorkers;
@@ -250,7 +273,7 @@ int main()
 
     // Initialisation of score variables
     for(int i = 0; i < SOUS_SIM; i++) {
-        sous_sim_scores[i] = std::vector<float>(NB_BRAIN, 0.0f);
+        sous_sim_scores[i] = std::vector<float>(nb_brain, 0.0f);
     }
     
     log("All variable initialized. Starting main loop.", "INFO");
@@ -332,12 +355,12 @@ int main()
                 log("Generation finished. Processing...", "INFO");
                 
                 for(int i=0;i<sous_sim_scores.size();i++) {
-                    for(int j=0;j<NB_BRAIN;j++) {
+                    for(int j=0;j<nb_brain;j++) {
                         score_agent[j] += sous_sim_scores[i][j];
                     }
                 }
                 
-                for(int j=0;j<NB_BRAIN;j++) {
+                for(int j=0;j<nb_brain;j++) {
                         if(score_agent[j] != 0) score_agent[j] /= sous_sim_total;
                 }
                 
@@ -350,8 +373,20 @@ int main()
 
                 // Sauvegarde automatique
                 if (AUTOSAVE && generation % AUTOSAVE_FREQ == 0) {
-                    // TODO: implement autosave
-                    log("Autosave is not implemented yet.", "WARNING");
+                    // Time to autosave !
+                    
+                    for (int i=0; i<nb_brain; i++)
+                    {
+                        std::string istring = std::to_string(i);
+                        brain_agent[i].saveFile(sds.getFullPath()+istring+".pt");
+                    }
+                    
+                    sds.data["generation"];
+                    sds.data["simu_time"];
+                    sds.data["evolution"];
+                    sds.save();
+                    
+                    log("Autosaved.", "INFO");
                 }
                 
                 // Initialization the variables for the next generation

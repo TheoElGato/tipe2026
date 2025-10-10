@@ -1,4 +1,4 @@
-#include "save.h"
+#include "filemanager.h"
 
 std::string generate_name(const std::string& name) {
     std::time_t now = std::time(nullptr); // Get current time
@@ -16,19 +16,23 @@ std::string generate_name(const std::string& name) {
     return name + "_" + oss.str();
 }
 
-SimDataStruct::SimDataStruct(std::string path, std::string name, int generation, int simu_time, int evolution, int brains_number,int agents_number,int train_sessions) {
-    
+std::string getHostName() {
     // This bloc has been made with no intention for WIN32. 
 	char hostname[HOST_NAME_MAX];
 	gethostname(hostname, HOST_NAME_MAX);
-	std::string host_name = hostname;
 	// Cry about it.
+	return hostname;
+}
+
+SimDataStruct::SimDataStruct(std::string path, std::string name, int generation, int simu_time, int evolution, int brains_number,int agents_number,int train_sessions) {
+    
+	std::string host_name = getHostName();
 
 	this->name = generate_name(name);
 	
-	std::filesystem::path part1 = path;
+	folder = path;
 	std::filesystem::path part2 = this->name;
-	this->fullpath = part1 / part2;
+	this->fullpath = folder / part2;
 	
 	if (!std::filesystem::exists(fullpath))
     {
@@ -46,11 +50,29 @@ SimDataStruct::SimDataStruct(std::string path, std::string name, int generation,
         {"train_sessions",train_sessions}
     };
     
-    save();
 }
 
 void SimDataStruct::save() {
-    // write pretty~~ JSON to another file :)
+    // write a really pretty~~ JSON file :)
 	std::ofstream o(fullpath / (name+".json"));
 	o << std::setw(4) << data << std::endl;
+}
+
+
+
+void SimDataStruct::loadFromFile(std::string load_name) {
+    // read the JSON file from the load_name sim 
+    std::ifstream i(folder / load_name / (load_name+".json"));
+    nlohmann::json j;
+    i >> j;
+    
+    std::string host_name = getHostName();
+    j["host_name"] = host_name;
+    
+    data = j;
+}
+
+std::string SimDataStruct::getFullPath() {
+    std::string fp = this->fullpath;
+    return fp+"/";
 }

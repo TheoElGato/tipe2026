@@ -24,9 +24,10 @@ Brain::Brain(int input_size, int output_size, std::string file, std::string devi
     }
 
     // Load model from file if provided
-    if (!file.empty()) {
+    if (file!="") {
+        std::cout << file << std::endl;
         try {
-            //torch::loadFile(*this, file);
+            this->loadFile(file);
             this->nb_hidden_neurones = this->fc1->weight.size(0);
         } catch (const c10::Error& e) {
             std::cerr << "Error loading the model from " << file << ": " << e.what() << std::endl;
