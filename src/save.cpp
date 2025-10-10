@@ -1,20 +1,39 @@
 #include "save.h"
 
-SimDataSave::SimDataSave() {
+std::string generate_name(const std::string& name) {
+    std::time_t now = std::time(nullptr); // Get current time
+    std::tm local_time{};
+#ifdef _WIN32                            // Yes WIN32 support
+    localtime_s(&local_time, &now);
+#else
+    localtime_r(&now, &local_time);
+#endif
 
+    // Format time as YYYYMMDD_HHMMSS
+    std::ostringstream oss;
+    oss << std::put_time(&local_time, "%Y%m%d_%H%M%S");
+
+    return name + "_" + oss.str();
+}
+
+SimDataStruct::SimDataStruct(std::string path, std::string name, int generation, int simu_time, int evolution, int brains_number,int agents_number,int train_sessions) {
+    
+    // This bloc has been made with no intention for WIN32. 
 	char hostname[HOST_NAME_MAX];
 	gethostname(hostname, HOST_NAME_MAX);
-	
-	
-
-	std::string name = "";
 	std::string host_name = hostname;
-	int generation = 0;
-	int simu_time = 0;
-	int evolution = 0;
-	int brains_number = 0;
-	int agents_number = 0;
-	int train_sessions = 0;
+	// Cry about it.
+
+	name = generate_name(name);
+	
+	std::filesystem::path part1 = path;
+	std::filesystem::path part2 = name;
+	std::filesystem::path fullpath = part1 / part2;
+	
+	if (!std::filesystem::exists(fullpath))
+    {
+         std::filesystem::create_directory(fullpath);
+    }
 	
 	data = {
         {"name", "name"},
@@ -26,4 +45,8 @@ SimDataSave::SimDataSave() {
         {"agents-number", agents_number},
         {"train_sessions",train_sessions}
     };
+    
+    // write pretty~~ JSON to another file :)
+	std::ofstream o(fullpath / (name+".json"));
+	o << std::setw(4) << data << std::endl;
 }

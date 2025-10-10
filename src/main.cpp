@@ -9,6 +9,7 @@
 #include "creature.h"
 #include "brain.h"
 #include "threadsmg.h"
+#include "save.h"
 
 /// SETTINGS ///
 
@@ -201,6 +202,7 @@ int main()
     {
         // Initialize simulation state
         init_agents_and_brain(NB_AGENT, NB_BRAIN, start.x, start.y, &agents, &brain_agent);
+        SimDataStruct sds("save",SIM_NAME,0,0,evolution,NB_BRAIN,NB_AGENT,0);
     }
 
     
