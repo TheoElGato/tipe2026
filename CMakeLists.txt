@@ -2,9 +2,14 @@ cmake_minimum_required(VERSION 3.28)
 
 project(TIPE2026 LANGUAGES CXX)
 
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 set(PcLycee FALSE)
+
+include(FetchContent)
+FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz)
+FetchContent_MakeAvailable(json)
 
 if(PcLycee)
     set(SFML_DIR "/nfs/home/rbenichou/Documents/TIPE/SFML-2.5.1/lib/cmake/SFML/")
@@ -21,9 +26,6 @@ else()
     FetchContent_MakeAvailable(SFML)
 endif()
 
-include(FetchContent)
-FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz)
-FetchContent_MakeAvailable(json)
 
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
@@ -37,9 +39,19 @@ add_executable(main
     src/reproduction.cpp
     src/filemanager.cpp
 )
+
+
+# Force the exact json include dir first for this target.
+# json_SOURCE_DIR is provided by FetchContent
+target_include_directories(main
+    BEFORE
+    PRIVATE
+      ${json_SOURCE_DIR}/include
+)
+
+target_link_libraries(main PRIVATE nlohmann_json::nlohmann_json sfml-graphics "${TORCH_LIBRARIES}" )
 target_include_directories(main PRIVATE include)
-target_compile_features(main PRIVATE cxx_std_17)
-target_link_libraries(main PRIVATE sfml-graphics "${TORCH_LIBRARIES}" nlohmann_json::nlohmann_json)
+
 
 # The following code block is suggested to be used on Windows.
 # According to https://github.com/pytorch/pytorch/issues/25457,

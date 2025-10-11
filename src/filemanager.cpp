@@ -1,5 +1,5 @@
 #include "filemanager.h"
-#include <iostream>
+
 
 std::string generate_name(const std::string& name) {
     std::time_t now = std::time(nullptr); // Get current time
@@ -66,15 +66,9 @@ void SimDataStruct::loadFromFile(std::string load_name) {
     // read the JSON file from the load_name sim 
     std::string filename = folder / load_name / (load_name+".json");
     
-    std::ifstream ifs(filename, std::ios::binary);
-    std::string content((std::istreambuf_iterator<char>(ifs)),
-                     std::istreambuf_iterator<char>());
-
-    try {
-        nlohmann::json j = nlohmann::json::parse(content);
-    } catch (const nlohmann::json::parse_error &e) {
-        std::cerr << "parse error: " << e.what() << "\n";
-    }
+    
+    std::ifstream f(filename);
+    nlohmann::json data = nlohmann::json::parse("{\"field\":\"\"}");
 
     
     

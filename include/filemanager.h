@@ -5,6 +5,7 @@
 #include <fstream>
 #include <unistd.h>
 #include <limits.h>
+#include <iostream>
 
 
 class SimDataStruct {
