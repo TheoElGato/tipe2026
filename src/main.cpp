@@ -17,7 +17,7 @@ std::string DEVICE = "cpu"; // "cpu" or "gpu"
 int THREADS = 8;
 
 bool LOAD_FROM_FILE = true;
-std::string LOAD_NAME = "test2_20251010_211915";
+std::string LOAD_NAME = "test2_20251013_164057";
 
 std::string SIM_NAME = "test2";
 
@@ -34,7 +34,7 @@ int SOUS_SIM = 20;
 // AUTOSAVE //
 
 bool AUTOSAVE = true;
-int AUTOSAVE_FREQ = 1;
+int AUTOSAVE_FREQ = 4;
 
 // GOAL //
 
@@ -194,7 +194,7 @@ int main()
         int temp = sds.data["train_sessions"];
         sds.data["train_sessions"] = temp + 1;
         
-        init_agents_and_brain(nb_agent, nb_brain, start.x, start.y, &agents, &brain_agent, sds.getFullPath());
+        init_agents_and_brain(nb_agent, nb_brain, start.x, start.y, &agents, &brain_agent, "save/"+LOAD_NAME+"/");
     }
     else {
         // Initialize simulation state

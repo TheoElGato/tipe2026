@@ -67,7 +67,6 @@ void SimDataStruct::loadFromFile(std::string load_name) {
     // read the JSON file from the load_name sim 
     std::string filename = folder / load_name / (load_name+".json");
     
-    
     std::ifstream f(filename);
     nlohmann::json j = nlohmann::json::parse(f);
     
@@ -75,7 +74,6 @@ void SimDataStruct::loadFromFile(std::string load_name) {
     j["host_name"] = host_name;
     
     data = j;
-    std::cout << std::setw(4) << j << std::endl;
 }
 
 std::string SimDataStruct::getFullPath() {
