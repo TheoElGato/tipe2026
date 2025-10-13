@@ -191,7 +191,8 @@ int main()
         generation = sds.data["generation"];
         simu_time = sds.data["simu_time"];
         evolution = sds.data["evolution"];
-        sds.data["train_sessions"] += 1;
+        int temp = sds.data["train_sessions"];
+        sds.data["train_sessions"] = temp + 1;
         
         init_agents_and_brain(nb_agent, nb_brain, start.x, start.y, &agents, &brain_agent, sds.getFullPath());
     }
@@ -381,9 +382,9 @@ int main()
                         brain_agent[i].saveFile(sds.getFullPath()+istring+".pt");
                     }
                     
-                    sds.data["generation"];
-                    sds.data["simu_time"];
-                    sds.data["evolution"];
+                    sds.data["generation"] = generation;
+                    sds.data["simu_time"] = simu_time;
+                    sds.data["evolution"] = evolution;
                     sds.save();
                     
                     log("Autosaved.", "INFO");

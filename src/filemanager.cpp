@@ -1,5 +1,6 @@
 #include "filemanager.h"
 
+using namespace nlohmann::literals;
 
 std::string generate_name(const std::string& name) {
     std::time_t now = std::time(nullptr); // Get current time
@@ -68,14 +69,13 @@ void SimDataStruct::loadFromFile(std::string load_name) {
     
     
     std::ifstream f(filename);
-    nlohmann::json data = nlohmann::json::parse(R"({"test": "aaa"})");
-
-    
+    nlohmann::json j = nlohmann::json::parse(f);
     
     std::string host_name = getHostName();
-    //j["host_name"] = host_name;
+    j["host_name"] = host_name;
     
-    //data = j;
+    data = j;
+    std::cout << std::setw(4) << j << std::endl;
 }
 
 std::string SimDataStruct::getFullPath() {

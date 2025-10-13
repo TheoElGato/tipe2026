@@ -41,19 +41,7 @@ add_executable(main
 )
 
 target_include_directories(main PRIVATE include)
-
-# Force the exact json include dir first for this target.
-# json_SOURCE_DIR is provided by FetchContent
-target_include_directories(main
-    BEFORE
-    PRIVATE
-      ${json_SOURCE_DIR}/include
-)
-
-
 target_link_libraries(main PRIVATE nlohmann_json::nlohmann_json sfml-graphics "${TORCH_LIBRARIES}" )
-
-
 
 # The following code block is suggested to be used on Windows.
 # According to https://github.com/pytorch/pytorch/issues/25457,
