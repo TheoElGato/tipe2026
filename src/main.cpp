@@ -5,6 +5,7 @@
 #include <thread>
 #include <iostream>
 
+#include "reproduction.h"
 #include "physics.h"
 #include "creature.h"
 #include "brain.h"
@@ -16,7 +17,7 @@
 std::string DEVICE = "cpu"; // "cpu" or "gpu"
 int THREADS = 8;
 
-bool LOAD_FROM_FILE = true;
+bool LOAD_FROM_FILE = false;
 std::string LOAD_NAME = "test2_20251013_164057";
 
 std::string SIM_NAME = "test2";
@@ -29,6 +30,8 @@ int NB_BRAIN = 300;
 int NB_AGENT = NB_BRAIN*THREADS;
 int NB_HIDDEN_LAYER = 100;
 int SOUS_SIM = 20;
+int BEST_KEEP = 20;
+int SELECTION_POL = 50;
 
 
 // AUTOSAVE //
@@ -391,6 +394,8 @@ int main()
                 }
                 
                 // Initialization the variables for the next generation
+                reproduce(&brain_agent, score_agent,  nb_brain, evolution, BEST_KEEP, SELECTION_POL);
+
                 sous_sim_next_index = 0;
                 sous_sim_started = 0;
                 sous_sim_completed = 0;
