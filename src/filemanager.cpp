@@ -68,7 +68,7 @@ void SimDataStruct::loadFromFile(std::string load_name) {
     
     
     std::ifstream f(filename);
-    nlohmann::json data = nlohmann::json::parse("{\"field\":\"\"}");
+    nlohmann::json data = nlohmann::json::parse(R"({"test": "aaa"})");
 
     
     

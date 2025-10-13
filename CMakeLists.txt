@@ -40,6 +40,7 @@ add_executable(main
     src/filemanager.cpp
 )
 
+target_include_directories(main PRIVATE include)
 
 # Force the exact json include dir first for this target.
 # json_SOURCE_DIR is provided by FetchContent
@@ -49,8 +50,9 @@ target_include_directories(main
       ${json_SOURCE_DIR}/include
 )
 
+
 target_link_libraries(main PRIVATE nlohmann_json::nlohmann_json sfml-graphics "${TORCH_LIBRARIES}" )
-target_include_directories(main PRIVATE include)
+
 
 
 # The following code block is suggested to be used on Windows.
