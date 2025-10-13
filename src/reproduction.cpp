@@ -34,7 +34,6 @@ void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
         score_agent[i] /= total;
     }
 
-    std::cout << "score normaliser" << std::endl;
 
     // Generation of the new agent for the next gen
     for(int i = num_best_to_keep; i < NB_BRAIN; i+=1){
@@ -52,7 +51,6 @@ void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
 
     }
 
-    std::cout << "nouvelle génération crée" << std::endl;
 
     for(int i = num_best_to_keep + 1; i < NB_BRAIN; i+=1){
         (*brain_agents)[i] = new_agents[i-num_best_to_keep]; 

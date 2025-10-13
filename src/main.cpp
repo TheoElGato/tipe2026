@@ -274,6 +274,16 @@ int main()
     // dummy goal
     sf::Vector2f goal(250, 250);
 
+    std::vector<sf::Vector2f> goals;
+
+    for(int i=0; i<sous_sim_total; i++) {
+        float angle = (2 * M_PI / NB_GOAL) * i;
+        float radius = MINDIST + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX/(MAXDIST - MINDIST)));
+        float x = start.x + radius * cos(angle);
+        float y = start.y + radius * sin(angle);
+        goals.emplace_back(sf::Vector2f(x, y));
+    }
+
 
     // Initialisation of score variables
     for(int i = 0; i < SOUS_SIM; i++) {
@@ -444,7 +454,7 @@ int main()
     
                 
     
-                sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goal, brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ss_dt, simu_time, ss_dt*4);
+                sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goals[sous_sim_next_index], brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ss_dt, simu_time, ss_dt*4);
                 sous_sim_threads[sous_sim_next_index].detach(); // Détacher le thread pour qu'il s'exécute indépendamment
     
                 sous_sim_state[sous_sim_next_index] = 1; // Marquer comme en cours d'exécution
