@@ -100,7 +100,7 @@ void reverse_sorting_brain(std::vector<Brain>* tab, std::vector<float>* score_ta
     (*score_tab)[i] = (*score_tab)[high];
     (*score_tab)[high] = sc_temp;
 
-    b_temp = (*tab)[i];
+    Brain b_temp = (*tab)[i];
     (*tab)[i] = (*tab)[high];
     (*tab)[high] = b_temp;
 
