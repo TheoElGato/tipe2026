@@ -1,70 +1,68 @@
 #include "reproduction.h"
+#include <random>
 
+void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent, 
+               int NB_BRAIN, float EVOLUTION, int bestKeep, int selectionPol) {
 
-void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent, int NB_BRAIN, float EVOLUTION, int bestKeep, int selectionPol){
-
-    // Fool proof
-    if ((*brain_agents).size() != NB_BRAIN || score_agent.size() != NB_BRAIN) {
-        std::cerr << "Error: brain_agents and score_agent vectors must have size NB_BRAIN." << std::endl;
+    // Validation
+    if (brain_agents->size() != NB_BRAIN || score_agent.size() != NB_BRAIN) {
+        std::cerr << "Error: brain_agents and score_agent must have size NB_BRAIN.\n";
         exit(EXIT_FAILURE);
     }
-    if (bestKeep > 100 || selectionPol > 100 || bestKeep < 0 || selectionPol < 0) {
-        std::cerr << "Error: bestKeep and selectionPol must be purcentage" << std::endl;
+    if (bestKeep < 0 || bestKeep > 100 || selectionPol < 0 || selectionPol > 100) {
+        std::cerr << "Error: bestKeep and selectionPol must be percentages.\n";
         exit(EXIT_FAILURE);
     }
 
-
-    // Creation of the new brain vector
-    std::vector<Brain> new_agents;
-
-    // Calculate number of best and worst brain_agents to keep/kill
-    int num_best_to_keep = (bestKeep * NB_BRAIN) / 100;
-    int num_selctionable = (selectionPol * NB_BRAIN) / 100;
-
-    // Sort brain_agents by score
+    // Sort by score descending
     reverse_sorting_brain(brain_agents, &score_agent, 0, NB_BRAIN - 1);
 
+    // Compute how many to keep and to select
+    int num_best_to_keep = (bestKeep * NB_BRAIN) / 100;
+    int num_selectable = (selectionPol * NB_BRAIN) / 100;
+    if (num_selectable == 0) num_selectable = 1; // Avoid divide by zero
 
-    // Normalise score
-    float total = 0;
-    for(int i = 0; i <= num_selctionable; i+=1){
+    // Normalize scores
+    float total = 0.f;
+    for (int i = 0; i < num_selectable; ++i){
         total += score_agent[i];
     }
-    for(int i = 0; i <= num_selctionable; i+=1){
+
+    if (total == 0.f) total = 1.f; // Prevent division by zero
+
+    for (int i = 0; i < num_selectable; ++i){
         score_agent[i] /= total;
     }
 
+    // Random number setup
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dist(0.0f, 1.0f);
 
-    // Generation of the new agent for the next gen
-    for(int i = num_best_to_keep; i < NB_BRAIN; i+=1){
-        float ran = ((float) rand())/ RAND_MAX;
-        float temp = score_agent[0];
+    // Generate new brains
+    std::vector<Brain> new_agents;
+    new_agents.reserve(NB_BRAIN - num_best_to_keep);
+
+    for (int i = num_best_to_keep; i < NB_BRAIN; ++i) {
+        float ran = dist(gen);  // [0,1[
+        float cumul = score_agent[0];
         int j = 0;
-
-        while(temp < ran){
-            j += 1;
-            temp += score_agent[j];
+        while (cumul < ran && j < num_selectable - 1) {
+            j+=1;
+            cumul += score_agent[j];
         }
-
         new_agents.emplace_back((*brain_agents)[j]);
         new_agents.back().mutate(EVOLUTION);
-
     }
 
-
-    for(int i = num_best_to_keep + 1; i < NB_BRAIN; i+=1){
-        (*brain_agents)[i] = new_agents[i-num_best_to_keep]; 
-
+    // Replace worst brains
+    for (int i = num_best_to_keep; i < NB_BRAIN; ++i){
+        (*brain_agents)[i] = new_agents[i - num_best_to_keep];
     }
-    
-
-
-    while (!new_agents.empty())
-    {
-        new_agents.pop_back();
-    }
-
+    // Cleanup
+    new_agents.clear();
 }
+
 
 
 void reverse_sorting_brain(std::vector<Brain>* tab, std::vector<float>* score_tab, int low, int high){
