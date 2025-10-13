@@ -1,7 +1,7 @@
 #include "reproduction.h"
 
 
-void reproduce(std::vector<Brain*>& agents, std::vector<float>& score_agent, int NB_BRAIN, float EVOLUTION, int bestKeep, int selectionPol){
+std::vector<Brain>* reproduce(std::vector<Brain>& agents, std::vector<float>& score_agent, int NB_BRAIN, float EVOLUTION, int bestKeep, int selectionPol){
 
     // Fool proof
     if (agents.size() != NB_BRAIN || score_agent.size() != NB_BRAIN) {
@@ -15,7 +15,7 @@ void reproduce(std::vector<Brain*>& agents, std::vector<float>& score_agent, int
 
 
     // Creation of the new brain vector
-    std::vector<Brain*> new_agents(NB_BRAIN, nullptr);
+    std::vector<Brain> new_agents;
 
     // Calculate number of best and worst agents to keep/kill
     int num_best_to_keep = (bestKeep * NB_BRAIN) / 100;
@@ -26,12 +26,7 @@ void reproduce(std::vector<Brain*>& agents, std::vector<float>& score_agent, int
 
     // Keep best agent
     for(int i = 0; i < num_best_to_keep; i+=1){
-        new_agents[i] = agents[i];
-    }
-
-    // Free worst brain
-    for(int i = NB_BRAIN - 1; i > num_selctionable; i-=1){
-        free(agents[i]);
+        new_agents.emplace_back(agents[i]);
     }
 
     // Normalise score
@@ -44,16 +39,31 @@ void reproduce(std::vector<Brain*>& agents, std::vector<float>& score_agent, int
     }
 
     // Generation of the new agent for the next gen
+    for(int i = num_best_to_keep; i < NB_BRAIN; i+=1){
+        float ran = ((float) rand())/ RAND_MAX;
+        float temp = score_agent[0];
+        int j = 0;
 
+        while(temp < ran){
+            j += 1;
+            temp += score_agent[j];
+        }
 
-    // il faut regarder comment copier des agents et les modifiers
+        new_agents.emplace_back(agents[j]);
+        new_agents.back().mutate(EVOLUTION);
 
-    std::cout << "THIS IS NOT FINISHED YET" << std::endl;
+    }
 
+    while (!agents.empty())
+    {
+        agents.pop_back();
+    }
+
+    return &new_agents;
 }
 
 
-void reverse_sorting_brain(std::vector<Brain*>& tab, std::vector<float>& score_tab, int low, int high){
+void reverse_sorting_brain(std::vector<Brain>& tab, std::vector<float>& score_tab, int low, int high){
 
     if (low >= high) {
         return;
@@ -73,9 +83,9 @@ void reverse_sorting_brain(std::vector<Brain*>& tab, std::vector<float>& score_t
             score_tab[j] = sc_temp;
 
             // Swap brains
-            b_temp = tab[i];
+            b_temp = &tab[i];
             tab[i] = tab[j];
-            tab[j] = b_temp;
+            tab[j] = *b_temp;
 
             i += 1;
         }
@@ -87,9 +97,9 @@ void reverse_sorting_brain(std::vector<Brain*>& tab, std::vector<float>& score_t
     score_tab[i] = score_tab[high];
     score_tab[high] = sc_temp;
 
-    b_temp = tab[i];
+    b_temp = &tab[i];
     tab[i] = tab[high];
-    tab[high] = b_temp;
+    tab[high] = *b_temp;
 
     reverse_sorting_brain(tab, score_tab, low, i-1);
     reverse_sorting_brain(tab, score_tab, i + 1, high);
