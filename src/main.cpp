@@ -5,6 +5,7 @@
 #include <thread>
 #include <iostream>
 
+#include "reproduction.h"
 #include "physics.h"
 #include "creature.h"
 #include "brain.h"
@@ -14,10 +15,10 @@
 /// SETTINGS ///
 
 std::string DEVICE = "cpu"; // "cpu" or "gpu"
-int THREADS = 8;
+int THREADS = 16;
 
-bool LOAD_FROM_FILE = true;
-std::string LOAD_NAME = "test2_20251013_202929";
+bool LOAD_FROM_FILE = false;
+std::string LOAD_NAME = "test2_20251013_164057";
 
 std::string SIM_NAME = "test2";
 
@@ -29,6 +30,8 @@ int NB_BRAIN = 300;
 int NB_AGENT = NB_BRAIN*THREADS;
 int NB_HIDDEN_LAYER = 100;
 int SOUS_SIM = 20;
+int BEST_KEEP = 20;
+int SELECTION_POL = 50;
 
 
 // AUTOSAVE //
@@ -271,6 +274,16 @@ int main()
     // dummy goal
     sf::Vector2f goal(250, 250);
 
+    std::vector<sf::Vector2f> goals;
+
+    for(int i=0; i<sous_sim_total; i++) {
+        float angle = (2 * M_PI / NB_GOAL) * i;
+        float radius = MINDIST;
+        float x = start.x + radius * cos(angle);
+        float y = start.y + radius * sin(angle);
+        goals.emplace_back(sf::Vector2f(x, y));
+    }
+
 
     // Initialisation of score variables
     for(int i = 0; i < SOUS_SIM; i++) {
@@ -391,6 +404,8 @@ int main()
                 }
                 
                 // Initialization the variables for the next generation
+                reproduce(&brain_agent, score_agent,  nb_brain, evolution, BEST_KEEP, SELECTION_POL);
+
                 sous_sim_next_index = 0;
                 sous_sim_started = 0;
                 sous_sim_completed = 0;
@@ -439,7 +454,7 @@ int main()
     
                 
     
-                sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goal, brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ss_dt, simu_time/10, ss_dt*4);
+                sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goals[sous_sim_next_index], brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ss_dt, simu_time, ss_dt*4);
                 sous_sim_threads[sous_sim_next_index].detach(); // Détacher le thread pour qu'il s'exécute indépendamment
     
                 sous_sim_state[sous_sim_next_index] = 1; // Marquer comme en cours d'exécution
