@@ -15,7 +15,7 @@
 /// SETTINGS ///
 
 std::string DEVICE = "cpu"; // "cpu" or "gpu"
-int THREADS = 8;
+int THREADS = 16;
 
 bool LOAD_FROM_FILE = false;
 std::string LOAD_NAME = "test2_20251013_164057";
@@ -278,7 +278,7 @@ int main()
 
     for(int i=0; i<sous_sim_total; i++) {
         float angle = (2 * M_PI / NB_GOAL) * i;
-        float radius = MINDIST + static_cast<float>(rand()) / (static_cast<float>(RAND_MAX/(MAXDIST - MINDIST)));
+        float radius = MINDIST;
         float x = start.x + radius * cos(angle);
         float y = start.y + radius * sin(angle);
         goals.emplace_back(sf::Vector2f(x, y));
