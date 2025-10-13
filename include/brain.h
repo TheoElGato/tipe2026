@@ -13,13 +13,9 @@ public:
     void mutate(float a);
 
 
-    //void train(const std::vector<torch::Tensor>& inputs, const std::vector<torch::Tensor>& targets);
 private:
-    void save(torch::serialize::OutputArchive& archive) const override;
-    void load(torch::serialize::InputArchive& archive) override;
 
     torch::nn::Linear fc1 = nullptr, fc2 = nullptr, fc3 = nullptr, out = nullptr;
-    //torch::nn::ReLU relu;
     int input_size;
     int output_size;
     int nb_hidden_neurones;
