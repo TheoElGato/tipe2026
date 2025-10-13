@@ -76,7 +76,6 @@ void reverse_sorting_brain(std::vector<Brain>* tab, std::vector<float>* score_ta
     float pivot = (*score_tab)[high];
     int i = low;
     float sc_temp;
-    Brain* b_temp;
 
     for (int j = low; j < high; j+=1){
         if((*score_tab)[j] >= pivot){
@@ -87,9 +86,9 @@ void reverse_sorting_brain(std::vector<Brain>* tab, std::vector<float>* score_ta
             (*score_tab)[j] = sc_temp;
 
             // Swap brains
-            b_temp = &(*tab)[i];
+            Brain b_temp = (*tab)[i];
             (*tab)[i] = (*tab)[j];
-            (*tab)[j] = *b_temp;
+            (*tab)[j] = b_temp;
 
             i += 1;
         }
@@ -101,9 +100,9 @@ void reverse_sorting_brain(std::vector<Brain>* tab, std::vector<float>* score_ta
     (*score_tab)[i] = (*score_tab)[high];
     (*score_tab)[high] = sc_temp;
 
-    b_temp = &(*tab)[i];
+    b_temp = (*tab)[i];
     (*tab)[i] = (*tab)[high];
-    (*tab)[high] = *b_temp;
+    (*tab)[high] = b_temp;
 
     reverse_sorting_brain(tab, score_tab, low, i-1);
     reverse_sorting_brain(tab, score_tab, i + 1, high);
