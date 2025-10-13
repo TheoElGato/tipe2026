@@ -105,6 +105,19 @@ void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<st
     }
 }
 
+void draw_items(sf::RenderWindow& window, sf::Sprite sp, sf::Sprite ob, std::vector<sf::Vector2f> g, int idsssim) {
+    sp.scale({0.6f, 0.6f});
+    ob.scale({0.6f, 0.6f});
+    sf::FloatRect spb = sp.getLocalBounds();
+    sf::FloatRect obb = ob.getLocalBounds();
+    sp.setOrigin(spb.width/2, spb.height/2);
+    ob.setOrigin(obb.width/2, obb.height/2);
+    sp.setPosition(start);
+    ob.setPosition(g[idsssim]);
+    window.draw(sp);
+    window.draw(ob);
+}
+
 void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::vector<Creature>* agents, std::vector<Brain>* brains, std::string brainFile="")
 {
     for(int i=0; i<countAgents; i++)
@@ -263,9 +276,31 @@ int main()
     font.loadFromFile("assets/fonts/arial.ttf");
     sf::Texture backgroundTexture;
     backgroundTexture.loadFromFile("assets/textures/background.png");
+    
+    // Item textures
+    sf::Texture startTexture;
+    startTexture.loadFromFile("assets/textures/start.png");
+    sf::Texture diamondTexture;
+    diamondTexture.loadFromFile("assets/items/diamond.png");
+    sf::Texture emeraldTexture;
+    emeraldTexture.loadFromFile("assets/items/emerald.png");
+    sf::Texture nether_starTexture;
+    nether_starTexture.loadFromFile("assets/items/nether_star.png");
+    sf::Texture netherite_ingotTexture;
+    netherite_ingotTexture.loadFromFile("assets/items/netherite_ingot.png");
+    sf::Texture music_disc_othersideTexture;
+    music_disc_othersideTexture.loadFromFile("assets/items/zzmusic_disc_otherside.png");
 
     // Create Sprite
     sf::Sprite backgroundSprite(backgroundTexture);
+    sf::Sprite startSprite(startTexture);
+    
+    sf::Sprite diamondSprite(diamondTexture);
+    sf::Sprite emeraldSprite(emeraldTexture);
+    sf::Sprite nether_starSprite(nether_starTexture);
+    sf::Sprite netherite_ingotSprite(netherite_ingotTexture);
+    sf::Sprite music_disc_othersideSprite(music_disc_othersideTexture);
+    
 
     // Manage Clock
     sf::Clock clock;
@@ -460,7 +495,7 @@ int main()
 
         window.clear();
         window.draw(backgroundSprite);
-
+        draw_items(window,startSprite,diamondSprite,goals,selected_agents);
         // Drawing of the agents
         if (drawall) {
             for ( Creature* agent : agentPartitions[selected_agents]) {
