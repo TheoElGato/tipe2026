@@ -444,7 +444,7 @@ int main()
     
                 
     
-                sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goal, brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ss_dt, simu_time/10, ss_dt*4);
+                sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goal, brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ss_dt, simu_time, ss_dt*4);
                 sous_sim_threads[sous_sim_next_index].detach(); // Détacher le thread pour qu'il s'exécute indépendamment
     
                 sous_sim_state[sous_sim_next_index] = 1; // Marquer comme en cours d'exécution
