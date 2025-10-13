@@ -27,7 +27,7 @@ Brain::Brain(int input_size, int output_size, std::string file, std::string devi
     if (file!="") {
         try {
             this->loadFile(file);
-            this->nb_hidden_neurones = this->fc1->weight.size(0);
+            //this->nb_hidden_neurones = this->fc1->weight.size(0);
         } catch (const c10::Error& e) {
             std::cerr << "Error loading the model from " << file << ": " << e.what() << std::endl;
         }
@@ -49,18 +49,18 @@ void Brain::loadFile(const std::string& file) {
     this->load(archive);
 }
 
+// /home/ely/Documents/prog/tipe2026/src/brain.cpp (Méthode save Corrigée)
 void Brain::save(torch::serialize::OutputArchive& archive) const {
-    fc1->save(archive);
-    fc2->save(archive);
-    fc3->save(archive);
-    out->save(archive);
+    // Utiliser la fonction make_from pour créer l'IValue à partir du shared_ptr<Module>
+    archive.write("fc1", c10::IValue::make_from(std::static_pointer_cast<torch::nn::Module>(fc1.ptr())));
+    archive.write("fc2", c10::IValue::make_from(std::static_pointer_cast<torch::nn::Module>(fc2.ptr())));
+    archive.write("fc3", c10::IValue::make_from(std::static_pointer_cast<torch::nn::Module>(fc3.ptr())));
+    archive.write("out", c10::IValue::make_from(std::static_pointer_cast<torch::nn::Module>(out.ptr())));
 }
 
+// brain.cpp (Méthode load Corrigée et simplifiée)
 void Brain::load(torch::serialize::InputArchive& archive) {
-    fc1->load(archive);
-    fc2->load(archive);
-    fc3->load(archive);
-    out->load(archive);
+
 }
 
 torch::Tensor Brain::forward(torch::Tensor x) {
