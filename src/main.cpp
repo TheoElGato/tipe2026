@@ -15,7 +15,7 @@
 /// SETTINGS ///
 
 std::string DEVICE = "cpu"; // "cpu" or "gpu"
-int THREADS = 10;
+int THREADS = 16;
 
 bool LOAD_FROM_FILE = false;
 std::string LOAD_NAME = "test2_20251013_164057";
@@ -29,7 +29,7 @@ float EVOLUTION = 0.075;
 int NB_BRAIN = 300;
 int NB_AGENT = NB_BRAIN*THREADS;
 int NB_HIDDEN_LAYER = 100;
-int SOUS_SIM = 20;
+int SOUS_SIM = 32;
 int BEST_KEEP = 20;
 int SELECTION_POL = 50;
 
@@ -57,15 +57,6 @@ void log(const std::string& message, const std::string& level = "INFO")
 {   
     // Standardized logging function
     std::cout << "[" << level << "] " << message << std::endl;
-}
-
-void progress(const std::string& task, int current, int total)
-{
-    // Standardized progress function
-    std::cout << "\r" << task << ": " << std::fixed << current << "/" << total << " completed." << std::flush;
-    if (current == total) {
-        std::cout << std::endl; // Move to the next line when done
-    }
 }
 
 void error(const std::string& message)
@@ -384,7 +375,7 @@ int main()
                 
                 log(std::to_string(score_agent[0]),"DEBUG");
                 log(std::to_string(score_agent[1]),"DEBUG");
-                log(std::to_string(score_agent[2]),"DEBUG");
+                log(std::to_string(score_agent[2]),"DEBUG");               
 
                 
                 Creature best_agent = agents[std::distance(score_agent.begin(), std::max_element(score_agent.begin(), score_agent.end()))];
@@ -453,10 +444,8 @@ int main()
     
                 
                 sous_sim_started+=1;
-                //log("Starting sous-sim " + std::to_string(sous_sim_next_index) + " on group " + std::to_string(group_index) + " with " + std::to_string(agentPartitions[group_index].size()) + " agents.", "THREAD");
+                log("Starting sous-sim " + std::to_string(sous_sim_next_index) + " on group " + std::to_string(group_index) + " with " + std::to_string(agentPartitions[group_index].size()) + " agents.", "THREAD");
                 //log("threads used: " + std::to_string(threads_used) + "/" + std::to_string(THREADS), "THREAD");
-                progress("Sous-sim:", sous_sim_started, sous_sim_total);
-                
     
                 sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goals[sous_sim_next_index], brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ss_dt, simu_time, ss_dt*4);
                 sous_sim_threads[sous_sim_next_index].detach(); // Détacher le thread pour qu'il s'exécute indépendamment
