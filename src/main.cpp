@@ -312,7 +312,7 @@ int main()
     std::vector<sf::Vector2f> goals;
 
     for(int i=0; i<sous_sim_total; i++) {
-        float angle = (2 * M_PI / NB_GOAL) * i;
+        float angle = (2 * M_PI / sous_sim_total) * i;
         float radius = MINDIST;
         float x = start.x + radius * cos(angle);
         float y = start.y + radius * sin(angle);
