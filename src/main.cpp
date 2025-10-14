@@ -12,55 +12,12 @@
 #include "threadsmg.h"
 #include "filemanager.h"
 
-/// SETTINGS ///
-
-std::string DEVICE = "cpu"; // "cpu" or "gpu"
-int THREADS = 8;
-
-bool LOAD_FROM_FILE = false;
-std::string LOAD_NAME = "test2_20251014_213011";
-
-std::string SIM_NAME = "test2";
-
-// SIM //
-
-int SIM_TIME = 10;
-float EVOLUTION = 0.075;
-int NB_BRAIN = 300;
-int NB_AGENT = NB_BRAIN*THREADS;
-int NB_HIDDEN_LAYER = 100;
-int SOUS_SIM = 32;
-int BEST_KEEP = 20;
-int SELECTION_POL = 50;
-
-
-// AUTOSAVE //
-
-bool AUTOSAVE = true;
-int AUTOSAVE_FREQ = 4;
-
-// GOAL //
-
-int MAXDIST = 300;
-int MINDIST = 200;
-int NB_GOAL = 3;
-
-//// Start position
-sf::Vector2f start = sf::Vector2f(523, 375);
-///////////////////
-
-
-
-
-
-void log(const std::string& message, const std::string& level = "INFO")
-{   
+void log(const std::string& message, const std::string& level = "INFO") {   
     // Standardized logging function
     std::cout << "[" << level << "] " << message << std::endl;
 }
 
-void error(const std::string& message)
-{
+void error(const std::string& message) {
     // Standardized error function
     log(message, "ERROR");
     exit(EXIT_FAILURE);
@@ -72,8 +29,7 @@ std::string nozero(float value) {
     return oss.str();
 }
 
-void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<std::string, float>& stats)
-{
+void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<std::string, float>& stats) {
     // Draw statistics on the window
 
     sf::Vector2u size = window.getSize();
@@ -105,7 +61,7 @@ void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<st
     }
 }
 
-void draw_items(sf::RenderWindow& window, sf::Sprite sp, sf::Sprite ob, std::vector<sf::Vector2f> g, int idsssim) {
+void draw_items(sf::RenderWindow& window, sf::Sprite sp, sf::Sprite ob, sf::Vector2f start,std::vector<sf::Vector2f> g, int idsssim) {
     if (idsssim < 0) idsssim = 0;
     sp.scale({0.6f, 0.6f});
     ob.scale({0.6f, 0.6f});
@@ -119,8 +75,7 @@ void draw_items(sf::RenderWindow& window, sf::Sprite sp, sf::Sprite ob, std::vec
     window.draw(ob);
 }
 
-void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::vector<Creature>* agents, std::vector<Brain>* brains, std::string brainFile="")
-{
+void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::vector<Creature>* agents, std::vector<Brain>* brains, std::string device, int nb_hidden_layer, std::string brainFile="") {
     for(int i=0; i<countAgents; i++)
     {
         agents->emplace_back(x, y, i);
@@ -131,7 +86,7 @@ void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::
         // Initialize agents with default brain
         for (int i=0; i<countBrains; i++)
         {
-            brains->emplace_back(9,6,"",DEVICE,NB_HIDDEN_LAYER);
+            brains->emplace_back(9,6,"",device,nb_hidden_layer);
         }
     } else {
         // Initialize agents with brain from file
@@ -139,28 +94,38 @@ void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::
         {
             std::string istring = std::to_string(i);
             log("Loading brain"+istring+" from file.");
-            brains->emplace_back(9,6,brainFile+istring+".pt",DEVICE,NB_HIDDEN_LAYER);
+            brains->emplace_back(9,6,brainFile+istring+".pt",device,nb_hidden_layer);
         }
     }
 
     
 }
 
-// inutiliser
-void physicsUpdate(PhysicsWorker& physics, std::vector<Creature*> agents, float dt)
-{
-    for (auto &agent : agents) {
-        std::vector<Point>* vertices = &agent->vertices;
-        physics.PBD(vertices, agent->links, agent->muscles, 10, dt);
-    }
-}
-
-int main()
-{
+int simulate(SimTasker stk) {
+    
     log("Welcome to the USRAF Sim");
-
-    SimTasker simTasker("task.json");
-    simTasker.loadTask(0);
+    
+    /// SETTINGS FROM THE SIMTASKER///
+    std::string DEVICE = stk.device;
+    int THREADS = stk.threads;
+    bool LOAD_FROM_FILE = stk.load_from_file;
+    std::string LOAD_NAME = stk.load_name;
+    std::string SIM_NAME = stk.sim_name;
+    int SIM_TIME = stk.sim_time;
+    float EVOLUTION = stk.evolution;
+    int NB_BRAIN = stk.nb_brain;
+    int NB_AGENT = stk.nb_agent;
+    int NB_HIDDEN_LAYER = stk.nb_hidden_layer;
+    int SOUS_SIM = stk.sous_sim;
+    int BEST_KEEP = stk.best_keep;
+    int SELECTION_POL = stk.selection_pol;
+    bool AUTOSAVE = stk.autosave;
+    int AUTOSAVE_FREQ = stk.autosave_freq;
+    int MAXDIST = stk.maxdist;
+    int MINDIST = stk.mindist;
+    int NB_GOAL = stk.nb_goal;
+    sf::Vector2f start = sf::Vector2f(stk.startx, stk.starty);
+    ///////////////////
 
     /// temp
     float ss_dt = 1/60.f;
@@ -217,11 +182,11 @@ int main()
         int temp = sds.data["train_sessions"];
         sds.data["train_sessions"] = temp + 1;
         
-        init_agents_and_brain(nb_agent, nb_brain, start.x, start.y, &agents, &brain_agent, "save/"+LOAD_NAME+"/");
+        init_agents_and_brain(nb_agent, nb_brain, start.x, start.y, &agents, &brain_agent, DEVICE,NB_HIDDEN_LAYER,"save/"+LOAD_NAME+"/");
     }
     else {
         // Initialize simulation state
-        init_agents_and_brain(nb_agent, nb_brain, start.x, start.y, &agents, &brain_agent);
+        init_agents_and_brain(nb_agent, nb_brain, start.x, start.y, &agents, &brain_agent, DEVICE,NB_HIDDEN_LAYER);
     }
     sds.save();
 
@@ -508,7 +473,7 @@ int main()
 
         window.clear();
         window.draw(backgroundSprite);
-        draw_items(window,startSprite,diamondSprite,goals,groups_avail[selected_agents]);
+        draw_items(window,startSprite,diamondSprite,start,goals,groups_avail[selected_agents]);
         // Drawing of the agents
         if (drawall) {
             for ( Creature* agent : agentPartitions[selected_agents]) {
@@ -527,5 +492,14 @@ int main()
     }
 
     log("Exiting simulation.", "INFO");
+    return 0;
+}
+
+int main() {
+    // Load all the task we have to do
+    SimTasker mainSimTasker("task.json");
+    mainSimTasker.loadTask(0);
+    
+    simulate(mainSimTasker);
     return 0;
 }

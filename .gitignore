@@ -43,6 +43,7 @@ build/*
 .vscode/
 buildrun.sh
 save/*
+task.json
 
 # debug information files
 *.dwo

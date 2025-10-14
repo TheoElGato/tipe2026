@@ -1,0 +1,28 @@
+[{
+	"SIM_NAME": "test2",
+
+	"DEVICE": "cpu",
+	"THREADS": 8,
+
+	"LOAD_FROM_FILE": false,
+	"LOAD_NAME": "test2_20251014_213011",
+	
+	"SIM_TIME": 10,
+	"EVOLUTION": 0.075,
+	"NB_BRAIN": 300,
+	"NB_AGENT": "THIS IS AUTOMATIC : NB_BRAIN*THREADS",
+	"NB_HIDDEN_LAYER": 100,
+	"SOUS_SIM": 32,
+	"BEST_KEEP": 20,
+	"SELECTION_POL": 50,
+	
+	"AUTOSAVE": true,
+	"AUTOSAVE_FREQ": 4,
+	
+	"MAXDIST": 300,
+	"MINDIST": 200,
+	"NB_GOAL": 3,
+
+	"STARTX": 523,
+	"STARTY": 275
+}]
