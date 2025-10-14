@@ -106,6 +106,7 @@ void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<st
 }
 
 void draw_items(sf::RenderWindow& window, sf::Sprite sp, sf::Sprite ob, std::vector<sf::Vector2f> g, int idsssim) {
+    if (idsssim < 0) idsssim = 0;
     sp.scale({0.6f, 0.6f});
     ob.scale({0.6f, 0.6f});
     sf::FloatRect spb = sp.getLocalBounds();
@@ -495,7 +496,7 @@ int main()
 
         window.clear();
         window.draw(backgroundSprite);
-        draw_items(window,startSprite,diamondSprite,goals,selected_agents);
+        draw_items(window,startSprite,diamondSprite,goals,groups_avail[selected_agents]);
         // Drawing of the agents
         if (drawall) {
             for ( Creature* agent : agentPartitions[selected_agents]) {
@@ -503,7 +504,7 @@ int main()
             }
         }
 
-        drawStats(window, font, {{"FPS", std::round(fps)}, {"Nb agents", agents.size()}, {"SGen Selected", selected_agents}, {"Current Gen", generation},{"Current SGen", sous_sim_started},{"Tps",round(acu)},{"Tps max", simu_time}, {"Evolution", evolution}});
+        drawStats(window, font, {{"FPS", std::round(fps)}, {"Nb agents", agents.size()}, {"SGen Selected", groups_avail[selected_agents]}, {"Current Gen", generation},{"Current SGen", sous_sim_started},{"Tps",round(acu)},{"Tps max", simu_time}, {"Evolution", evolution}});
 
         window.display();
 
