@@ -49,15 +49,64 @@ SimDataStruct::SimDataStruct(std::string path, std::string name, int generation,
         {"evolution", evolution},
         {"brains-number", brains_number},
         {"agents-number", agents_number},
+        {"total_trained_time", 0},
         {"train_sessions",train_sessions}
     };
     
+}
+
+void SimDataStruct::addStatRow(float generation, float agent0score, float agent1score, float agent2score, 
+                   float agent3score, float agent4score, float agent5score, float agent6score,
+                   float agent7score, float agent8score, float agent9score,
+                   float bestAgentScore, float timeForOneGen) {
+    generationV.push_back(generation);
+    agent0scoreV.push_back(agent0score);
+    agent1scoreV.push_back(agent1score);
+    agent2scoreV.push_back(agent2score);
+    agent3scoreV.push_back(agent3score);
+    agent4scoreV.push_back(agent4score);
+    agent5scoreV.push_back(agent5score);
+    agent6scoreV.push_back(agent6score);
+    agent7scoreV.push_back(agent7score);
+    agent8scoreV.push_back(agent8score);
+    agent9scoreV.push_back(agent9score);
+    bestAgentScoreV.push_back(bestAgentScore);
+    timeForOneGenV.push_back(timeForOneGen);
+    
+
 }
 
 void SimDataStruct::save() {
     // write a really pretty~~ JSON file :)
 	std::ofstream o(fullpath / (name+".json"));
 	o << std::setw(4) << data << std::endl;
+	o.close();
+	
+	// write a cool CSV for the stats :
+	std::ofstream ss(fullpath / (name+".csv"));
+    auto writer = make_csv_writer(ss); // Fix auto I don't like this
+    
+    
+    writer << std::vector<std::string>({"Generation","Agent0Score", "Agent1Score", "Agent2Score", "Agent3Score", 
+                         "Agent4Score", "Agent5Score", "Agent6Score", "Agent7Score", "Agent8Score", 
+                         "Agent9Score", "BestAgentScore", "TimeForOneGen"});
+    for(int i=0;i<this->generationV.size();i+=1) {
+        writer << std::vector<float>({ generationV[i],
+                                       agent0scoreV[i],
+                                       agent1scoreV[i],
+                                       agent2scoreV[i],
+                                       agent3scoreV[i],
+                                       agent4scoreV[i],
+                                       agent5scoreV[i],
+                                       agent6scoreV[i],
+                                       agent7scoreV[i],
+                                       agent8scoreV[i],
+                                       agent9scoreV[i],
+                                       bestAgentScoreV[i],
+                                       timeForOneGenV[i]});
+    }
+    
+    
 	o.close();
 }
 
@@ -74,6 +123,25 @@ void SimDataStruct::loadFromFile(std::string load_name) {
     j["host_name"] = host_name;
     
     data = j;
+    // Load the STATS 
+    
+    std::string filenameCsv = folder / load_name / (load_name+".csv");
+    CSVReader reader(filenameCsv);
+    for (CSVRow& row: reader) { // Input iterator
+        generationV.push_back(row["Generation"].get<float>());
+        agent0scoreV.push_back(row["Agent0Score"].get<float>());
+        agent1scoreV.push_back(row["Agent1Score"].get<float>());
+        agent2scoreV.push_back(row["Agent2Score"].get<float>());
+        agent3scoreV.push_back(row["Agent3Score"].get<float>());
+        agent4scoreV.push_back(row["Agent4Score"].get<float>());
+        agent5scoreV.push_back(row["Agent5Score"].get<float>());
+        agent6scoreV.push_back(row["Agent6Score"].get<float>());
+        agent7scoreV.push_back(row["Agent7Score"].get<float>());
+        agent8scoreV.push_back(row["Agent8Score"].get<float>());
+        agent9scoreV.push_back(row["Agent9Score"].get<float>());
+        bestAgentScoreV.push_back(row["BestAgentScore"].get<float>());
+        timeForOneGenV.push_back(row["TimeForOneGen"].get<float>());
+    }
 }
 
 std::string SimDataStruct::getFullPath() {

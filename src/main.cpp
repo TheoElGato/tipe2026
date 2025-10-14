@@ -15,16 +15,16 @@
 /// SETTINGS ///
 
 std::string DEVICE = "cpu"; // "cpu" or "gpu"
-int THREADS = 16;
+int THREADS = 8;
 
-bool LOAD_FROM_FILE = false;
-std::string LOAD_NAME = "test2_20251013_164057";
+bool LOAD_FROM_FILE = true;
+std::string LOAD_NAME = "test2_20251014_213011";
 
 std::string SIM_NAME = "test2";
 
 // SIM //
 
-int SIM_TIME = 100;
+int SIM_TIME = 10;
 float EVOLUTION = 0.075;
 int NB_BRAIN = 300;
 int NB_AGENT = NB_BRAIN*THREADS;
@@ -176,7 +176,7 @@ int main()
     int generation = 0;
 
     // accumulators
-    float acc = 0; // unused
+    float acc = 0;
     float acu = 0;
     int cyl = 0;
 
@@ -186,6 +186,7 @@ int main()
 
     // temp
     float dt = 0.016f;
+    
     
     // Some necessery data for brains and agents
     std::vector<Brain> brain_agent;
@@ -205,8 +206,10 @@ int main()
         nb_agent = sds.data["agents-number"];
         nb_brain = sds.data["brains-number"];
         generation = sds.data["generation"];
+        generation += 1;
         simu_time = sds.data["simu_time"];
         evolution = sds.data["evolution"];
+        acc = sds.data["total_trained_time"];
         int temp = sds.data["train_sessions"];
         sds.data["train_sessions"] = temp + 1;
         
@@ -245,6 +248,9 @@ int main()
     int sous_sim_total = SOUS_SIM;
     int sous_sim_started = 0;
     int sous_sim_completed = 0;
+    
+    // For stats time 
+    float last_acc = acc;
     
     // Distribute agents among PhysicsWorkers
     std::vector<PhysicsWorker> physicsWorkers;
@@ -408,13 +414,14 @@ int main()
                         if(score_agent[j] != 0) score_agent[j] /= sous_sim_total;
                 }
                 
-                log(std::to_string(score_agent[0]),"DEBUG");
-                log(std::to_string(score_agent[1]),"DEBUG");
-                log(std::to_string(score_agent[2]),"DEBUG");               
-
+                int best_score_index = std::distance(score_agent.begin(), std::max_element(score_agent.begin(), score_agent.end()));
                 
-                Creature best_agent = agents[std::distance(score_agent.begin(), std::max_element(score_agent.begin(), score_agent.end()))];
-
+                sds.addStatRow(generation, score_agent[0], score_agent[1], score_agent[2], 
+                   score_agent[3], score_agent[4], score_agent[5], score_agent[6],
+                   score_agent[7], score_agent[8], score_agent[9],
+                   score_agent[best_score_index], acc-last_acc);
+                last_acc = acc;
+                
                 // Sauvegarde automatique
                 if (AUTOSAVE && generation % AUTOSAVE_FREQ == 0) {
                     // Time to autosave !
@@ -428,6 +435,7 @@ int main()
                     sds.data["generation"] = generation;
                     sds.data["simu_time"] = simu_time;
                     sds.data["evolution"] = evolution;
+                    sds.data["total_trained_time"] = acc;
                     sds.save();
                     
                     log("Autosaved.", "INFO");
@@ -448,6 +456,7 @@ int main()
                 
                 acu = 0;
                 generation += 1;
+                
 
                 
             }
@@ -507,7 +516,7 @@ int main()
 
         window.display();
 
-        //acc += dt;
+        acc += dt;
         acu += dt;
         dt = clock.restart().asSeconds();
 

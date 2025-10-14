@@ -11,6 +11,15 @@ include(FetchContent)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz)
 FetchContent_MakeAvailable(json)
 
+FetchContent_Declare(
+  csv  
+  GIT_REPOSITORY https://github.com/vincentlaucsb/csv-parser.git
+  GIT_SHALLOW TRUE 
+  GIT_TAG 2.3.0
+)
+FetchContent_MakeAvailable(csv)
+
+
 if(PcLycee)
     set(SFML_DIR "/nfs/home/rbenichou/Documents/TIPE/SFML-2.5.1/lib/cmake/SFML/")
     set(SFML_FIND_COMPONENTS system window graphics audio network)
@@ -41,7 +50,7 @@ add_executable(main
 )
 
 target_include_directories(main PRIVATE include)
-target_link_libraries(main PRIVATE nlohmann_json::nlohmann_json sfml-graphics "${TORCH_LIBRARIES}" )
+target_link_libraries(main PRIVATE nlohmann_json::nlohmann_json sfml-graphics csv "${TORCH_LIBRARIES}" )
 
 # The following code block is suggested to be used on Windows.
 # According to https://github.com/pytorch/pytorch/issues/25457,
