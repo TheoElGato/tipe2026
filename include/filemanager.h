@@ -10,6 +10,47 @@
 
 using namespace csv;
 
+class SimTasker {
+   public:
+      SimTasker(std::string tastPath);
+      void loadTask(int id);
+      
+      
+      std::string sim_name;
+      std::string device;
+      int threads;
+      
+      bool load_from_file;
+      std::string load_name;
+      
+      // SIM //
+      int sim_time;
+      float evolution;
+      int nb_brain;
+      int nb_agent;
+      int nb_hidden_layer;
+      int sous_sim;
+      int best_keep;
+      int selection_pol;
+      
+      // AUTOSAVE //
+      bool autosave;
+      int autosave_freq;
+      
+      // GOAL //
+      int maxdist;
+      int mindist;
+      int nb_goal;
+      
+      // START POS//
+      int startx;
+      int starty;
+   
+   private:
+      nlohmann::json allData;
+   
+};
+
 class SimDataStruct {
 public:
    nlohmann::json data;

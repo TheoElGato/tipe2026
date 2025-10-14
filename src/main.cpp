@@ -17,7 +17,7 @@
 std::string DEVICE = "cpu"; // "cpu" or "gpu"
 int THREADS = 8;
 
-bool LOAD_FROM_FILE = true;
+bool LOAD_FROM_FILE = false;
 std::string LOAD_NAME = "test2_20251014_213011";
 
 std::string SIM_NAME = "test2";
@@ -158,6 +158,9 @@ void physicsUpdate(PhysicsWorker& physics, std::vector<Creature*> agents, float 
 int main()
 {
     log("Welcome to the USRAF Sim");
+
+    SimTasker simTasker("task.json");
+    simTasker.loadTask(0);
 
     /// temp
     float ss_dt = 1/60.f;

@@ -148,3 +148,42 @@ std::string SimDataStruct::getFullPath() {
     std::string fp = this->fullpath;
     return fp+"/";
 }
+
+
+// SimTasker
+
+SimTasker::SimTasker(std::string tastPath) {
+    // read the JSON file from the load_name sim 
+    std::ifstream f(tastPath);
+    allData = nlohmann::json::parse(f);
+    
+    
+    
+}
+
+void SimTasker::loadTask(int id) {
+    nlohmann::json data = this->allData[0];
+    this->sim_name = data["SIM_NAME"];
+    this->device = data["DEVICE"];
+    this->threads = data["THREADS"];
+    this->load_from_file = data["LOAD_FROM_FILE"];
+    this->load_name = data["LOAD_NAME"];
+    this->sim_time = data["SIM_TIME"];
+    this->evolution = data["EVOLUTION"];
+    this->nb_brain = data["NB_BRAIN"];
+    this->nb_agent = nb_brain*threads;
+    this->nb_hidden_layer = data["NB_HIDDEN_LAYER"];
+    this->sous_sim = data["SOUS_SIM"];
+    this->best_keep = data["BEST_KEEP"];
+    this->selection_pol = data["SELECTION_POL"];
+    this->autosave = data["AUTOSAVE"];
+    this->autosave_freq = data["AUTOSAVE_FREQ"];
+    this->maxdist = data["MAXDIST"];
+    this->mindist = data["MINDIST"];
+    this->nb_goal = data["NB_GOAL"];
+    this->startx = data["STARTX"];
+    this->starty = data["STARTY"];
+}
+
+
+
