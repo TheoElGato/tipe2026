@@ -157,12 +157,12 @@ SimTasker::SimTasker(std::string tastPath) {
     std::ifstream f(tastPath);
     allData = nlohmann::json::parse(f);
     
-    
+    len = allData.size();
     
 }
 
 void SimTasker::loadTask(int id) {
-    nlohmann::json data = this->allData[0];
+    nlohmann::json data = this->allData[id];
     this->sim_name = data["SIM_NAME"];
     this->device = data["DEVICE"];
     this->threads = data["THREADS"];
@@ -183,6 +183,8 @@ void SimTasker::loadTask(int id) {
     this->nb_goal = data["NB_GOAL"];
     this->startx = data["STARTX"];
     this->starty = data["STARTY"];
+    this->is_infinite = data["IS_INFINITE"];
+    this->time_allowed = data["TIME_ALLOWED"];
 }
 
 

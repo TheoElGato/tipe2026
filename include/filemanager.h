@@ -15,6 +15,7 @@ class SimTasker {
       SimTasker(std::string tastPath);
       void loadTask(int id);
       
+      int len=0;
       
       std::string sim_name;
       std::string device;
@@ -45,6 +46,10 @@ class SimTasker {
       // START POS//
       int startx;
       int starty;
+      
+      // OTHERS //
+      bool is_infinite;
+      int time_allowed;
    
    private:
       nlohmann::json allData;

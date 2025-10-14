@@ -1,5 +1,5 @@
 [{
-	"SIM_NAME": "test2",
+	"SIM_NAME": "time_test2",
 
 	"DEVICE": "cpu",
 	"THREADS": 8,
@@ -24,5 +24,8 @@
 	"NB_GOAL": 3,
 
 	"STARTX": 523,
-	"STARTY": 275
+	"STARTY": 275,
+	
+	"IS_INFINITE": false,
+	"TIME_ALLOWED": 50
 }]

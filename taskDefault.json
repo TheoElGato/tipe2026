@@ -1,11 +1,11 @@
 [{
-	"SIM_NAME": "test2",
+	"SIM_NAME": "default",
 
 	"DEVICE": "cpu",
 	"THREADS": 8,
 
 	"LOAD_FROM_FILE": false,
-	"LOAD_NAME": "test2_20251014_213011",
+	"LOAD_NAME": "test2_20250201_000000",
 	
 	"SIM_TIME": 10,
 	"EVOLUTION": 0.075,
@@ -24,5 +24,8 @@
 	"NB_GOAL": 3,
 
 	"STARTX": 523,
-	"STARTY": 275
+	"STARTY": 275,
+	
+	"IS_INFINITE": true,
+	"TIME_ALLOWED": 126000
 }]

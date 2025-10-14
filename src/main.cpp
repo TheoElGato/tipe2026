@@ -125,6 +125,8 @@ int simulate(SimTasker stk) {
     int MINDIST = stk.mindist;
     int NB_GOAL = stk.nb_goal;
     sf::Vector2f start = sf::Vector2f(stk.startx, stk.starty);
+    bool is_infinite = stk.is_infinite;
+    int time_allowed = stk.time_allowed;
     ///////////////////
 
     /// temp
@@ -143,6 +145,7 @@ int simulate(SimTasker stk) {
     int simu_time = SIM_TIME;
     float evolution = EVOLUTION;
     int generation = 0;
+    bool clean_exit = false;
 
     // accumulators
     float acc = 0;
@@ -243,7 +246,7 @@ int simulate(SimTasker stk) {
         sous_sim_threads.emplace_back(std::thread());
     }
 
-    auto window = sf::RenderWindow(sf::VideoMode({1050u, 750u}), "URSAFSIM");
+    auto window = sf::RenderWindow(sf::VideoMode({1050u, 750u}), "URSAFSIM - "+SIM_NAME);
     window.setFramerateLimit(60);
 
     // Load Textures
@@ -316,6 +319,10 @@ int simulate(SimTasker stk) {
                 window.close();
             }
         }
+        
+        if (!is_infinite) {
+            if (acc > time_allowed) clean_exit = true;
+        }
 
         // Gestion des touches :
         if (inputdelay == inputdelayBase) {
@@ -333,6 +340,12 @@ int simulate(SimTasker stk) {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F))
             {
                 drawall = !drawall;
+                inputdelay = 0;
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::K))
+            {
+                clean_exit = true;
+                log("Wainting for threads to finish before exiting...");
                 inputdelay = 0;
             }
 
@@ -358,6 +371,25 @@ int simulate(SimTasker stk) {
                 sous_sim_state[i] = 3; // Mark as collected
                 sous_sim_completed += 1;
                 
+            }
+        }
+        
+        if(clean_exit) {
+            if (threads_used == 0) {
+                for (int i=0; i<nb_brain; i++)
+                {
+                    std::string istring = std::to_string(i);
+                    brain_agent[i].saveFile(sds.getFullPath()+istring+".pt");
+                }
+                
+                sds.data["generation"] = generation;
+                sds.data["simu_time"] = simu_time;
+                sds.data["evolution"] = evolution;
+                sds.data["total_trained_time"] = acc;
+                sds.save();
+                
+                log("Saved.", "INFO");
+                return 0;
             }
         }
         
@@ -498,8 +530,13 @@ int simulate(SimTasker stk) {
 int main() {
     // Load all the task we have to do
     SimTasker mainSimTasker("task.json");
-    mainSimTasker.loadTask(0);
     
-    simulate(mainSimTasker);
+    // Execute all the sims : 
+    log("Hello, we are going for "+std::to_string(mainSimTasker.len)+" simulations today.");
+    for(int i=0;i<mainSimTasker.len;i+=1) {
+        mainSimTasker.loadTask(i);
+        simulate(mainSimTasker);
+    }
+    
     return 0;
 }
