@@ -148,8 +148,8 @@ int simulate(SimTasker stk) {
     bool clean_exit = false;
 
     // accumulators
-    float acc = 0;
-    float acu = 0;
+    float acc = 0; // Used for the total trained time
+    float acu = 0; // Used for the time for a generation 
     int cyl = 0;
 
     // selected agent
@@ -221,9 +221,6 @@ int simulate(SimTasker stk) {
     int sous_sim_started = 0;
     int sous_sim_completed = 0;
     
-    // For stats time 
-    float last_acc = acc;
-    
     // Distribute agents among PhysicsWorkers
     std::vector<PhysicsWorker> physicsWorkers;
     for(int i = 0; i < THREADS; i++) {
@@ -284,9 +281,6 @@ int simulate(SimTasker stk) {
     sf::Clock clock;
     float fps = 0.0f;
 
-    // dummy goal
-    sf::Vector2f goal(250, 250);
-
     std::vector<sf::Vector2f> goals;
 
     for(int i=0; i<sous_sim_total; i++) {
@@ -307,7 +301,6 @@ int simulate(SimTasker stk) {
 
     while (window.isOpen())
     {
-        //sf::Time frameStart = clock.restart();
         if (dt < 1e-6f) dt = 1e-6f;
         fps = 1.0f / dt;
 
@@ -321,10 +314,12 @@ int simulate(SimTasker stk) {
         }
         
         if (!is_infinite) {
-            if (acc > time_allowed) clean_exit = true;
+            if (acc > time_allowed) {
+            clean_exit = true;
+            }
         }
 
-        // Gestion des touches :
+        // Manager keys pressed :
         if (inputdelay == inputdelayBase) {
 
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
@@ -363,7 +358,6 @@ int simulate(SimTasker stk) {
                 for (int j = 0; j < groups_avail.size(); j++) {
                     if (groups_avail[j] == i) {
                         groups_avail[j] = -1; // Mark group as available
-                        //log("Sous-sim " + std::to_string(i) + " finished with group " + std::to_string(j), "THREAD");
                         break;
                     }
                 }
@@ -400,7 +394,7 @@ int simulate(SimTasker stk) {
             
             if (sous_sim_completed >= sous_sim_total) {
                 // All of it is finished
-                // Changement de sim :
+                // Change of sim :
 
 
                 log("Generation finished. Processing...", "INFO");
@@ -420,10 +414,9 @@ int simulate(SimTasker stk) {
                 sds.addStatRow(generation, score_agent[0], score_agent[1], score_agent[2], 
                    score_agent[3], score_agent[4], score_agent[5], score_agent[6],
                    score_agent[7], score_agent[8], score_agent[9],
-                   score_agent[best_score_index], acc-last_acc);
-                last_acc = acc;
+                   score_agent[best_score_index], acu);
                 
-                // Sauvegarde automatique
+                // Autosave check
                 if (AUTOSAVE && generation % AUTOSAVE_FREQ == 0) {
                     // Time to autosave !
                     
@@ -480,22 +473,21 @@ int simulate(SimTasker stk) {
                 }
     
                 if (group_index == -1){ 
-                    error("No group available. Have you made a mistake ???"); // Pas de groupe libre
+                    error("No group available. Have you made a mistake ???"); // No free group to work with
                 }
     
-                // making a Vector of Brain pointers for the group
+                // Making a Vector of Brain pointers for the group
                 std::vector<Brain*> brain_agent_ptrs;
                 for (auto& b : brain_agent) brain_agent_ptrs.push_back(&b);
     
                 
                 sous_sim_started+=1;
                 log("Starting sous-sim " + std::to_string(sous_sim_next_index) + " on group " + std::to_string(group_index) + " with " + std::to_string(agentPartitions[group_index].size()) + " agents.", "THREAD");
-                //log("threads used: " + std::to_string(threads_used) + "/" + std::to_string(THREADS), "THREAD");
-    
+                    
                 sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goals[sous_sim_next_index], brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ss_dt, simu_time, ss_dt*4);
-                sous_sim_threads[sous_sim_next_index].detach(); // Détacher le thread pour qu'il s'exécute indépendamment
+                sous_sim_threads[sous_sim_next_index].detach(); // Detach the thread to make it run on is own
     
-                sous_sim_state[sous_sim_next_index] = 1; // Marquer comme en cours d'exécution
+                sous_sim_state[sous_sim_next_index] = 1; // Mark it as running
     
                 threads_used += 1;
                 sous_sim_next_index += 1;
