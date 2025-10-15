@@ -47,6 +47,7 @@ add_executable(main
     src/threadsmg.cpp
     src/reproduction.cpp
     src/filemanager.cpp
+    src/client.cpp
 )
 
 target_include_directories(main PRIVATE include)
