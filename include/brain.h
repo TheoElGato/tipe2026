@@ -11,6 +11,7 @@ public:
     void saveFile(const std::string& file);
     void loadFile(const std::string& file);
     void mutate(float a);
+    Brain copy();
 
 
 private:
