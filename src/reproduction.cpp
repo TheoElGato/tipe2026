@@ -51,7 +51,8 @@ void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
             j+=1;
             cumul += score_agent[j];
         }
-        new_agents.emplace_back((*brain_agents)[j]);
+       // la copie ici ne marche pas il faut créé une fct qui permet de le faire 
+new_agents.emplace_back((*brain_agents)[j]);
         new_agents.back().mutate(EVOLUTION);
     }
 
