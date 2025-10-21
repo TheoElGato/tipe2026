@@ -16,6 +16,7 @@ LogicServer::LogicServer() {
         	logm("[-] Client#"+std::to_string(from)+": "+ clients_hn[from] +" disconnected","Server");
             connections.erase(it);
             clients_hn.erase(from);
+            nb_client -=1;
         }
     });
 
@@ -32,9 +33,16 @@ LogicServer::LogicServer() {
         	
         	Packet resp("connected",std::to_string(from),"","");
         	send(resp, hdl);
-        	
+        	nb_client +=1;
         	logm("[+] Client#"+std::to_string(from)+": "+ clients_hn[from] +" connected","Server");
-        	
+        }
+        if (r.cmd == "genfinished") {
+            if (step == 1) {
+                step = 2;
+                timetime = std::time(nullptr);
+            }
+            logm("Client#"+std::to_string(from)+": "+ clients_hn[from] +" finished gen #"+r.arg1,"Server");
+            cfinished +=1;
         }
 
         
@@ -77,38 +85,43 @@ void LogicServer::logic_loop() {
 
 
 	int task_done = 0;
-	int step = 0;
+	int started_at = 0;
 
     while (task_done != mstk->len) {
 
-    	if (step == 0) {
+    	if (step == 0) { // Asking client to start a sim
     		logm("Asking clients to start sim #"+std::to_string(task_done));
     		Packet startpacket("startsim",std::to_string(task_done),"","");
     		send_all(startpacket);
+    		started_at = std::time(nullptr);
     		step += 1;
     	}
-    
-    	/*
-        if (connections.empty()) {
-            std::cout << "Waiting for clients to connect..." << std::endl;
-            std::this_thread::sleep_for(std::chrono::seconds(2));
-            continue;
-        }
-
-        std::cout << "Launching action on clients..." << std::endl;
-        Packet p;
-        p.cmd = "start_task";
-        send_all(p);
-
-        // Wait for clients to finish (this could be improved by tracking replies)
-        std::this_thread::sleep_for(std::chrono::seconds(5));
-
-        std::cout << "Processing results..." << std::endl;
-        // (process data here...)
-
-        std::cout << "Loop iteration done." << std::endl;
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-        */
+    	
+    	if (step==1) {
+    	    // Client are working on a generation. We are waiting...
+    	}
+    	
+    	if (step==2) { // One client have finished.
+    	    if (cfinished==nb_client) step +=1;
+    	    else if(std::time(nullptr)>(timetime+timeout)) {
+    	        logm("Some clients need to be kicked. Reason : timeout","WARNING");
+    	        logm("KIKING NOT IMPLEMENTED","WARNING");
+    	        step +=1;
+    	    }
+    	}
+    	
+    	if (step==3) { // Now we analyse the results here
+    	    logm("Generation done. Analysing...");
+    	    // TODO
+    	    step+=1;
+    	}
+    	
+    	if (step==4) {
+    	    cfinished = 0;
+    	    Packet ngen("nextgen","","","");
+    	    send_all(ngen);
+    	    step = 1;
+    	}
     }
     
     logm("Server Logic Loop finished. WS Server will continue to run. Please exit using Ctrl+C");

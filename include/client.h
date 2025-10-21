@@ -19,21 +19,25 @@
 
 typedef websocketpp::client<websocketpp::config::asio_client> client;
 
-int simulate(SimTasker stk);
 
 class SimpleClient {
 public:
-    SimpleClient(const std::string &uri);
+    SimpleClient(const std::string &uri, const std::string path);
     ~SimpleClient();
     void send(Packet pck);
     void run(SimTasker* stk);
+    int state = 0;
+    std::string sbfpath = "";
+    std::string srvid = "";
+
 private:
     client m_client;
     websocketpp::connection_hdl m_hdl;
     std::thread m_thread;
-    int state = 0;
-    std::string srvid = "";
     SimTasker* mstk;
 };
+
+int simulate(SimTasker stk, bool mc = false, SimpleClient* cl = nullptr);
+
 
 #endif // CLIENT_H

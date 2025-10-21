@@ -48,3 +48,4 @@ save/*
 
 # debug information files
 *.dwo
+task.json

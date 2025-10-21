@@ -84,7 +84,7 @@ void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::
     
 }
 
-int simulate(SimTasker stk) {
+int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
     
     logm("Welcome to the USRAF Sim");
     
@@ -235,6 +235,9 @@ int simulate(SimTasker stk) {
     sf::Texture backgroundTexture;
     backgroundTexture.loadFromFile("assets/textures/background.png");
     
+    sf::Texture wifiTexture;
+    wifiTexture.loadFromFile("assets/textures/wifi.png");
+    
     // Item textures
     sf::Texture startTexture;
     startTexture.loadFromFile("assets/textures/start.png");
@@ -251,6 +254,7 @@ int simulate(SimTasker stk) {
 
     // Create Sprite
     sf::Sprite backgroundSprite(backgroundTexture);
+    sf::Sprite wifiSprite(wifiTexture);
     sf::Sprite startSprite(startTexture);
     
     sf::Sprite diamondSprite(diamondTexture);
@@ -259,6 +263,8 @@ int simulate(SimTasker stk) {
     sf::Sprite netherite_ingotSprite(netherite_ingotTexture);
     sf::Sprite music_disc_othersideSprite(music_disc_othersideTexture);
     
+    wifiSprite.setPosition({0, 0});
+    wifiSprite.scale({0.1f, 0.1f});
 
     // Manage Clock
     sf::Clock clock;
@@ -299,6 +305,25 @@ int simulate(SimTasker stk) {
         if (!is_infinite) {
             if (acc > time_allowed) {
             clean_exit = true;
+            }
+        }
+        
+        // End of generation for client mode
+        if(mc) {
+            if (cl->state == 2) continue;
+            if (cl->state == 3) {
+                sous_sim_next_index = 0;
+                sous_sim_started = 0;
+                sous_sim_completed = 0;
+                sous_sim_threads.clear();
+                sous_sim_state.clear();
+                for(int i=0; i<sous_sim_total; i++) {
+                    sous_sim_threads.emplace_back(std::thread());
+                    sous_sim_state.emplace_back(0);
+                }
+                acu = 0;
+                generation += 1;
+                cl->state = 1;
             }
         }
 
@@ -403,10 +428,13 @@ int simulate(SimTasker stk) {
                 if (AUTOSAVE && generation % AUTOSAVE_FREQ == 0) {
                     // Time to autosave !
                     
-                    for (int i=0; i<nb_brain; i++)
-                    {
-                        std::string istring = std::to_string(i);
-                        brain_agent[i].saveFile(sds.getFullPath()+istring+".pt");
+                    // We only want to save brain in classic mode here.
+                    if (!mc) {
+                        for (int i=0; i<nb_brain; i++)
+                        {
+                            std::string istring = std::to_string(i);
+                            brain_agent[i].saveFile(sds.getFullPath()+istring+".pt");
+                        }
                     }
                     
                     sds.data["generation"] = generation;
@@ -418,23 +446,32 @@ int simulate(SimTasker stk) {
                     logm("Autosaved.", "INFO");
                 }
                 
-                // Initialization the variables for the next generation
-                reproduce(&brain_agent, score_agent,  nb_brain, evolution, BEST_KEEP, SELECTION_POL);
-
-                sous_sim_next_index = 0;
-                sous_sim_started = 0;
-                sous_sim_completed = 0;
-                sous_sim_threads.clear();
-                sous_sim_state.clear();
-                for(int i=0; i<sous_sim_total; i++) {
-                    sous_sim_threads.emplace_back(std::thread());
-                    sous_sim_state.emplace_back(0);
+                if (!mc) {
+                    // Initialization the variables for the next generation
+                    reproduce(&brain_agent, score_agent,  nb_brain, evolution, BEST_KEEP, SELECTION_POL);
+                    sous_sim_next_index = 0;
+                    sous_sim_started = 0;
+                    sous_sim_completed = 0;
+                    sous_sim_threads.clear();
+                    sous_sim_state.clear();
+                    for(int i=0; i<sous_sim_total; i++) {
+                        sous_sim_threads.emplace_back(std::thread());
+                        sous_sim_state.emplace_back(0);
+                    }
+                    acu = 0;
+                    generation += 1;
+                } else {
+                
+                    for (int i=0; i<nb_brain; i++)
+                    {
+                        std::string istring = std::to_string(i);
+                        brain_agent[i].saveFile(cl->sbfpath+"/"+cl->srvid+"s"+istring+".pt");
+                    }
+                
+                    Packet genf("genfinished",std::to_string(generation),"","");
+                    cl->send(genf);
+                    cl->state = 2;
                 }
-                
-                acu = 0;
-                generation += 1;
-                
-
                 
             }
         } else {
@@ -489,7 +526,8 @@ int simulate(SimTasker stk) {
         }
 
         drawStats(window, font, {{"FPS", std::round(fps)}, {"Nb agents", agents.size()}, {"SGen Selected", groups_avail[selected_agents]}, {"Current Gen", generation},{"Current SGen", sous_sim_started},{"Tps",round(acu)},{"Tps max", simu_time}, {"Evolution", evolution}});
-
+        if (mc) window.draw(wifiSprite);
+        
         window.display();
 
         acc += dt;
@@ -502,7 +540,8 @@ int simulate(SimTasker stk) {
     return 0;
 }
 
-SimpleClient::SimpleClient(const std::string &uri) {
+SimpleClient::SimpleClient(const std::string &uri, const std::string path) {
+    sbfpath = path;
     m_client.init_asio();
     m_client.clear_access_channels(websocketpp::log::alevel::all);
     m_client.clear_error_channels(websocketpp::log::elevel::all);
@@ -520,6 +559,11 @@ SimpleClient::SimpleClient(const std::string &uri) {
         	mstk->loadTask(std::stoi(r.arg1));
         	mstk->sim_name = mstk->sim_name + srvid;
         	state = 1;
+        }
+        
+        if (r.cmd == "nextgen") {
+        	logm("Server requested the next gen");
+        	state = 3;
         }
         
     });
@@ -566,7 +610,7 @@ void SimpleClient::run(SimTasker* stk) {
     while (state != -1) {
         if (state==0) {continue;}
         if (state==1) {
-            simulate(*mstk);
+            simulate(*mstk, true, this);
         }
     }
 }

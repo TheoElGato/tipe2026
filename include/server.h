@@ -16,7 +16,7 @@ class LogicServer {
 public:
     LogicServer();
     void run(uint16_t port, SimTasker* test);
-    
+    int timeout = 10;
      
 
 private:
@@ -25,6 +25,10 @@ private:
 	std::map<websocketpp::connection_hdl, uint64_t, std::owner_less<websocketpp::connection_hdl>> connections;
 	std::map<uint64_t, std::string> clients_hn;
 	SimTasker* mstk;
+	int timetime = 0;
+	int cfinished = 0;
+	int nb_client = 0;
+	int step = 0;
 	void logic_loop();
 	void send_all(Packet pck);
 	void send(Packet pck, websocketpp::connection_hdl hdl);
