@@ -507,7 +507,21 @@ SimpleClient::SimpleClient(const std::string &uri) {
     m_client.clear_access_channels(websocketpp::log::alevel::all);
     m_client.clear_error_channels(websocketpp::log::elevel::all);
     m_client.set_message_handler([this](websocketpp::connection_hdl, client::message_ptr msg) {
-        logm("Received: " + msg->get_payload(),"Client");
+        
+        std::string payload = msg->get_payload();
+        Packet r(payload);
+        
+        if (r.cmd == "connected") {
+        	srvid = r.arg1;
+        }
+        
+        if (r.cmd == "startsim") {
+        	logm("Server requested the start of sim #" + r.arg1,"Client");
+        	mstk->loadTask(std::stoi(r.arg1));
+        	mstk->sim_name = mstk->sim_name + srvid;
+        	state = 1;
+        }
+        
     });
 
     websocketpp::lib::error_code ec;
@@ -534,5 +548,25 @@ void SimpleClient::send(Packet pck) {
     m_client.send(m_hdl, pck.get_string(), websocketpp::frame::opcode::text, ec);
     if (ec) {
         logm("Send failed: " + ec.message(),"ERROR");
+    }
+}
+
+void SimpleClient::run(SimTasker* stk) {
+    
+    mstk = stk;
+    
+    // Connecting...
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    Packet conn("connect",getHostName(),"","");
+    send(conn);
+    
+    while (srvid == "") continue;
+    logm("Connected to server with id #" + srvid,"Client");
+    
+    while (state != -1) {
+        if (state==0) {continue;}
+        if (state==1) {
+            simulate(*mstk);
+        }
     }
 }

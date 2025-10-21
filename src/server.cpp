@@ -7,7 +7,6 @@ LogicServer::LogicServer() {
     m_server.set_open_handler([this](websocketpp::connection_hdl hdl) {
     	uint64_t id = next_id++;
         connections[hdl] =  id;
-        //logm("[+] New client connected","Server");
     });
 
     m_server.set_close_handler([this](websocketpp::connection_hdl hdl) {
@@ -30,23 +29,87 @@ LogicServer::LogicServer() {
         
         if (r.cmd == "connect") {
         	clients_hn[from] = r.arg1;
+        	
+        	Packet resp("connected",std::to_string(from),"","");
+        	send(resp, hdl);
+        	
         	logm("[+] Client#"+std::to_string(from)+": "+ clients_hn[from] +" connected","Server");
+        	
         }
 
-        // Broadcast to all other clients
-        /*
-        for (auto &conn : m_connections) {
-            if (conn.lock().get() != hdl.lock().get()) {
-                m_server.send(conn, payload, msg->get_opcode());
-            }
-        }
-        */
+        
     });
 }
 
-void LogicServer::run(uint16_t port) {
+void LogicServer::send(Packet pck, websocketpp::connection_hdl hdl) {
+    websocketpp::lib::error_code ec;
+    m_server.send(hdl, pck.get_string(), websocketpp::frame::opcode::text, ec);
+    if (ec) {
+        logm("Send failed: " + ec.message(),"ERROR");
+    }
+}
+
+void LogicServer::send_all(Packet pck) {
+	// Broadcast to all
+    for (auto &pair : connections) {
+		send(pck, pair.first);
+    }
+}
+
+void LogicServer::run(uint16_t port,SimTasker* test) {
     m_server.listen(port);
     m_server.start_accept();
     logm("Server listening on port "+ std::to_string(port) +"...","Server");
+    
+    mstk = test;
+    // Launch the logic loop in another thread
+    std::thread([this]() { this->logic_loop(); }).detach();
+    
     m_server.run();
+}
+
+void LogicServer::logic_loop() {
+    // We are waiting for clients to connect
+    logm("Press ENTER when all clients are connected sucessfully");
+    std::getc(stdin);
+    
+    logm("All clients are connected Starting Logic Loop...");
+
+
+	int task_done = 0;
+	int step = 0;
+
+    while (task_done != mstk->len) {
+
+    	if (step == 0) {
+    		logm("Asking clients to start sim #"+std::to_string(task_done));
+    		Packet startpacket("startsim",std::to_string(task_done),"","");
+    		send_all(startpacket);
+    		step += 1;
+    	}
+    
+    	/*
+        if (connections.empty()) {
+            std::cout << "Waiting for clients to connect..." << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+            continue;
+        }
+
+        std::cout << "Launching action on clients..." << std::endl;
+        Packet p;
+        p.cmd = "start_task";
+        send_all(p);
+
+        // Wait for clients to finish (this could be improved by tracking replies)
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+
+        std::cout << "Processing results..." << std::endl;
+        // (process data here...)
+
+        std::cout << "Loop iteration done." << std::endl;
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        */
+    }
+    
+    logm("Server Logic Loop finished. WS Server will continue to run. Please exit using Ctrl+C");
 }

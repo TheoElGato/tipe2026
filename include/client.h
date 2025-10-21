@@ -26,11 +26,14 @@ public:
     SimpleClient(const std::string &uri);
     ~SimpleClient();
     void send(Packet pck);
-
+    void run(SimTasker* stk);
 private:
     client m_client;
     websocketpp::connection_hdl m_hdl;
     std::thread m_thread;
+    int state = 0;
+    std::string srvid = "";
+    SimTasker* mstk;
 };
 
 #endif // CLIENT_H
