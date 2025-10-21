@@ -6,17 +6,20 @@
 int main(int argc, char* argv[]) {
     // Read args
     int mode = 0;
-    std::string ip;
+    std::string ip = "localhost";
+    std::string sbf_path = "sbf"; // Stand for Server Brain File Path
     if (argc==1) mode = 0;
     else {
-        if (argc<3) return 1;
+        if (argc<4) return 1;
         std::string tmp = argv[1];
         if (tmp=="-c") {
             mode = 1;
             ip = argv[2];
+            sbf_path = argv[3];
         } else if (tmp=="-s") {
             mode = 2;
             ip = argv[2];
+            sbf_path = argv[3];
         } else {
             return 1;
         }
@@ -27,7 +30,7 @@ int main(int argc, char* argv[]) {
     
     if (mode==0) {
         // Execute all the sims : 
-        logm("Classic mode for "+std::to_string(mainSimTasker.len)+" simulations today.");
+        logm("Classic mode for "+std::to_string(mainSimTasker.len)+" simulations");
         for(int i=0;i<mainSimTasker.len;i+=1) {
             mainSimTasker.loadTask(i);
             simulate(mainSimTasker);

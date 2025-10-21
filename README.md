@@ -3,7 +3,7 @@
 **Problématique** : *Comment optimiser le cycle de marche d'une créature à 4 pattes avec un réseau de neurones ?*
 
 
-On souhaite créer une simulation de deux dimensions ou une créature à 4 pattes cherche à parcourir un point à une distance de 10m. La créature est contrôlée par une intelligence artificielle dotée d’un réseau de neurones.
+On souhaite créer une simulation à deux dimensions où une créature à 4 pattes cherche à se déplacer jusqu'à un point. La créature est contrôlée par une intelligence artificielle dotée d’un réseau de neurones.
 On cherche à faire varier les paramètres variables suivants dans la simulation pour gagner du temps d'entraînement, tout en gardant  : 
 
 **Paramètres variables :**
@@ -28,9 +28,13 @@ On cherche à faire varier les paramètres variables suivants dans la simulation
 - Facteur aléatoire (répéter plusieur fois sur les même paramètres)
 
 
-**Module utilisé**
-- SFML
-- libtorch
+**Modules utilisé**
+- SFML : https://github.com/SFML/SFML
+- libtorch : https://github.com/pytorch/pytorch
+- JSON for Modern C++ : https://github.com/nlohmann/json
+- csv-parser : https://github.com/vincentlaucsb/csv-parser
+- websocketpp : https://github.com/zaphoyd/websocketpp
+- asio : https://github.com/chriskohlhoff/asio
 
 
 **MP2I >> MPSI**

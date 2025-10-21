@@ -19,6 +19,23 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(csv)
 
+FetchContent_Declare(
+  websocketpp
+  GIT_REPOSITORY https://github.com/zaphoyd/websocketpp.git
+  GIT_SHALLOW TRUE 
+  GIT_TAG 0.8.2
+)
+FetchContent_MakeAvailable(websocketpp)
+add_library(websocketpp INTERFACE)
+target_include_directories(websocketpp INTERFACE ${websocketpp_SOURCE_DIR})
+
+FetchContent_Declare(
+  asio
+  GIT_REPOSITORY https://github.com/chriskohlhoff/asio.git
+  GIT_TAG asio-1-28-0
+  GIT_SHALLOW TRUE
+)
+FetchContent_MakeAvailable(asio)
 
 if(PcLycee)
     set(SFML_DIR "/nfs/home/rbenichou/Documents/TIPE/SFML-2.5.1/lib/cmake/SFML/")
@@ -50,8 +67,9 @@ add_executable(main
     src/client.cpp
 )
 
-target_include_directories(main PRIVATE include)
-target_link_libraries(main PRIVATE nlohmann_json::nlohmann_json sfml-graphics csv "${TORCH_LIBRARIES}" )
+target_compile_definitions(main PRIVATE ASIO_STANDALONE)
+target_include_directories(main PRIVATE include ${asio_SOURCE_DIR}/asio/include)
+target_link_libraries(main PRIVATE nlohmann_json::nlohmann_json sfml-graphics csv websocketpp "${TORCH_LIBRARIES}" )
 
 # The following code block is suggested to be used on Windows.
 # According to https://github.com/pytorch/pytorch/issues/25457,
