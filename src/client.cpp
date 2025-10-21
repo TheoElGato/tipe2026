@@ -506,3 +506,36 @@ int simulate(SimTasker stk) {
     logm("Exiting simulation.", "INFO");
     return 0;
 }
+
+SimpleClient::SimpleClient(const std::string &uri) {
+    m_client.init_asio();
+    m_client.set_message_handler([this](websocketpp::connection_hdl, client::message_ptr msg) {
+        logm("Received: " + msg->get_payload(),"Client");
+    });
+
+    websocketpp::lib::error_code ec;
+    client::connection_ptr con = m_client.get_connection(uri, ec);
+    if (ec) {
+        logm("Could not create connection: ", "ERROR");
+        return;
+    }
+
+    m_hdl = con->get_handle();
+    m_client.connect(con);
+
+    m_thread = std::thread([this]() { m_client.run(); });
+}
+
+SimpleClient::~SimpleClient() {
+    m_client.stop_perpetual();
+    if (m_thread.joinable())
+        m_thread.join();
+}
+
+void SimpleClient::send(const std::string &msg) {
+    websocketpp::lib::error_code ec;
+    m_client.send(m_hdl, msg, websocketpp::frame::opcode::text, ec);
+    if (ec) {
+        logm("Send failed: " + ec.message(),"ERROR");
+    }
+}

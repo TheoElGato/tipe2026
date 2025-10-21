@@ -17,7 +17,21 @@
 #include "threadsmg.h"
 #include "filemanager.h"
 
+typedef websocketpp::client<websocketpp::config::asio_client> client;
+
 int simulate(SimTasker stk);
 void logm(const std::string& message, const std::string& level = "INFO");
+
+class SimpleClient {
+public:
+    SimpleClient(const std::string &uri);
+    ~SimpleClient();
+    void send(const std::string &msg);
+
+private:
+    client m_client;
+    websocketpp::connection_hdl m_hdl;
+    std::thread m_thread;
+};
 
 #endif // CLIENT_H

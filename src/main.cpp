@@ -6,7 +6,7 @@
 int main(int argc, char* argv[]) {
     // Read args
     int mode = 0;
-    std::string ip = "localhost";
+    std::string ip = "localhost:9002";
     std::string sbf_path = "sbf"; // Stand for Server Brain File Path
     if (argc==1) mode = 0;
     else {
@@ -30,13 +30,14 @@ int main(int argc, char* argv[]) {
     
     if (mode==0) {
         // Execute all the sims : 
-        logm("Classic mode for "+std::to_string(mainSimTasker.len)+" simulations");
+        logm("Starting Classic mode for "+std::to_string(mainSimTasker.len)+" simulations");
         for(int i=0;i<mainSimTasker.len;i+=1) {
             mainSimTasker.loadTask(i);
             simulate(mainSimTasker);
         }
     } else if (mode==1) {
-        logm("Client mode");
+        logm("Starting Client mode");
+        SimpleClient c("ws://"+ip);
     } else if (mode==2) {
         logm("Server mode for "+std::to_string(mainSimTasker.len)+" simulations today.");
     } 
