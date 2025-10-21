@@ -20,13 +20,12 @@
 typedef websocketpp::client<websocketpp::config::asio_client> client;
 
 int simulate(SimTasker stk);
-void logm(const std::string& message, const std::string& level = "INFO");
 
 class SimpleClient {
 public:
     SimpleClient(const std::string &uri);
     ~SimpleClient();
-    void send(const std::string &msg);
+    void send(Packet pck);
 
 private:
     client m_client;

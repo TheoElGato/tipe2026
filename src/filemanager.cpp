@@ -1,6 +1,9 @@
 #include "filemanager.h"
 
-using namespace nlohmann::literals;
+void logm(const std::string& message, const std::string& level) {   
+    // Standardized logging function
+    std::cout << "[" << level << "] " << message << std::endl;
+}
 
 std::string generate_name(const std::string& name) {
     std::time_t now = std::time(nullptr); // Get current time
@@ -187,5 +190,37 @@ void SimTasker::loadTask(int id) {
     this->time_allowed = data["TIME_ALLOWED"];
 }
 
+Packet::Packet(std::string c,std::string a1,std::string a2,std::string a3)
+{
+    cmd = c;
+    arg1 = a1;
+    arg2 = a2;
+    arg3 = a3;
+    update();
+}
 
+Packet::Packet(std::string loads)
+{
+    data = nlohmann::json::parse(loads);
+    cmd = data["cmd"];
+    arg1 = data["arg1"];
+    arg2 = data["arg2"];
+    arg3 = data["arg3"];
+    update();
+}
+
+std::string Packet::get_string()
+{
+    return data.dump();
+}
+
+void Packet::update()
+{
+    data = {
+        {"cmd", cmd},
+        {"arg1", arg1},
+        {"arg2", arg2},
+        {"arg3", arg3},
+    };
+}
 

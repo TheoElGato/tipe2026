@@ -65,6 +65,7 @@ add_executable(main
     src/reproduction.cpp
     src/filemanager.cpp
     src/client.cpp
+    src/server.cpp
 )
 
 target_compile_definitions(main PRIVATE ASIO_STANDALONE)

@@ -1,10 +1,5 @@
 #include "client.h"
 
-void logm(const std::string& message, const std::string& level) {   
-    // Standardized logging function
-    std::cout << "[" << level << "] " << message << std::endl;
-}
-
 void error(const std::string& message) {
     // Standardized error function
     logm(message, "ERROR");
@@ -509,6 +504,8 @@ int simulate(SimTasker stk) {
 
 SimpleClient::SimpleClient(const std::string &uri) {
     m_client.init_asio();
+    m_client.clear_access_channels(websocketpp::log::alevel::all);
+    m_client.clear_error_channels(websocketpp::log::elevel::all);
     m_client.set_message_handler([this](websocketpp::connection_hdl, client::message_ptr msg) {
         logm("Received: " + msg->get_payload(),"Client");
     });
@@ -532,9 +529,9 @@ SimpleClient::~SimpleClient() {
         m_thread.join();
 }
 
-void SimpleClient::send(const std::string &msg) {
+void SimpleClient::send(Packet pck) {
     websocketpp::lib::error_code ec;
-    m_client.send(m_hdl, msg, websocketpp::frame::opcode::text, ec);
+    m_client.send(m_hdl, pck.get_string(), websocketpp::frame::opcode::text, ec);
     if (ec) {
         logm("Send failed: " + ec.message(),"ERROR");
     }

@@ -9,6 +9,25 @@
 #include "csv.hpp"
 
 using namespace csv;
+using namespace nlohmann::literals;
+
+void logm(const std::string& message, const std::string& level = "INFO");
+std::string getHostName();
+
+class Packet {
+   public:
+      Packet(std::string c,std::string a1,std::string a2,std::string a3);
+      Packet(std::string loads);
+      std::string get_string();
+      std::string cmd = "";
+      std::string arg1 = "";
+      std::string arg2 = "";
+      std::string arg3 = "";
+      void update();
+   private:
+      
+      nlohmann::json data;
+};
 
 class SimTasker {
    public:
