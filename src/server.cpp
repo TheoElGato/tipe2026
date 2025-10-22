@@ -46,6 +46,15 @@ LogicServer::LogicServer() {
             if (result.size() == 0) {
                 logm("Client#"+std::to_string(from)+": "+clients_hn[from]+" send a result of 0 on a generation","ERROR");
                 genresults.emplace_back(std::vector<float>{}, std::vector<Brain>{});
+            } else {
+                std::vector<Brain> vb;
+                for (int i=0; i<result.size(); i++) {
+                    Brain db(1,1,"","cpu",1); // Dummy Brain
+                    db.bid1 = from;
+                    db.bid2 = i;
+                    vb.push_back(db);
+                }
+                genresults.emplace_back(result, vb);
             }
             cfinished +=1;
         }
@@ -118,7 +127,31 @@ void LogicServer::logic_loop() {
     	
     	if (step==3) { // Now we analyse the results here
     	    logm("Generation done. Analysing...");
-    	    // TODO
+    	    
+    	    std::vector<float> allFloats;
+            std::vector<Brain> allBrains;
+            
+            // Reserve space to avoid reallocations (optional but faster)
+            size_t totalFloats = 0;
+            size_t totalBrains = 0;
+            
+            for (auto &pair : genresults) {
+                totalFloats += pair.first.size();
+                totalBrains += pair.second.size();
+            }
+            
+            allFloats.reserve(totalFloats);
+            allBrains.reserve(totalBrains);
+            
+            // Merge
+            for (auto &pair : genresults) {
+                allFloats.insert(allFloats.end(), pair.first.begin(), pair.first.end());
+                allBrains.insert(allBrains.end(), pair.second.begin(), pair.second.end());
+            }
+            
+            // Sort by score descending
+            reverse_sorting_brain(&allBrains, &allFloats, 0, allBrains.size() - 1);
+    	    
     	    step+=1;
     	}
     	

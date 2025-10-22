@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <atomic>
 #include "brain.h"
+#include "reproduction.h"
 
 typedef websocketpp::server<websocketpp::config::asio> server;
 
