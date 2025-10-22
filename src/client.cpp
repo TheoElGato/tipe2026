@@ -86,7 +86,7 @@ void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::
 
 int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
     
-    logm("Welcome to the USRAF Sim");
+    logm("Welcome to the URSAF Sim");
     
     /// SETTINGS FROM THE SIMTASKER///
     std::string DEVICE = stk.device;
@@ -115,7 +115,6 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
     /// temp
     float ss_dt = 1/60.f;
     
-
     ////// variable related to the state of simulation ///////
 
     // var input handling
