@@ -29,6 +29,8 @@ public:
     int state = 0;
     std::string sbfpath = "";
     std::string srvid = "";
+    std::vector<std::string> selectioned;
+    std::vector<float> scores;
 
 private:
     client m_client;

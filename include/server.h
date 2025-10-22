@@ -31,6 +31,8 @@ private:
 	int cfinished = 0;
 	int nb_client = 0;
 	int step = 0;
+	std::string packageSelectionned = "";
+	std::string packageScores = "";
 	std::vector<std::pair<std::vector<float>,std::vector<Brain>>> genresults;
 	void logic_loop();
 	void send_all(Packet pck);

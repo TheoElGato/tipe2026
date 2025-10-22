@@ -37,11 +37,7 @@ LogicServer::LogicServer() {
         	logm("[+] Client#"+std::to_string(from)+": "+ clients_hn[from] +" connected","Server");
         }
         if (r.cmd == "genfinished") {
-            if (step == 1) {
-                step = 2;
-                timetime = std::time(nullptr);
-            }
-            std::vector<float> result = jsonstring_to_vect(r.arg2);
+            std::vector<float> result = jsonstring_to_vectf(r.arg2);
             logm("Client#"+std::to_string(from)+": "+ clients_hn[from] +" finished gen #"+r.arg1,"Server");
             if (result.size() == 0) {
                 logm("Client#"+std::to_string(from)+": "+clients_hn[from]+" send a result of 0 on a generation","ERROR");
@@ -55,6 +51,10 @@ LogicServer::LogicServer() {
                     vb.push_back(db);
                 }
                 genresults.emplace_back(result, vb);
+            }
+            if (step == 1) {
+                timetime = std::time(nullptr);
+                step = 2;
             }
             cfinished +=1;
         }
@@ -105,11 +105,12 @@ void LogicServer::logic_loop() {
 
     	if (step == 0) { // Asking client to start a sim
     		logm("Asking clients to start sim #"+std::to_string(task_done));
+    		mstk->loadTask(task_done);
     		Packet startpacket("startsim",std::to_string(task_done),"","");
     		send_all(startpacket);
     		started_at = std::time(nullptr);
     		genresults.clear();
-    		step += 1;
+    		step = 1;
     	}
     	
     	if (step==1) {
@@ -121,7 +122,7 @@ void LogicServer::logic_loop() {
     	    else if(std::time(nullptr)>(timetime+timeout)) {
     	        logm("Some clients need to be kicked. Reason : timeout","WARNING");
     	        logm("KIKING NOT IMPLEMENTED","WARNING");
-    	        step +=1;
+    	        step=3;
     	    }
     	}
     	
@@ -144,6 +145,8 @@ void LogicServer::logic_loop() {
             allBrains.reserve(totalBrains);
             
             // Merge
+            // I'm concerned by the complexity of this...
+            // We have to test it but I think we need to rework all of this...
             for (auto &pair : genresults) {
                 allFloats.insert(allFloats.end(), pair.first.begin(), pair.first.end());
                 allBrains.insert(allBrains.end(), pair.second.begin(), pair.second.end());
@@ -151,14 +154,31 @@ void LogicServer::logic_loop() {
             
             // Sort by score descending
             reverse_sorting_brain(&allBrains, &allFloats, 0, allBrains.size() - 1);
+            
+            // Selected whitch files need to be send to the clients
+            // The bests 
+            std::vector<std::string> selectioned;
+            std::vector<float> scores;
+            for(int i=0; i<(mstk->nb_brain); i+=1) {
+                std::string idstr = std::to_string(allBrains[i].bid1)+"s"+std::to_string(allBrains[i].bid2)+".pt";
+                selectioned.push_back(idstr);
+                scores.push_back(allFloats[i]);
+            }
+            packageSelectionned = vects_to_jsonstring(selectioned);      
+            packageScores = vectf_to_jsonstring(scores);            
+            
+            allFloats.clear();
+            allBrains.clear();
     	    
-    	    step+=1;
+    	    step=4;
     	}
     	
     	if (step==4) {
-    	    cfinished = 0;
-    	    Packet ngen("nextgen","","","");
+    	    cfinished = 0;    	    
+            genresults.clear();
+    	    Packet ngen("nextgen",packageSelectionned,packageScores,"");
     	    send_all(ngen);
+    	    started_at = std::time(nullptr);
     	    step = 1;
     	}
     }

@@ -86,7 +86,7 @@ void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::
 
 int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
     
-    logm("Welcome to the USRAF Sim");
+    logm("Welcome to the URSAF Sim");
     
     /// SETTINGS FROM THE SIMTASKER///
     std::string DEVICE = stk.device;
@@ -312,6 +312,14 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
         if(mc) {
             if (cl->state == 2) continue;
             if (cl->state == 3) {
+                score_agent = cl->scores;
+                brain_agent.clear();
+                // Initialize agents with brain from file
+                for (int i=0; i<nb_brain; i++)
+                {
+                    brain_agent.emplace_back(9,6,cl->sbfpath+cl->selectioned[i],DEVICE,NB_HIDDEN_LAYER);
+                }
+                reproduce(&brain_agent, score_agent,  nb_brain, evolution, BEST_KEEP, SELECTION_POL);
                 sous_sim_next_index = 0;
                 sous_sim_started = 0;
                 sous_sim_completed = 0;
@@ -378,12 +386,13 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
         
         if(clean_exit) {
             if (threads_used == 0) {
-                for (int i=0; i<nb_brain; i++)
-                {
-                    std::string istring = std::to_string(i);
-                    brain_agent[i].saveFile(sds.getFullPath()+istring+".pt");
-                }
-                
+                if (!mc) {
+                    for (int i=0; i<nb_brain; i++)
+                    {
+                        std::string istring = std::to_string(i);
+                        brain_agent[i].saveFile(sds.getFullPath()+istring+".pt");
+                    }
+                } 
                 sds.data["generation"] = generation;
                 sds.data["simu_time"] = simu_time;
                 sds.data["evolution"] = evolution;
@@ -470,11 +479,15 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                         brain_agent[i].saveFile(cl->sbfpath+"/"+cl->srvid+"s"+istring+".pt");
                     }
                     
-                    std::string temptest = vect_to_jsonstring(score_agent);
+                    std::string temptest = vectf_to_jsonstring(score_agent);
                     //logm(temptest,"DEBUG");
                     Packet genf("genfinished",std::to_string(generation),temptest,"");
                     cl->send(genf);
                     cl->state = 2;
+                }
+                
+                for(int j=0;j<nb_brain;j++) {
+                    score_agent[j] = 0;
                 }
                 
             }
@@ -566,7 +579,9 @@ SimpleClient::SimpleClient(const std::string &uri, const std::string path) {
         }
         
         if (r.cmd == "nextgen") {
-        	logm("Server requested the next gen");
+        	logm("Server requested the next gen","Client");
+        	selectioned = jsonstring_to_vects(r.arg1);
+        	scores = jsonstring_to_vectf(r.arg2);
         	state = 3;
         }
         

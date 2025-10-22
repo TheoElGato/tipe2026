@@ -13,8 +13,10 @@ using namespace nlohmann::literals;
 
 void logm(const std::string& message, const std::string& level = "INFO");
 std::string getHostName();
-std::string vect_to_jsonstring(std::vector<float> v);
-std::vector<float> jsonstring_to_vect(std::string s);
+std::string vectf_to_jsonstring(std::vector<float> v);
+std::string vects_to_jsonstring(std::vector<std::string> v);
+std::vector<float> jsonstring_to_vectf(std::string s);
+std::vector<std::string> jsonstring_to_vects(std::string s);
 
 class Packet {
    public:

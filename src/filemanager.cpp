@@ -29,12 +29,23 @@ std::string getHostName() {
 	return hostname;
 }
 
-std::string vect_to_jsonstring(std::vector<float> v) {
+std::string vectf_to_jsonstring(std::vector<float> v) {
     nlohmann::json j(v);
     return j.dump();
 }
 
-std::vector<float> jsonstring_to_vect(std::string s) {
+std::string vects_to_jsonstring(std::vector<std::string> v) {
+    nlohmann::json j(v);
+    return j.dump();
+}
+
+
+std::vector<float> jsonstring_to_vectf(std::string s) {
+    nlohmann::json j = nlohmann::json::parse(s);
+    return j;
+}
+
+std::vector<std::string> jsonstring_to_vects(std::string s) {
     nlohmann::json j = nlohmann::json::parse(s);
     return j;
 }
