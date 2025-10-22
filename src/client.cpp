@@ -6,7 +6,7 @@ void error(const std::string& message) {
     exit(EXIT_FAILURE);
 }
 
-std::string nozero(float value) {
+std::string remove_zero_ts(float value) {
     std::ostringstream oss;
     oss << std::setprecision(8) << std::noshowpoint << value;
     return oss.str();
@@ -35,7 +35,7 @@ void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<st
         sf::Text text;
         text.setFont(font);
 
-        text.setString(key + ": " + nozero(value));
+        text.setString(key + ": " + remove_zero_ts(value));
         text.setCharacterSize(20);
         text.setFillColor(sf::Color::Black);
         text.setPosition({rectX + margin, rectY + margin + count});
