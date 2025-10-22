@@ -9,6 +9,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <atomic>
+#include "brain.h"
 
 typedef websocketpp::server<websocketpp::config::asio> server;
 
@@ -29,6 +30,7 @@ private:
 	int cfinished = 0;
 	int nb_client = 0;
 	int step = 0;
+	std::vector<std::pair<std::vector<float>,std::vector<Brain>>> genresults;
 	void logic_loop();
 	void send_all(Packet pck);
 	void send(Packet pck, websocketpp::connection_hdl hdl);

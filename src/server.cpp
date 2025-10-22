@@ -41,7 +41,12 @@ LogicServer::LogicServer() {
                 step = 2;
                 timetime = std::time(nullptr);
             }
+            std::vector<float> result = jsonstring_to_vect(r.arg2);
             logm("Client#"+std::to_string(from)+": "+ clients_hn[from] +" finished gen #"+r.arg1,"Server");
+            if (result.size() == 0) {
+                logm("Client#"+std::to_string(from)+": "+clients_hn[from]+" send a result of 0 on a generation","ERROR");
+                genresults.emplace_back(std::vector<float>{}, std::vector<Brain>{});
+            }
             cfinished +=1;
         }
 
@@ -94,6 +99,7 @@ void LogicServer::logic_loop() {
     		Packet startpacket("startsim",std::to_string(task_done),"","");
     		send_all(startpacket);
     		started_at = std::time(nullptr);
+    		genresults.clear();
     		step += 1;
     	}
     	

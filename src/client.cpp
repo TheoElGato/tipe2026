@@ -466,8 +466,10 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                         std::string istring = std::to_string(i);
                         brain_agent[i].saveFile(cl->sbfpath+"/"+cl->srvid+"s"+istring+".pt");
                     }
-                
-                    Packet genf("genfinished",std::to_string(generation),"","");
+                    
+                    std::string temptest = vect_to_jsonstring(score_agent);
+                    //logm(temptest,"DEBUG");
+                    Packet genf("genfinished",std::to_string(generation),temptest,"");
                     cl->send(genf);
                     cl->state = 2;
                 }

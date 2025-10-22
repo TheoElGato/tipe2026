@@ -29,6 +29,17 @@ std::string getHostName() {
 	return hostname;
 }
 
+std::string vect_to_jsonstring(std::vector<float> v) {
+    nlohmann::json j(v);
+    return j.dump();
+}
+
+std::vector<float> jsonstring_to_vect(std::string s) {
+    nlohmann::json j = nlohmann::json::parse(s);
+    return j;
+}
+
+
 SimDataStruct::SimDataStruct(std::string path, std::string name, int generation, int simu_time, int evolution, int brains_number,int agents_number,int train_sessions) {
     
 	std::string host_name = getHostName();
