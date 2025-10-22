@@ -86,7 +86,7 @@ void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::
 
 int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
     
-    logm("Welcome to the URSAF Sim");
+    logm("Welcome to the USRAF Sim");
     
     /// SETTINGS FROM THE SIMTASKER///
     std::string DEVICE = stk.device;
@@ -115,6 +115,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
     /// temp
     float ss_dt = 1/60.f;
     
+
     ////// variable related to the state of simulation ///////
 
     // var input handling
@@ -412,9 +413,11 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                     }
                 }
                 
-                for(int j=0;j<nb_brain;j++) {
-                        if(score_agent[j] != 0) score_agent[j] /= sous_sim_total;
-                }
+                // Visibly this portion is making the rest bug and I don't know why...
+                // So for now I comment it out.
+                //for(int j=0;j<nb_brain;j++) {
+                //        if(score_agent[j] != 0) score_agent[j] /= sous_sim_total;
+                //}
                 
                 int best_score_index = std::distance(score_agent.begin(), std::max_element(score_agent.begin(), score_agent.end()));
                 

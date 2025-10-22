@@ -75,14 +75,14 @@ void Brain::mutate(float valeur) {
 Brain Brain::copy() {
     Brain new_brain(this->input_size, this->output_size, "", "cpu", this->nb_hidden_neurones);
     torch::NoGradGuard no_grad;
-    new_brain.fc1->weight = this->fc1->weight.clone();
-    new_brain.fc1->bias = this->fc1->bias.clone();
-    new_brain.fc2->weight = this->fc2->weight.clone();
-    new_brain.fc2->bias = this->fc2->bias.clone();
-    new_brain.fc3->weight = this->fc3->weight.clone();
-    new_brain.fc3->bias = this->fc3->bias.clone();
-    new_brain.out->weight = this->out->weight.clone();
-    new_brain.out->bias = this->out->bias.clone();
+    new_brain.fc1->weight = this->fc1->weight.detach().clone();
+    new_brain.fc1->bias = this->fc1->bias.detach().clone();
+    new_brain.fc2->weight = this->fc2->weight.detach().clone();
+    new_brain.fc2->bias = this->fc2->bias.detach().clone();
+    new_brain.fc3->weight = this->fc3->weight.detach().clone();
+    new_brain.fc3->bias = this->fc3->bias.detach().clone();
+    new_brain.out->weight = this->out->weight.detach().clone();
+    new_brain.out->bias = this->out->bias.detach().clone();
     return new_brain;
 }
 
