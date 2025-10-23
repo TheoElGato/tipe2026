@@ -359,6 +359,11 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
             }
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::K))
             {
+                if (mc) {
+                    logm("You should not do that !","WARNING");
+                    logm("If you really need to close this client, crash it.","WARNING");
+                    continue;
+                }
                 clean_exit = true;
                 logm("Wainting for threads to finish before exiting...");
                 inputdelay = 0;
@@ -404,6 +409,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                 sds.save();
                 
                 logm("Saved.", "INFO");
+                logm("Exiting simulation.", "INFO");
                 return 0;
             }
         }
