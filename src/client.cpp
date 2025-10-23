@@ -302,16 +302,16 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
             }
         }
         
-        if (!is_infinite) {
+        if (!is_infinite && !mc) {
             if (acc > time_allowed) {
             clean_exit = true;
             }
         }
         
-        // End of generation for client mode
+        // Checks for the client mode (mc stand for client mode)
         if(mc) {
             if (cl->state == 2) continue;
-            if (cl->state == 3) {
+            if (cl->state == 3) { // End of generation for client mode
                 score_agent = cl->scores;
                 brain_agent.clear();
                 // Initialize agents with brain from file
@@ -333,6 +333,10 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                 generation += 1;
                 cl->state = 1;
             }
+            if (cl->state == 4) {
+                clean_exit = true;
+            }
+            
         }
 
         // Manager keys pressed :
@@ -585,6 +589,16 @@ SimpleClient::SimpleClient(const std::string &uri, const std::string path) {
         	state = 3;
         }
         
+        if (r.cmd == "stopsim") {
+        	logm("Server requested the end of sim","Client");
+        	state = 4;
+        }
+        
+        if (r.cmd == "exit") {
+        	logm("Server requested exiting...","Client");
+        	state = -1;
+        }
+        
     });
 
     websocketpp::lib::error_code ec;
@@ -630,6 +644,25 @@ void SimpleClient::run(SimTasker* stk) {
         if (state==0) {continue;}
         if (state==1) {
             simulate(*mstk, true, this);
+            state=0;
+            Packet simfnsh("simfinished","","","");
+            send(simfnsh);
         }
     }
+    logm("Shuting down...","Client");
+    
+    // Close connection with the server
+    websocketpp::lib::error_code ec;
+    m_client.close(m_hdl, websocketpp::close::status::normal, "Client shutting down", ec);
+    if (ec) {
+        logm("Close failed: " + ec.message(), "ERROR");
+    }
+    
+    // Stop the ASIO event loop and wait for the thread to end
+    // For once...
+    m_client.stop();
+    if (m_thread.joinable())
+        m_thread.join();
+    
+    logm("Shutdown.","Client");
 }

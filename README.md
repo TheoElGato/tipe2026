@@ -28,7 +28,7 @@ On cherche à faire varier les paramètres variables suivants dans la simulation
 - Facteur aléatoire (répéter plusieur fois sur les même paramètres)
 
 
-**Modules utilisé**
+**Modules utilisés**
 - SFML : https://github.com/SFML/SFML
 - libtorch : https://github.com/pytorch/pytorch
 - JSON for Modern C++ : https://github.com/nlohmann/json

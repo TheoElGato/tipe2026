@@ -17,6 +17,7 @@ std::string vectf_to_jsonstring(std::vector<float> v);
 std::string vects_to_jsonstring(std::vector<std::string> v);
 std::vector<float> jsonstring_to_vectf(std::string s);
 std::vector<std::string> jsonstring_to_vects(std::string s);
+bool str_to_uint16(const char *str, uint16_t *res);
 
 class Packet {
    public:

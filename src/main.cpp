@@ -1,20 +1,6 @@
-#include <iostream>
-#include <chrono>
-
 #include "server.h"
 #include "client.h"
 #include "filemanager.h"
-
-bool str_to_uint16(const char *str, uint16_t *res) {
-    char *end;
-    errno = 0;
-    long val = strtol(str, &end, 10);
-    if (errno || end == str || *end != '\0' || val < 0 || val >= 0x10000) {
-        return false;
-    }
-    *res = (uint16_t)val;
-    return true;
-}
 
 int main(int argc, char* argv[]) {
     // Read args
@@ -34,6 +20,7 @@ int main(int argc, char* argv[]) {
         } else if (tmp=="-s") {
             mode = 2;
             ip = argv[2];
+            str_to_uint16(argv[3], &port);
             sbf_path = argv[3];
         } else {
             return 1;

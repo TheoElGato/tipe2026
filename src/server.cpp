@@ -1,5 +1,22 @@
 #include "server.h"
 
+/*
+    I will list all of the packets here :
+    
+    From the Client : 
+    - connect; hostname, null, null : register the client with hostname to the server
+    - genfinished; generation, json_results, null : sending generation results to the server
+    - simfinished; null, null, null : client confirm to the server he have finished his sim.
+    
+    From the Server : 
+    - connected; id, null, null : confirm the registration with the id of the client
+    - startsim; task_id, null, null : ask clients to start task #task_id
+    - nextgen; json_selectioned_files, json_scores, null : send to clients the files and scores to load to start a new gen
+    - stopsim; null, null, null : ask the clients to stop their current task
+    - exit; null, null, null : shutdown the client
+
+*/
+
 LogicServer::LogicServer() {
     m_server.init_asio();
     m_server.clear_access_channels(websocketpp::log::alevel::all);
@@ -58,6 +75,11 @@ LogicServer::LogicServer() {
             }
             cfinished +=1;
         }
+        if (r.cmd == "simfinished") {
+            logm("Client#"+std::to_string(from)+": "+ clients_hn[from] +" finished task","Server");
+            cfinished += 1;
+        }
+        
 
         
     });
@@ -95,39 +117,51 @@ void LogicServer::logic_loop() {
     logm("Press ENTER when all clients are connected sucessfully");
     std::getc(stdin);
     
-    logm("All clients are connected Starting Logic Loop...");
+    logm("All clients are connected. Starting Logic Loop...");
 
 
 	int task_done = 0;
 	int started_at = 0;
+	int generation = 0;
 
     while (task_done != mstk->len) {
 
     	if (step == 0) { // Asking client to start a sim
     		logm("Asking clients to start sim #"+std::to_string(task_done));
+    		
+    		// Load the right task
     		mstk->loadTask(task_done);
+    		
     		Packet startpacket("startsim",std::to_string(task_done),"","");
     		send_all(startpacket);
+    		
+    		// Get a time stamp
     		started_at = std::time(nullptr);
-    		genresults.clear();
+    		
+    		genresults.clear(); // We never know...
+    		generation = 0;
+    		logm("Starting new generation #"+std::to_string(generation));
     		step = 1;
     	}
     	
     	if (step==1) {
-    	    // Client are working on a generation. We are waiting...
+    	    // Clients are working on a generation. We are waiting...
     	}
     	
     	if (step==2) { // One client have finished.
     	    if (cfinished==nb_client) step +=1;
     	    else if(std::time(nullptr)>(timetime+timeout)) {
     	        logm("Some clients need to be kicked. Reason : timeout","WARNING");
+    	        // TODO, but I don't know if this is usefull
+    	        // since if the client crash he's already disconnecting
+    	        // from the server...
     	        logm("KIKING NOT IMPLEMENTED","WARNING");
     	        step=3;
     	    }
     	}
     	
     	if (step==3) { // Now we analyse the results here
-    	    logm("Generation done. Analysing...");
+    	    logm("Generation done. Processing...");
     	    
     	    std::vector<float> allFloats;
             std::vector<Brain> allBrains;
@@ -164,9 +198,13 @@ void LogicServer::logic_loop() {
                 selectioned.push_back(idstr);
                 scores.push_back(allFloats[i]);
             }
+            
+            // Packaging it in json to send it
             packageSelectionned = vects_to_jsonstring(selectioned);      
             packageScores = vectf_to_jsonstring(scores);            
             
+            // Clearing memory
+            // (I think this is not necessery but why not :/
             allFloats.clear();
             allBrains.clear();
     	    
@@ -174,14 +212,52 @@ void LogicServer::logic_loop() {
     	}
     	
     	if (step==4) {
-    	    cfinished = 0;    	    
-            genresults.clear();
-    	    Packet ngen("nextgen",packageSelectionned,packageScores,"");
-    	    send_all(ngen);
-    	    started_at = std::time(nullptr);
-    	    step = 1;
+    	
+    	    if(!mstk->is_infinite &&  (std::time(nullptr) - started_at)>mstk->time_allowed) {
+    	        logm("Time limit reached. Finishing this task now.");
+    	        
+    	        // Cleaning up
+        	    cfinished = 0;
+                genresults.clear();
+    	        
+    	        Packet stpsim("stopsim","","","");
+    	        send_all(stpsim);
+    	        step=5;
+    	        
+    	    } else {
+    	
+                generation += 1;
+        	    logm("Starting new generation #"+std::to_string(generation));
+        	    
+        	    // Cleaning up
+        	    cfinished = 0;
+                genresults.clear();
+                
+                // Sending nextgen packet
+        	    Packet ngen("nextgen",packageSelectionned,packageScores,"");
+        	    send_all(ngen);
+    
+    
+        	    step = 1;
+        	}
+        	
+    	}
+    	
+    	if (step==5) {
+    	    // Waiting for all clients to stop their sim
+    	    if (cfinished != nb_client) continue;
+    	    
+    	    // We are done
+    	    cfinished = 0;
+    	    task_done += 1;
+    	    step = 0;
     	}
     }
     
+    logm("Asking all clients to shutdown...");
+    Packet exitpck("exit","","","");
+    send_all(exitpck);
+    
     logm("Server Logic Loop finished. WS Server will continue to run. Please exit using Ctrl+C");
+    
 }
