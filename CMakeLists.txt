@@ -76,6 +76,7 @@ target_include_directories(main PRIVATE include ${asio_SOURCE_DIR}/asio/include)
 target_link_libraries(main PRIVATE nlohmann_json::nlohmann_json sfml-graphics csv websocketpp "${TORCH_LIBRARIES}" )
 
 # The following code block is suggested to be used on Windows.
+# However our code is not compatible for it.
 # According to https://github.com/pytorch/pytorch/issues/25457,
 # the DLLs need to be copied to avoid memory errors.
 if (MSVC)

@@ -92,7 +92,7 @@ SimDataStruct::SimDataStruct(std::string path, std::string name, int generation,
 
 void SimDataStruct::addStatRow(float generation, float agent0score, float agent1score, float agent2score, 
                    float agent3score, float agent4score, float agent5score, float agent6score,
-                   float agent7score, float agent8score, float agent9score,
+                   float agent7score, float agent8score, float agent9score, float mean,
                    float bestAgentScore, float timeForOneGen) {
     generationV.push_back(generation);
     agent0scoreV.push_back(agent0score);
@@ -105,6 +105,7 @@ void SimDataStruct::addStatRow(float generation, float agent0score, float agent1
     agent7scoreV.push_back(agent7score);
     agent8scoreV.push_back(agent8score);
     agent9scoreV.push_back(agent9score);
+    meanV.push_back(mean);
     bestAgentScoreV.push_back(bestAgentScore);
     timeForOneGenV.push_back(timeForOneGen);
     
@@ -124,7 +125,7 @@ void SimDataStruct::save() {
     
     writer << std::vector<std::string>({"Generation","Agent0Score", "Agent1Score", "Agent2Score", "Agent3Score", 
                          "Agent4Score", "Agent5Score", "Agent6Score", "Agent7Score", "Agent8Score", 
-                         "Agent9Score", "BestAgentScore", "TimeForOneGen"});
+                         "Agent9Score", "Mean", "BestAgentScore", "TimeForOneGen"});
     for(int i=0;i<this->generationV.size();i+=1) {
         writer << std::vector<float>({ generationV[i],
                                        agent0scoreV[i],
@@ -137,6 +138,7 @@ void SimDataStruct::save() {
                                        agent7scoreV[i],
                                        agent8scoreV[i],
                                        agent9scoreV[i],
+                                       meanV[i],
                                        bestAgentScoreV[i],
                                        timeForOneGenV[i]});
     }
@@ -174,6 +176,7 @@ void SimDataStruct::loadFromFile(std::string load_name) {
         agent7scoreV.push_back(row["Agent7Score"].get<float>());
         agent8scoreV.push_back(row["Agent8Score"].get<float>());
         agent9scoreV.push_back(row["Agent9Score"].get<float>());
+        meanV.push_back(row["Mean"].get<float>());
         bestAgentScoreV.push_back(row["BestAgentScore"].get<float>());
         timeForOneGenV.push_back(row["TimeForOneGen"].get<float>());
     }

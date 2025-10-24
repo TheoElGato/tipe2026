@@ -12,6 +12,15 @@ std::string remove_zero_ts(float value) {
     return oss.str();
 }
 
+float average(std::vector<float> v){
+    if(v.empty()){
+        return 0;
+    }
+
+    auto const count = static_cast<float>(v.size());
+    return std::reduce(v.begin(), v.end()) / count;
+}
+
 void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<std::string, float>& stats) {
     // Draw statistics on the window
 
@@ -442,7 +451,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                 
                 sds.addStatRow(generation, score_agent[0], score_agent[1], score_agent[2], 
                    score_agent[3], score_agent[4], score_agent[5], score_agent[6],
-                   score_agent[7], score_agent[8], score_agent[9],
+                   score_agent[7], score_agent[8], score_agent[9], average(score_agent),
                    score_agent[best_score_index], acu);
                 
                 // Autosave check

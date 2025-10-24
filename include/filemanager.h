@@ -1,11 +1,11 @@
 #ifndef FILEMANAGER_H
 #define FILEMANAGER_H
 
-#include <nlohmann/json.hpp>
 #include <fstream>
 #include <unistd.h>
 #include <limits.h>
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include "csv.hpp"
 
 using namespace csv;
@@ -30,7 +30,6 @@ class Packet {
       std::string arg3 = "";
       void update();
    private:
-      
       nlohmann::json data;
 };
 
@@ -82,7 +81,6 @@ class SimTasker {
 
 class SimDataStruct {
 public:
-   nlohmann::json data;
    SimDataStruct(std::string path, std::string name, int generation, int simu_time, int evolution, int brains_number,int agents_number,int train_sessions);
    void save();
    void loadFromFile(std::string load_name);
@@ -90,9 +88,10 @@ public:
    
    void addStatRow(float generation, float agent0score, float agent1score, float agent2score, 
                    float agent3score, float agent4score, float agent5score, float agent6score,
-                   float agent7score, float agent8score, float agent9score,
+                   float agent7score, float agent8score, float agent9score, float mean,
                    float bestAgentScore, float timeForOneGen);
-   
+                   
+   nlohmann::json data;
    std::vector<float> generationV;
    std::vector<float> agent0scoreV;
    std::vector<float> agent1scoreV;
@@ -104,6 +103,7 @@ public:
    std::vector<float> agent7scoreV;
    std::vector<float> agent8scoreV;
    std::vector<float> agent9scoreV;
+   std::vector<float> meanV;
    std::vector<float> bestAgentScoreV;
    std::vector<float> timeForOneGenV;
    
@@ -111,8 +111,6 @@ private:
    std::string name;
    std::filesystem::path fullpath;
    std::filesystem::path folder;
-	
-
 };
 
 
