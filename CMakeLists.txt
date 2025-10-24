@@ -56,6 +56,9 @@ endif()
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
+# To test for memory leaks, uncomment the line below :
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g")
+
 add_executable(main
     src/main.cpp
     src/physics.cpp

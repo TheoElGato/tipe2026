@@ -258,6 +258,7 @@ void LogicServer::logic_loop() {
     Packet exitpck("exit","","","");
     send_all(exitpck);
     
-    logm("Server Logic Loop finished. WS Server will continue to run. Please exit using Ctrl+C");
-    
+    while(nb_client > 0) continue;
+    logm("Server Logic Loop finished. WS Server will stop now.");
+    m_server.stop();
 }
