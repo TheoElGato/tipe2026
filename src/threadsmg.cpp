@@ -39,7 +39,8 @@ void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Ve
         Creature* agent = agents[i];
         float dx = objectif.x - agent->vertices[0].position.x;
         float dy = objectif.y - agent->vertices[0].position.y;
-        (*scores)[i] = 1/(1+std::sqrt(dx * dx + dy * dy));
+        float dst = std::sqrt(dx * dx + dy * dy);
+        (*scores)[i] = 1/(1+(dst * dst));
     }
 
 

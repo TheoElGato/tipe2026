@@ -329,6 +329,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                     brain_agent.emplace_back(9,6,cl->sbfpath+cl->selectioned[i],DEVICE,NB_HIDDEN_LAYER);
                 }
                 reproduce(&brain_agent, score_agent,  nb_brain, evolution, BEST_KEEP, SELECTION_POL);
+                for(int j=0;j<nb_brain;j++) score_agent[j] = 0;
                 sous_sim_next_index = 0;
                 sous_sim_started = 0;
                 sous_sim_completed = 0;
@@ -479,6 +480,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                 if (!mc) {
                     // Initialization the variables for the next generation
                     reproduce(&brain_agent, score_agent,  nb_brain, evolution, BEST_KEEP, SELECTION_POL);
+                    for(int j=0;j<nb_brain;j++) score_agent[j] = 0;
                     sous_sim_next_index = 0;
                     sous_sim_started = 0;
                     sous_sim_completed = 0;
@@ -504,11 +506,6 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                     cl->send(genf);
                     cl->state = 2;
                 }
-                
-                for(int j=0;j<nb_brain;j++) {
-                    score_agent[j] = 0;
-                }
-                
             }
         } else {
             

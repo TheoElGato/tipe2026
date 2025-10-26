@@ -23,6 +23,7 @@ void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
     if (num_selectable == 0) num_selectable = 1; // Avoid divide by zero
 
     // Normalize scores
+
     float total = 0.f;
     for (int i = 0; i < num_selectable; ++i){
         total += score_agent[i];
@@ -43,7 +44,8 @@ void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
     std::vector<Brain> new_agents;
     new_agents.reserve(NB_BRAIN - num_best_to_keep);
 
-    for (int i = num_best_to_keep; i < NB_BRAIN; ++i) {
+    for (int i = num_best_to_keep; i < NB_BRAIN; i+=1) {
+        
         float ran = dist(gen);  // [0,1[
         float cumul = score_agent[0];
         int j = 0;
@@ -51,13 +53,14 @@ void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
             j+=1;
             cumul += score_agent[j];
         }
+        
         // Add mutated copy of selected brain
         new_agents.emplace_back((*brain_agents)[j].copy());
         new_agents.back().mutate(EVOLUTION);
     }
 
     // Replace worst brains
-    for (int i = num_best_to_keep; i < NB_BRAIN; ++i){
+    for (int i = num_best_to_keep; i < NB_BRAIN; i+=1){
         (*brain_agents)[i] = new_agents[i - num_best_to_keep];
     }
     // Cleanup
