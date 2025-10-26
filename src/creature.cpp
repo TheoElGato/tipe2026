@@ -63,6 +63,21 @@ Creature::Creature(float sx, float sy, int bodyColorSeed, std::string brainFile)
         sf::Color(34, 0, 25),
         unique_color_from_single_number(bodyColorSeed)
     };
+    
+    pawUp = sf::CircleShape(5);
+    pawDown = sf::CircleShape(10);
+    body = sf::CircleShape(20);
+    eyeWhite = sf::CircleShape(8);
+    eyeBlack = sf::CircleShape(2);
+    
+    pawUp.setOrigin({5, 5});
+    pawDown.setOrigin({10, 10});
+    body.setFillColor(this->colors[4]);
+    body.setOrigin({20, 20});
+    eyeWhite.setFillColor(sf::Color::White);
+    eyeWhite.setOrigin({8, 8});
+    eyeBlack.setFillColor(sf::Color::Black);
+    eyeBlack.setOrigin({2, 2});
 }
 
 sf::Color Creature::unique_color_from_single_number(int number)
@@ -89,13 +104,17 @@ void Creature::brainUpdate(sf::Vector2f target, Brain * brain)
 
     // InputTensor
     torch::Tensor inputTensor = torch::tensor({dist,ddx, ddy, this->leg_up[0], this->leg_up[1], this->leg_up[2], this->leg_up[3], this->muscle_con[0], this->muscle_con[1]});
-    torch::Tensor  output = brain->forward(inputTensor);
+    torch::Tensor output = brain->forward(inputTensor);
 
     for(int i=0;i<4;i++) {
-        this->leg_up[i] = output[i].item<float>()>0.0f ? 1.0f : 0.0f;
+        float temp = this->leg_up[i] = output[i].item<float>();
+        //std::cout << temp << std::endl;
+        this->leg_up[i] = temp > 0.0f ? 1.0f : 0.0f;
     }
     for(int i=0;i<2;i++) {
-        this->muscle_con[i] = output[i+4].item<float>()>0.0f ? 1.0f : 0.0f;
+        float temp = output[i+4].item<float>();
+        //std::cout << temp << std::endl;
+        this->muscle_con[i] = temp > 0.0f ? 1.0f : 0.0f;
     }
 }
 
@@ -103,21 +122,28 @@ void Creature::update(float dt)
 {
     // gestion de la longueur des pattes
     this->links[0].restLength = this->leg_len[(int) this->muscle_con[0]];
-    this->vertices[1].fixed = !this->leg_up[0];
+    if (this->leg_up[0]==0) this->vertices[1].fixed = true;
+    else this->vertices[1].fixed = false;
 
     this->links[1].restLength = this->leg_len[(int) this->muscle_con[0]];
-    this->vertices[2].fixed = !this->leg_up[1];
+    if (this->leg_up[1]==0) this->vertices[2].fixed = true;
+    else this->vertices[2].fixed = false;
 
     this->links[2].restLength = this->leg_len[(int) this->muscle_con[1]];
-    this->vertices[3].fixed = !this->leg_up[2];
+    if (this->leg_up[2]==0) this->vertices[3].fixed = true;
+    else this->vertices[3].fixed = false;
 
     this->links[3].restLength = this->leg_len[(int) this->muscle_con[1]];
-    this->vertices[4].fixed = !this->leg_up[3];
+    if (this->leg_up[3]==0) this->vertices[4].fixed = true;
+    else this->vertices[4].fixed = false;
 
     // gestion de la longueur des muscles
     this->muscles[0].restLength = this->muscle_len[(int) this->muscle_con[0]];
     this->muscles[1].restLength = this->muscle_len[(int) this->muscle_con[1]];
+    //std::cout << std::to_string(this->muscle_con[0]) << " " << std::to_string( this->muscle_con[1]) << std::endl;
+    //std::cout << std::to_string((int) this->muscle_con[0]) << " " << std::to_string((int) this->muscle_con[1]) << std::endl;
 
+    
         // Calcul du milieu entre la patte avant droite (1) et arrière droite (3)
     sf::Vector2f mid = sf::Vector2f(
         (this->vertices[1].position.x + this->vertices[3].position.x) / 2.0f,
@@ -157,12 +183,6 @@ void Creature::moveTo(float x, float y) {
 
 void Creature::draw(sf::RenderWindow &window)
 {
-    // Préparer les formes à l'avance pour éviter les allocations répétées
-    sf::CircleShape pawUp(5);
-    pawUp.setOrigin({5, 5});
-    sf::CircleShape pawDown(10);
-    pawDown.setOrigin({10, 10});
-
     // Dessin des pattes et des lignes corps-patte
     
     for (int i = 0; i < 4; ++i) {
@@ -191,9 +211,7 @@ void Creature::draw(sf::RenderWindow &window)
     }
 
     // Dessin du corps
-    static sf::CircleShape body(20);
-    body.setFillColor(this->colors[4]);
-    body.setOrigin({20, 20});
+    
     body.setPosition(this->vertices[0].position);
     window.draw(body);
 
@@ -204,17 +222,13 @@ void Creature::draw(sf::RenderWindow &window)
     sf::Vector2f eye1 = center + sf::Vector2f(20 * std::cos(eye_offset1), 20 * std::sin(eye_offset1));
     sf::Vector2f eye2 = center + sf::Vector2f(20 * std::cos(eye_offset2), 20 * std::sin(eye_offset2));
 
-    static sf::CircleShape eyeWhite(8);
-    eyeWhite.setFillColor(sf::Color::White);
-    eyeWhite.setOrigin({8, 8});
+    
     eyeWhite.setPosition(eye1);
     window.draw(eyeWhite);
     eyeWhite.setPosition(eye2);
     window.draw(eyeWhite);
 
-    static sf::CircleShape eyeBlack(2);
-    eyeBlack.setFillColor(sf::Color::Black);
-    eyeBlack.setOrigin({2, 2});
+    
     eyeBlack.setPosition(eye1);
     window.draw(eyeBlack);
     eyeBlack.setPosition(eye2);

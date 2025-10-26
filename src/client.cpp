@@ -438,6 +438,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                 
                 for(int i=0;i<sous_sim_scores.size();i++) {
                     for(int j=0;j<nb_brain;j++) {
+                        //logm(std::to_string(sous_sim_scores[i][j]),"DEBUG");
                         score_agent[j] += sous_sim_scores[i][j];
                     }
                 }

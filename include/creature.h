@@ -39,6 +39,13 @@ public:
 
 
 private:
+    // Préparer les formes à l'avance pour éviter les allocations répétées
+    sf::CircleShape pawUp;
+    sf::CircleShape pawDown;
+    sf::CircleShape body;
+    sf::CircleShape eyeWhite;
+    sf::CircleShape eyeBlack;
+    
     sf::Color unique_color_from_single_number(int number);
 };
 

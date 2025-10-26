@@ -25,6 +25,7 @@ void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Ve
             if(brainAcc <= accbrain) 
             {
                 // handle brain update for each agent
+                //std::cout << "tick" << std::endl;
                 agent->brainUpdate(objectif, brains[i]);
                 agent->update(*dt);
                 accbrain = 0;
@@ -40,7 +41,9 @@ void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Ve
         float dx = objectif.x - agent->vertices[0].position.x;
         float dy = objectif.y - agent->vertices[0].position.y;
         float dst = std::sqrt(dx * dx + dy * dy);
-        (*scores)[i] = 1/(1+(dst * dst));
+        float scr = 100/(1+(dst * dst));
+        //std::cout << scr << std::endl;
+        (*scores)[i] = scr;
     }
 
 

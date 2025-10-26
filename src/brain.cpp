@@ -14,7 +14,19 @@ Brain::Brain(int input_size, int output_size, std::string file, std::string devi
     this->fc3 = register_module("fc3", torch::nn::Linear(nb_hidden_neurones, nb_hidden_neurones));
     this->out = register_module("out", torch::nn::Linear(nb_hidden_neurones, output_size));
 
-    
+    {
+        torch::NoGradGuard no_grad;
+        auto manual_init = [](torch::nn::Linear& layer) {
+            // Gaussian (normal) distribution with small stddev
+            layer->weight = 0.02 * torch::randn_like(layer->weight);
+            layer->bias   = 0.02 * torch::randn_like(layer->bias);
+        };
+
+        manual_init(fc1);
+        manual_init(fc2);
+        manual_init(fc3);
+        manual_init(out);
+    }
 
     // Set device (CPU or CUDA)
     if (device == "cuda" && torch::cuda::is_available()) {
