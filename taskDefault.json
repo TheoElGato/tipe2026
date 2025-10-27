@@ -26,6 +26,12 @@
 	"STARTX": 523,
 	"STARTY": 275,
 	
+	"USE_EVOLUTION_CURVE": false,
+	"CURVE_A": 0.075,
+	"CURVE_B": 0,
+	"CURVE_C": 0,
+	"CURVE_D": 0,
+	
 	"IS_INFINITE": true,
 	"TIME_ALLOWED": 126000
 }]

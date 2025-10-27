@@ -221,6 +221,11 @@ void SimTasker::loadTask(int id) {
     this->nb_goal = data["NB_GOAL"];
     this->startx = data["STARTX"];
     this->starty = data["STARTY"];
+    this->use_evolution_curve = data["USE_EVOLUTION_CURVE"];
+    this->curve_a = data["CURVE_A"];
+    this->curve_b = data["CURVE_B"];
+    this->curve_c = data["CURVE_C"];
+    this->curve_d = data["CURVE_D"];
     this->is_infinite = data["IS_INFINITE"];
     this->time_allowed = data["TIME_ALLOWED"];
 }

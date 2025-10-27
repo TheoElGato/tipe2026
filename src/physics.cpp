@@ -100,8 +100,9 @@ void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, st
 
             // si les points sont fixes, on ne les bouge pas
             if (a->fixed && b->fixed) {
-                //a->position -= delta * diff * 0.5f;
-                //b->position += delta * diff * 0.5f;
+                // @TheoElGato, is this a normal ?
+                a->position -= delta * diff * 0.5f;
+                b->position += delta * diff * 0.5f;
             } else if (!a->fixed && b->fixed) {
                 a->position -= delta * diff;
             } else if (a->fixed && !b->fixed) {

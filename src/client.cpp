@@ -119,6 +119,11 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
     sf::Vector2f start = sf::Vector2f(stk.startx, stk.starty);
     bool is_infinite = stk.is_infinite;
     int time_allowed = stk.time_allowed;
+    bool use_evolution_curve = stk.use_evolution_curve;
+    float curve_a = stk.curve_a;
+    float curve_b = stk.curve_b;
+    float curve_c = stk.curve_c;
+    float curve_d = stk.curve_d;
     ///////////////////
 
     /// temp
@@ -295,6 +300,11 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
         sous_sim_scores[i] = std::vector<float>(nb_brain, 0.0f);
     }
     
+    // Init of evolution curve
+    if (use_evolution_curve) {
+        evolution = curve_a*std::exp(curve_b*generation+curve_c)+curve_d;
+    }
+    
     logm("All variable initialized. Starting main loop.", "INFO");
 
     while (window.isOpen())
@@ -339,8 +349,11 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                     sous_sim_threads.emplace_back(std::thread());
                     sous_sim_state.emplace_back(0);
                 }
-                acu = 0;
                 generation += 1;
+                if (use_evolution_curve) {
+                    evolution = curve_a*std::exp(curve_b*generation+curve_c)+curve_d;
+                }
+                acu = 0;
                 cl->state = 1;
             }
             if (cl->state == 4) {
@@ -492,8 +505,11 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                         sous_sim_threads.emplace_back(std::thread());
                         sous_sim_state.emplace_back(0);
                     }
-                    acu = 0;
                     generation += 1;
+                    if (use_evolution_curve) {
+                        evolution = curve_a*std::exp(curve_b*generation+curve_c)+curve_d;
+                    }
+                    acu = 0;
                 } else {
                 
                     for (int i=0; i<nb_brain; i++)

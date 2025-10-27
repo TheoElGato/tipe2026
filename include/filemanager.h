@@ -71,6 +71,12 @@ class SimTasker {
       int starty;
       
       // OTHERS //
+      bool use_evolution_curve;
+      float curve_a;
+      float curve_b;
+      float curve_c;
+      float curve_d;
+      
       bool is_infinite;
       int time_allowed;
    
