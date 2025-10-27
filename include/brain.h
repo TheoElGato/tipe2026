@@ -23,6 +23,7 @@ private:
     int output_size;
     int nb_hidden_neurones;
     int links;
+    void manual_init();
     torch::Device device = torch::kCPU;
 };
 

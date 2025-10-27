@@ -108,12 +108,10 @@ void Creature::brainUpdate(sf::Vector2f target, Brain * brain)
 
     for(int i=0;i<4;i++) {
         float temp = this->leg_up[i] = output[i].item<float>();
-        //std::cout << temp << std::endl;
         this->leg_up[i] = temp > 0.0f ? 1.0f : 0.0f;
     }
     for(int i=0;i<2;i++) {
         float temp = output[i+4].item<float>();
-        //std::cout << temp << std::endl;
         this->muscle_con[i] = temp > 0.0f ? 1.0f : 0.0f;
     }
 }
@@ -140,10 +138,10 @@ void Creature::update(float dt)
     // gestion de la longueur des muscles
     this->muscles[0].restLength = this->muscle_len[(int) this->muscle_con[0]];
     this->muscles[1].restLength = this->muscle_len[(int) this->muscle_con[1]];
-    //std::cout << std::to_string(this->muscle_con[0]) << " " << std::to_string( this->muscle_con[1]) << std::endl;
-    //std::cout << std::to_string((int) this->muscle_con[0]) << " " << std::to_string((int) this->muscle_con[1]) << std::endl;
 
-    
+    // Uncoment to debug muscle and leg states
+    //std::cout << leg_up[0] << leg_up[1] << leg_up[2] << leg_up[3] << this->muscle_con[0] << this->muscle_con[1] << std::endl;
+
         // Calcul du milieu entre la patte avant droite (1) et arrière droite (3)
     sf::Vector2f mid = sf::Vector2f(
         (this->vertices[1].position.x + this->vertices[3].position.x) / 2.0f,

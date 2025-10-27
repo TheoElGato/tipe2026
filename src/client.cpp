@@ -445,9 +445,10 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                 
                 // Visibly this portion is making the rest bug and I don't know why...
                 // So for now I comment it out.
-                //for(int j=0;j<nb_brain;j++) {
-                //        if(score_agent[j] != 0) score_agent[j] /= sous_sim_total;
-                //}
+                // Edit : I think it's okay to put this back now.
+                for(int j=0;j<nb_brain;j++) {
+                        if(score_agent[j] != 0) score_agent[j] /= sous_sim_total;
+                }
                 
                 int best_score_index = std::distance(score_agent.begin(), std::max_element(score_agent.begin(), score_agent.end()));
                 
@@ -502,7 +503,6 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                     }
                     
                     std::string temptest = vectf_to_jsonstring(score_agent);
-                    //logm(temptest,"DEBUG");
                     Packet genf("genfinished",std::to_string(generation),temptest,"");
                     cl->send(genf);
                     cl->state = 2;

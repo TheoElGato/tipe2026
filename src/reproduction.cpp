@@ -43,21 +43,24 @@ void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
     // Generate new brains
     std::vector<Brain> new_agents;
     new_agents.reserve(NB_BRAIN - num_best_to_keep);
-    std::cout << num_best_to_keep << std::endl;
+    
+    int mode_repr = 1;
+    int j = 0;
+    
     for (int i = num_best_to_keep; i < NB_BRAIN; i+=1) {
         
         float ran = dist(gen);  // [0,1[
-        float indx = ran*num_best_to_keep;
-        int j = std::floor(indx);
-        std::cout << j << std::endl;
-        /*
-        float cumul = score_agent[0];
-        int j = 0;
-        while (cumul < ran && j < num_selectable - 1) {
-            j+=1;
-            cumul += score_agent[j];
+        if (mode_repr==0) {
+            float cumul = score_agent[0];
+            j = 0;
+            while (cumul < ran && j < num_selectable - 1) {
+                j+=1;
+                cumul += score_agent[j];
+            }
+        } else {
+            float indx = ran*num_best_to_keep;
+            j = std::floor(indx);
         }
-        */
         
         // Add mutated copy of selected brain
         new_agents.emplace_back((*brain_agents)[j].copy());

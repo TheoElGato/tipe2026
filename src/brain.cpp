@@ -14,19 +14,7 @@ Brain::Brain(int input_size, int output_size, std::string file, std::string devi
     this->fc3 = register_module("fc3", torch::nn::Linear(nb_hidden_neurones, nb_hidden_neurones));
     this->out = register_module("out", torch::nn::Linear(nb_hidden_neurones, output_size));
 
-    {
-        torch::NoGradGuard no_grad;
-        auto manual_init = [](torch::nn::Linear& layer) {
-            // Gaussian (normal) distribution with small stddev
-            layer->weight = 0.02 * torch::randn_like(layer->weight);
-            layer->bias   = 0.02 * torch::randn_like(layer->bias);
-        };
-
-        manual_init(fc1);
-        manual_init(fc2);
-        manual_init(fc3);
-        manual_init(out);
-    }
+    
 
     // Set device (CPU or CUDA)
     if (device == "cuda" && torch::cuda::is_available()) {
@@ -36,6 +24,20 @@ Brain::Brain(int input_size, int output_size, std::string file, std::string devi
         this->device = torch::kCPU;
         this->to(this->device);
     }
+    
+    // Manuel seed and initial randomness
+    auto seed = static_cast<unsigned>(
+        std::chrono::high_resolution_clock::now()
+            .time_since_epoch()
+            .count()
+        + reinterpret_cast<uintptr_t>(this)
+    );
+    torch::manual_seed(seed);
+    if (this->device.is_cuda()) {
+        torch::cuda::manual_seed_all(seed);
+    }
+
+    manual_init();
 
     // Load model from file if provided
     if (file!="") {
@@ -87,15 +89,31 @@ void Brain::mutate(float valeur) {
 Brain Brain::copy() {
     Brain new_brain(this->input_size, this->output_size, "", "cpu", this->nb_hidden_neurones);
     torch::NoGradGuard no_grad;
-    new_brain.fc1->weight = this->fc1->weight.detach().clone();
-    new_brain.fc1->bias = this->fc1->bias.detach().clone();
-    new_brain.fc2->weight = this->fc2->weight.detach().clone();
-    new_brain.fc2->bias = this->fc2->bias.detach().clone();
-    new_brain.fc3->weight = this->fc3->weight.detach().clone();
-    new_brain.fc3->bias = this->fc3->bias.detach().clone();
-    new_brain.out->weight = this->out->weight.detach().clone();
-    new_brain.out->bias = this->out->bias.detach().clone();
+    new_brain.fc1->weight.copy_(this->fc1->weight.detach().clone());
+    new_brain.fc1->bias.copy_(this->fc1->bias.detach().clone());
+    new_brain.fc2->weight.copy_(this->fc2->weight.detach().clone());
+    new_brain.fc2->bias.copy_(this->fc2->bias.detach().clone());
+    new_brain.fc3->weight.copy_(this->fc3->weight.detach().clone());
+    new_brain.fc3->bias.copy_(this->fc3->bias.detach().clone());
+    new_brain.out->weight.copy_(this->out->weight.detach().clone());
+    new_brain.out->bias.copy_(this->out->bias.detach().clone());
     return new_brain;
 }
 
+void Brain::manual_init() {
+    // Manual random initialization for all layers
+    torch::NoGradGuard no_grad;
+    
+    fc1->weight.copy_(torch::randn_like(fc1->weight));
+    fc1->bias.copy_(torch::randn_like(fc1->bias));
+
+    fc2->weight.copy_(torch::randn_like(fc2->weight));
+    fc2->bias.copy_(torch::randn_like(fc2->bias));
+
+    fc3->weight.copy_(torch::randn_like(fc3->weight));
+    fc3->bias.copy_(torch::randn_like(fc3->bias));
+
+    out->weight.copy_(torch::randn_like(out->weight));
+    out->bias.copy_(torch::randn_like(out->bias));
+}
 

@@ -15,22 +15,24 @@ void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Ve
     }
 
     while (acc < time) {
+        // Physics update for all agents
         for (int i = 0; i < agents.size(); ++i) {
             Creature* agent = agents[i];
-
-            // handle physics update for each agent
             std::vector<Point> *vertices = &agent->vertices;
             physics->PBD(vertices, agent->links, agent->muscles, 10, *dt);
-
-            if(brainAcc <= accbrain) 
-            {
-                // handle brain update for each agent
-                //std::cout << "tick" << std::endl;
-                agent->brainUpdate(objectif, brains[i]);
-                agent->update(*dt);
-                accbrain = 0;
-            }
         }
+
+        // Brain update for all agents (when timer triggers)
+        // 10 Hours wasted here,
+        // because only agent0 had time to update...
+        if (accbrain > brainAcc) {
+            for (int i = 0; i < agents.size(); ++i) {
+                agents[i]->brainUpdate(objectif, brains[i]);
+                agents[i]->update(*dt);
+            }
+            accbrain = 0;
+        }
+
         accbrain += *dt;
         acc += *dt;
     }
@@ -41,8 +43,7 @@ void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Ve
         float dx = objectif.x - agent->vertices[0].position.x;
         float dy = objectif.y - agent->vertices[0].position.y;
         float dst = std::sqrt(dx * dx + dy * dy);
-        float scr = 100/(1+(dst * dst));
-        //std::cout << scr << std::endl;
+        float scr = 1/(1+dst);
         (*scores)[i] = scr;
     }
 
