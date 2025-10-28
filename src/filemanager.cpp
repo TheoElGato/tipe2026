@@ -1,5 +1,11 @@
 #include "filemanager.h"
 
+// At this point, this file is responsible for storing and loading json data into files
+// Serialising data for the websocket, logging, convertion, and os stuff.
+// So much more that a filemanager, this is the backbone for our project.
+
+// TODO: implement saving log message to files (with a option in task.json)
+
 void logm(const std::string& message, const std::string& level) {   
     // Standardized logging function
     std::cout << "[" << level << "] " << message << std::endl;
@@ -8,12 +14,7 @@ void logm(const std::string& message, const std::string& level) {
 std::string generate_name(const std::string& name) {
     std::time_t now = std::time(nullptr); // Get current time
     std::tm local_time{};
-#ifdef _WIN32                            // Yes WIN32 support
-    localtime_s(&local_time, &now);
-#else
-    localtime_r(&now, &local_time);
-#endif
-
+    localtime_r(&now, &local_time);    // Not for Windows
     // Format time as YYYYMMDD_HHMMSS
     std::ostringstream oss;
     oss << std::put_time(&local_time, "%Y%m%d_%H%M%S");
@@ -22,7 +23,7 @@ std::string generate_name(const std::string& name) {
 }
 
 std::string getHostName() {
-    // This bloc has been made with no intention for WIN32. 
+    // This bloc has been made with no intention for Windows. 
 	char hostname[HOST_NAME_MAX];
 	gethostname(hostname, HOST_NAME_MAX);
 	// Cry about it.
@@ -108,8 +109,6 @@ void SimDataStruct::addStatRow(float generation, float agent0score, float agent1
     meanV.push_back(mean);
     bestAgentScoreV.push_back(bestAgentScore);
     timeForOneGenV.push_back(timeForOneGen);
-    
-
 }
 
 void SimDataStruct::save() {
@@ -150,7 +149,7 @@ void SimDataStruct::save() {
 
 
 void SimDataStruct::loadFromFile(std::string load_name) {
-    // read the JSON file from the load_name sim 
+    // Read the JSON file from the load_name sim 
     std::string filename = folder / load_name / (load_name+".json");
     
     std::ifstream f(filename);
@@ -191,7 +190,7 @@ std::string SimDataStruct::getFullPath() {
 // SimTasker
 
 SimTasker::SimTasker(std::string tastPath) {
-    // read the JSON file from the load_name sim 
+    // Read the JSON file from tastPath (tastPath ??? why not taskPath)
     std::ifstream f(tastPath);
     allData = nlohmann::json::parse(f);
     
@@ -230,6 +229,8 @@ void SimTasker::loadTask(int id) {
     this->time_allowed = data["TIME_ALLOWED"];
 }
 
+// Packets for the websocket
+
 Packet::Packet(std::string c,std::string a1,std::string a2,std::string a3)
 {
     cmd = c;
@@ -246,7 +247,7 @@ Packet::Packet(std::string loads)
     arg1 = data["arg1"];
     arg2 = data["arg2"];
     arg3 = data["arg3"];
-    update();
+    update(); // Not needed I think, but why not.
 }
 
 std::string Packet::get_string()

@@ -38,10 +38,12 @@ int main(int argc, char* argv[]) {
             simulate(mainSimTasker);
         }
     } else if (mode==1) {
+        // Start client on ip and port
         logm("Starting Client mode for "+std::to_string(mainSimTasker.len)+" simulations today.");
         SimpleClient cl("ws://"+ip+":"+std::to_string(port),sbf_path);
         cl.run(&mainSimTasker);
     } else if (mode==2) {
+        // Start server on localhost and listening on port
         logm("Server mode for "+std::to_string(mainSimTasker.len)+" simulations today.");
         LogicServer sv;
         sv.run(port,&mainSimTasker);

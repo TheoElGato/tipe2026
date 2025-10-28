@@ -24,7 +24,6 @@ Spring::Spring(int a, int b, float restLength, float springStrength)
     this->springStrength = springStrength;
 }
 
-
 PhysicsWorker::PhysicsWorker()
 {
 
@@ -36,9 +35,6 @@ float PhysicsWorker::distance(Point a, Point b)
     float dy = b.position.y - a.position.y;
     return sqrt(dx * dx + dy * dy);
 }
-
-
-
 
 void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, std::vector<Spring> springs, int numsubstep, float dt)
 {
@@ -54,9 +50,7 @@ void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, st
             fext[i] = {0, 0};
         }
 
-        
-
-        //gestion des ressorts possibles
+        // Manage springs here
         for (const auto& spring : springs) {
             
             sf::Vector2f force = springForce((*objects)[spring.pointA], (*objects)[spring.pointB], spring.springStrength, spring.restLength);
@@ -71,8 +65,8 @@ void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, st
 
         
 
-        //sauvegarde des positions précédentes
-        //calculs des nouvelles positions en fonction de la vitesse à l'aide de la méthode d'Euler
+        // Save previous positions
+        // Compute new positions from speed and Euler method
         for (int i = 0; i < n; i++) {
             (*objects)[i].velocity += h * fext[i] / (*objects)[i].mass;
             if (!(*objects)[i].fixed) {
@@ -87,7 +81,7 @@ void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, st
 
         }
         
-        // gestion des liens solides (SolvePosition)
+        // SolvePosition
         for (const auto& link : links) {
             Point* a = &(*objects)[link.pointA];
             Point* b = &(*objects)[link.pointB];
@@ -98,7 +92,7 @@ void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, st
             float delta_len = sqrt(delta.x * delta.x + delta.y * delta.y);
             float diff = (delta_len - l) / delta_len;
 
-            // si les points sont fixes, on ne les bouge pas
+            // If points are fixed, we don't move them
             if (a->fixed && b->fixed) {
                 // @TheoElGato, is this a normal ?
                 a->position -= delta * diff * 0.5f;
@@ -113,8 +107,7 @@ void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, st
             }
         }
 
-
-        // mise à jour des vitesses en fonction des positions précédentes et des nouvelles positions
+        // Update speeds with old pos and new ones
         for (int i = 0; i < n; i++) {
             (*objects)[i].velocity = ((*objects)[i].position - xprev[i]) / h;
         }
@@ -123,13 +116,12 @@ void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, st
 
 }
 
-
 sf::Vector2f PhysicsWorker::springForce(Point a, Point b, float springConstant, float restLength)
 {
-    //calcule la force d'un ressort entre deux points
-    //et renvoie le vecteur force de a vers b (ou - de b vers a)
-
-    // /!\ ATTENTION si il y a des problème de perf on peut se permettre d'enlever ces vérifications
+    // Calculates the force of a spring between two points
+    // and returns the force vector from a to b (or from b to a)
+        
+    // /!\ WARNING: if there are performance issues, these checks can be removed.
 
     float l = distance(a, b);
     sf::Vector2f n;
@@ -138,11 +130,11 @@ sf::Vector2f PhysicsWorker::springForce(Point a, Point b, float springConstant, 
     } else {
         n = {0, 0};
     }
-    //si les points sont au même endroit, il n'existe pas de vecteur normal
+    // If the points are in the same place, there is no normal vector
 
     if (l - restLength == 0) {
-        // le ressort est à sa longueur à vide, donc pas de force
-        // on ne peut pas diviser par 0
+        // The spring is at its unloaded length, so there is no force
+        // You cannot divide by 0
         return {0, 0};
     }
 

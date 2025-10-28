@@ -126,17 +126,17 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
     float curve_d = stk.curve_d;
     ///////////////////
 
-    /// temp
+    /// Temp
     float ss_dt = 1/60.f;
+    float dt = 0.016f;
     
+    ////// Variable related to the state of simulation ///////
 
-    ////// variable related to the state of simulation ///////
-
-    // var input handling
+    // Var input handling
     int inputdelayBase = 10;
     float inputdelay = (float)inputdelayBase;
     
-    // var simulation gestion
+    // Var simulation gestion
     int nb_agent = NB_AGENT;
     int nb_brain = NB_BRAIN;
     int simu_time = SIM_TIME;
@@ -144,19 +144,15 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
     int generation = 0;
     bool clean_exit = false;
 
-    // accumulators
+    // Accumulators
     float acc = 0; // Used for the total trained time
     float acu = 0; // Used for the time for a generation 
     int cyl = 0;
 
-    // selected agent
+    // Selected agents
     int selected_agents = 0;
     bool drawall = false;
 
-    // temp
-    float dt = 0.016f;
-    
-    
     // Some necessery data for brains and agents
     std::vector<Brain> brain_agent;
     std::vector<Creature> agents;
@@ -190,7 +186,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
     }
     sds.save();
 
-    // data for agents and brains
+    // Data for agents and brains
     std::vector<float> score_agent(nb_brain, 0);
     std::vector<float> agents_objectif(nb_agent, 0);
     
@@ -211,7 +207,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
     // else it contains the index of the sous-sim using it
     std::vector<int> groups_avail(THREADS, -1); 
     
-    // variable to track the threads and their state
+    // Variable to track the threads and their state
     int threads_used = 0;
     int sous_sim_next_index = 0;
     int sous_sim_total = SOUS_SIM;
@@ -445,7 +441,6 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
             if (sous_sim_completed >= sous_sim_total) {
                 // All of it is finished
                 // Change of sim :
-
 
                 logm("Generation finished. Processing...", "INFO");
                 

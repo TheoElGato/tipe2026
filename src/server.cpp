@@ -237,7 +237,6 @@ void LogicServer::logic_loop() {
         	    Packet ngen("nextgen",packageSelectionned,packageScores,"");
         	    send_all(ngen);
     
-    
         	    step = 1;
         	}
         	

@@ -14,8 +14,6 @@ Brain::Brain(int input_size, int output_size, std::string file, std::string devi
     this->fc3 = register_module("fc3", torch::nn::Linear(nb_hidden_neurones, nb_hidden_neurones));
     this->out = register_module("out", torch::nn::Linear(nb_hidden_neurones, output_size));
 
-    
-
     // Set device (CPU or CUDA)
     if (device == "cuda" && torch::cuda::is_available()) {
         this->device = torch::kCUDA;
