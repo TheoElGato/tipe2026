@@ -59,7 +59,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 # To test for memory leaks, uncomment the line below :
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g")
 
-add_executable(main
+add_executable(ursafsim
     src/main.cpp
     src/physics.cpp
     src/creature.cpp
@@ -71,9 +71,9 @@ add_executable(main
     src/server.cpp
 )
 
-target_compile_definitions(main PRIVATE ASIO_STANDALONE)
-target_include_directories(main PRIVATE include ${asio_SOURCE_DIR}/asio/include)
-target_link_libraries(main PRIVATE nlohmann_json::nlohmann_json sfml-graphics csv websocketpp "${TORCH_LIBRARIES}" )
+target_compile_definitions(ursafsim PRIVATE ASIO_STANDALONE)
+target_include_directories(ursafsim PRIVATE include ${asio_SOURCE_DIR}/asio/include)
+target_link_libraries(ursafsim PRIVATE nlohmann_json::nlohmann_json sfml-graphics csv websocketpp "${TORCH_LIBRARIES}" )
 
 # The following code block is suggested to be used on Windows.
 # However our code is not compatible for it.
