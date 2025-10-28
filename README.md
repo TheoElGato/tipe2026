@@ -1,6 +1,6 @@
 # tipe2026 - URSAFSIM C++
 
-#### Problématique** : *Comment optimiser le cycle de marche d'une créature à 4 pattes avec un réseau de neurones ?*
+#### Problématique : *Comment optimiser le cycle de marche d'une créature à 4 pattes avec un réseau de neurones ?*
 
 
 On souhaite créer une simulation à deux dimensions où une créature à 4 pattes cherche à se déplacer jusqu'à un point. La créature est contrôlée par une intelligence artificielle dotée d’un réseau de neurones.
