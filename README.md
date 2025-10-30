@@ -62,6 +62,6 @@ Copyright :
 Les modules tierces utilisées par ce projet et le texte complet de leurs licences sont rassemblés dans le fichier « THIRD_PARTY_LICENSES ».
 Il est également inclut tous les fichiers NOTICE requis par ces modules (NOTICE de PyTorch/libtorch). 
 
-## Note additionnel
+## Note additionnele
 
 **MP2I >> MPSI**
