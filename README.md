@@ -49,6 +49,6 @@ Je suis sûr que c'est la réponse que vous attendiez.
   
 Vous pouvez maintenant éxecuter le programme.
 
-> **_NOTE:_** Le répertoire de travail courant doit contenir le dossier assets, un dossier save (Vous devez le créer), et task.json (Utilisez le template, taskTemplate.json) 
+> **_NOTE:_** Le répertoire de travail courant doit contenir le dossier assets, un dossier save (Vous devez le créer), et task.json (Utilisez le template, taskDefault.json) 
 
 **MP2I >> MPSI**
