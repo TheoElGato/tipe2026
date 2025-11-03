@@ -117,6 +117,3 @@ void reverse_sorting_brain(std::vector<Brain>* tab, std::vector<float>* score_ta
     reverse_sorting_brain(tab, score_tab, low, i-1);
     reverse_sorting_brain(tab, score_tab, i + 1, high);
 }
-
-
-

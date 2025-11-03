@@ -114,4 +114,3 @@ void Brain::manual_init() {
     out->weight.copy_(torch::randn_like(out->weight));
     out->bias.copy_(torch::randn_like(out->bias));
 }
-
