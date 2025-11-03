@@ -18,7 +18,7 @@ class LogicServer {
 public:
     LogicServer();
     void run(uint16_t port, SimTasker* test);
-    int timeout = 10;
+    int timeout = 60;
      
 
 private:

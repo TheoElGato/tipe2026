@@ -149,14 +149,14 @@ void LogicServer::logic_loop() {
     	}
     	
     	if (step==2) { // One client have finished.
-    	    if (cfinished==nb_client) step +=1;
+    	    if (cfinished==nb_client) step=3;
     	    else if(std::time(nullptr)>(timetime+timeout)) {
     	        logm("Some clients need to be kicked. Reason : timeout","WARNING");
     	        // TODO, but I don't know if this is usefull
     	        // since if the client crash he's already disconnecting
     	        // from the server...
     	        logm("KIKING NOT IMPLEMENTED","WARNING");
-    	        step=3;
+    	        //step=3; For now this is disabled
     	    }
     	}
     	
