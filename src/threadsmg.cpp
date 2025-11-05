@@ -1,6 +1,13 @@
 #include "threadsmg.h"
 #include <iostream>
 
+float distance(sf::Vector2f a, sf::Vector2f b) {
+    float dx = a.x - b.x;
+    float dy = a.y - b.y;
+    return std::sqrt(dx * dx + dy * dy);
+}
+
+
 void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Vector2f start, 
                   sf::Vector2f objectif, std::vector<Brain*> brains, int* state, 
                   std::vector<float>* scores, float* dt, float time,float brainAcc)
@@ -29,6 +36,10 @@ void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Ve
             for (int i = 0; i < agents.size(); ++i) {
                 agents[i]->brainUpdate(objectif, brains[i]);
                 agents[i]->update(*dt);
+                if(distance(agents[i]->vertices[0].position, objectif) < 5.0f) {
+                    agents[i]->moveTo(fmod(start.x + acc*10, 1050) , fmod(start.y + acc*10, 750));
+                    (*scores)[i] += 1.0f;
+                }
             }
             accbrain = 0;
         }
@@ -40,9 +51,7 @@ void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Ve
     // Evaluation of the simulation results
     for (int i = 0; i < agents.size(); ++i) {
         Creature* agent = agents[i];
-        float dx = objectif.x - agent->vertices[0].position.x;
-        float dy = objectif.y - agent->vertices[0].position.y;
-        float dst = std::sqrt(dx * dx + dy * dy);
+        float dst = distance(agent->vertices[0].position, objectif);
         float scr = 1/(1+dst);
         (*scores)[i] = scr;
     }
