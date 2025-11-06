@@ -118,7 +118,8 @@ void LogicServer::logic_loop() {
     std::getc(stdin);
     
     logm("All clients are connected. Starting Logic Loop...");
-
+    
+    SimDataStruct sds("save","",0,0,0,0,0,1,true);
 
 	int task_done = 0;
 	int started_at = 0;
@@ -134,7 +135,8 @@ void LogicServer::logic_loop() {
     		mstk->loadTask(task_done);
     		
     		// Creating sds
-    		*sds = SimDataStruct("save",mstk->sim_name,0,0,mstk->evolution,mstk->nb_brain,mstk->nb_agent,1);
+    		sds = SimDataStruct("save",mstk->sim_name,0,0,mstk->evolution,mstk->nb_brain,mstk->nb_agent,1);
+
     		
     		logm("Asking clients to start sim #"+std::to_string(task_done));
     		Packet startpacket("startsim",std::to_string(task_done),"","");
@@ -193,7 +195,7 @@ void LogicServer::logic_loop() {
             
             int best_score_index = std::distance(allFloats.begin(), std::max_element(allFloats.begin(), allFloats.end()));
 
-            sds->addStatRow(generation, allFloats[0], allFloats[1], allFloats[2], 
+            sds.addStatRow(generation, allFloats[0], allFloats[1], allFloats[2], 
                allFloats[3], allFloats[4], allFloats[5], allFloats[6],
                allFloats[7], allFloats[8], allFloats[9], average(allFloats),
                allFloats[best_score_index], std::time(nullptr)-gen_started_at);
@@ -205,13 +207,13 @@ void LogicServer::logic_loop() {
                 for (int i=0; i<nb_brain; i++)
                 {
                     std::string istring = std::to_string(i);
-                    brain_agent[i].saveFile(sds->getFullPath()+istring+".pt");
+                    brain_agent[i].saveFile(sds.getFullPath()+istring+".pt");
                 }*/
-                sds->data["generation"] = generation;
-                sds->data["simu_time"] = mstk->sim_time;
-                sds->data["evolution"] = mstk->evolution;
-                sds->data["total_trained_time"] = (std::time(nullptr) - started_at);
-                sds->save();
+                sds.data["generation"] = generation;
+                sds.data["simu_time"] = mstk->sim_time;
+                sds.data["evolution"] = mstk->evolution;
+                sds.data["total_trained_time"] = (std::time(nullptr) - started_at);
+                sds.save();
                 
                 logm("Autosaved.", "INFO");
             }
