@@ -191,17 +191,19 @@ void LogicServer::logic_loop() {
             
             // Selected whitch files need to be send to the clients
             // The bests 
-            std::vector<std::string> selectioned;
-            std::vector<float> scores;
-            for(int i=0; i<(mstk->nb_brain); i+=1) {
-                std::string idstr = std::to_string(allBrains[i].bid1)+"s"+std::to_string(allBrains[i].bid2)+".pt";
-                selectioned.push_back(idstr);
-                scores.push_back(allFloats[i]);
-            }
-            
-            // Packaging it in json to send it
-            packageSelectionned = vects_to_jsonstring(selectioned);      
-            packageScores = vectf_to_jsonstring(scores);            
+
+            for(int i=0; i<nb_client/2; i+=1) {
+                selection_clients.push_back(std::vector<std::string>{});
+
+                for(int j=0; j<(mstk->nb_brain); j+=1) {
+
+                    int idx = i*(mstk->nb_brain)+j;
+                    std::string idstr = std::to_string(allBrains[idx].bid1)+"s"+std::to_string(allBrains[idx].bid2)+".pt";
+                    selection_clients[i].push_back(idstr);
+                    scores_clients[i].push_back(allFloats[idx]);
+
+                }
+            }         
             
             // Clearing memory
             // (I think this is not necessery but why not :/
@@ -236,6 +238,15 @@ void LogicServer::logic_loop() {
                 // Sending nextgen packet
         	    Packet ngen("nextgen",packageSelectionned,packageScores,"");
         	    send_all(ngen);
+
+                int i = 0;
+                for (auto &pair : connections) {
+                    logm("Sent generation data to client#"+std::to_string(i));
+                    Packet ngen("nextgen",vects_to_jsonstring(selection_clients[i%(nb_client/2)]),vectf_to_jsonstring(scores_clients[i%(nb_client/2)]),"");
+                    send(ngen, pair.first);
+                    i += 1;
+                }
+
     
         	    step = 1;
         	}

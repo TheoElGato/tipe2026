@@ -33,6 +33,8 @@ private:
 	int step = 0;
 	std::string packageSelectionned = "";
 	std::string packageScores = "";
+	std::vector<std::vector<std::string>> selection_clients;
+    std::vector<std::vector<float>> scores_clients;
 	std::vector<std::pair<std::vector<float>,std::vector<Brain>>> genresults;
 	void logic_loop();
 	void send_all(Packet pck);
