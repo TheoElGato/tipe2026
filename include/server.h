@@ -27,10 +27,12 @@ private:
 	std::map<websocketpp::connection_hdl, uint64_t, std::owner_less<websocketpp::connection_hdl>> connections;
 	std::map<uint64_t, std::string> clients_hn;
 	SimTasker* mstk;
+	SimDataStruct* sds;
 	int timetime = 0;
 	int cfinished = 0;
 	int nb_client = 0;
 	int step = 0;
+	
 	std::string packageSelectionned = "";
 	std::string packageScores = "";
 	std::vector<std::vector<std::string>> selection_clients;
