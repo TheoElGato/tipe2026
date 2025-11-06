@@ -22,6 +22,15 @@ std::string generate_name(const std::string& name) {
     return name + "_" + oss.str();
 }
 
+float average(std::vector<float> v){
+    if(v.empty()){
+        return 0;
+    }
+
+    auto const count = static_cast<float>(v.size());
+    return std::reduce(v.begin(), v.end()) / count;
+}
+
 std::string getHostName() {
     // This bloc has been made with no intention for Windows. 
 	char hostname[HOST_NAME_MAX];
@@ -62,8 +71,8 @@ bool str_to_uint16(const char *str, uint16_t *res) {
     return true;
 }
 
-SimDataStruct::SimDataStruct(std::string path, std::string name, int generation, int simu_time, int evolution, int brains_number,int agents_number,int train_sessions) {
-    
+SimDataStruct::SimDataStruct(std::string path, std::string name, int generation, int simu_time, int evolution, int brains_number,int agents_number,int train_sessions,bool empty) {
+    if (empty) return;
 	std::string host_name = getHostName();
 
 	this->name = generate_name(name);

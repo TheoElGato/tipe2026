@@ -18,6 +18,7 @@ std::string vects_to_jsonstring(std::vector<std::string> v);
 std::vector<float> jsonstring_to_vectf(std::string s);
 std::vector<std::string> jsonstring_to_vects(std::string s);
 bool str_to_uint16(const char *str, uint16_t *res);
+float average(std::vector<float> v);
 
 class Packet {
    public:
@@ -87,7 +88,7 @@ class SimTasker {
 
 class SimDataStruct {
 public:
-   SimDataStruct(std::string path, std::string name, int generation, int simu_time, int evolution, int brains_number,int agents_number,int train_sessions);
+   SimDataStruct(std::string path, std::string name, int generation, int simu_time, int evolution, int brains_number,int agents_number,int train_sessions,bool empty=false);
    void save();
    void loadFromFile(std::string load_name);
    std::string getFullPath();

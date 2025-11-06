@@ -12,14 +12,6 @@ std::string remove_zero_ts(float value) {
     return oss.str();
 }
 
-float average(std::vector<float> v){
-    if(v.empty()){
-        return 0;
-    }
-
-    auto const count = static_cast<float>(v.size());
-    return std::reduce(v.begin(), v.end()) / count;
-}
 
 void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<std::string, float>& stats) {
     // Draw statistics on the window
@@ -160,10 +152,11 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
     // Init the SimDataStruct
     std::string sim_name = SIM_NAME;
     if (LOAD_FROM_FILE) sim_name=LOAD_NAME;
-    SimDataStruct sds("save",sim_name,0,0,evolution,nb_brain,nb_agent,1);
+    SimDataStruct sds("save",sim_name,0,0,evolution,nb_brain,nb_agent,1,mc);
     
     // If needed, load the sim
     if (LOAD_FROM_FILE) {
+        if(mc) logm("Loading in client mode not supported.","WARNING");
         // Load simulation state from file
         logm("Loading the sim","WARNING");
         sds.loadFromFile(LOAD_NAME);
@@ -184,7 +177,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
         // Initialize simulation state
         init_agents_and_brain(nb_agent, nb_brain, start.x, start.y, &agents, &brain_agent, DEVICE,NB_HIDDEN_LAYER);
     }
-    sds.save();
+    if (!mc) sds.save();
 
     // Data for agents and brains
     std::vector<float> score_agent(nb_brain, 0);
@@ -420,14 +413,15 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                         std::string istring = std::to_string(i);
                         brain_agent[i].saveFile(sds.getFullPath()+istring+".pt");
                     }
+                    sds.data["generation"] = generation;
+                    sds.data["simu_time"] = simu_time;
+                    sds.data["evolution"] = evolution;
+                    sds.data["total_trained_time"] = acc;
+                    sds.save();
+                    
+                    logm("Saved.", "INFO");
                 } 
-                sds.data["generation"] = generation;
-                sds.data["simu_time"] = simu_time;
-                sds.data["evolution"] = evolution;
-                sds.data["total_trained_time"] = acc;
-                sds.save();
                 
-                logm("Saved.", "INFO");
                 logm("Exiting simulation.", "INFO");
                 return 0;
             }
@@ -460,34 +454,31 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                 
                 int best_score_index = std::distance(score_agent.begin(), std::max_element(score_agent.begin(), score_agent.end()));
                 
-                sds.addStatRow(generation, score_agent[0], score_agent[1], score_agent[2], 
+                
+                
+                if (!mc) { // We only want to save brain in classic mode here.
+                
+                   sds.addStatRow(generation, score_agent[0], score_agent[1], score_agent[2], 
                    score_agent[3], score_agent[4], score_agent[5], score_agent[6],
                    score_agent[7], score_agent[8], score_agent[9], average(score_agent),
                    score_agent[best_score_index], acu);
                 
-                // Autosave check
-                if (AUTOSAVE && generation % AUTOSAVE_FREQ == 0) {
-                    // Time to autosave !
-                    
-                    // We only want to save brain in classic mode here.
-                    if (!mc) {
+                    // Autosave check
+                    if (AUTOSAVE && generation % AUTOSAVE_FREQ == 0) {
+                        // Time to autosave !
                         for (int i=0; i<nb_brain; i++)
                         {
                             std::string istring = std::to_string(i);
                             brain_agent[i].saveFile(sds.getFullPath()+istring+".pt");
                         }
+                        sds.data["generation"] = generation;
+                        sds.data["simu_time"] = simu_time;
+                        sds.data["evolution"] = evolution;
+                        sds.data["total_trained_time"] = acc;
+                        sds.save();
+                        
+                        logm("Autosaved.", "INFO");
                     }
-                    
-                    sds.data["generation"] = generation;
-                    sds.data["simu_time"] = simu_time;
-                    sds.data["evolution"] = evolution;
-                    sds.data["total_trained_time"] = acc;
-                    sds.save();
-                    
-                    logm("Autosaved.", "INFO");
-                }
-                
-                if (!mc) {
                     // Initialization the variables for the next generation
                     reproduce(&brain_agent, score_agent,  nb_brain, evolution, BEST_KEEP, SELECTION_POL);
                     for(int j=0;j<nb_brain;j++) score_agent[j] = 0;
