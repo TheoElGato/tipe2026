@@ -224,19 +224,21 @@ void LogicServer::logic_loop() {
             // Selected whitch files need to be send to the clients
             // The bests 
 
-            for(int i=0; i<nb_client/2; i+=1) {
-                selection_clients.push_back(std::vector<std::string>{});
-
-                for(int j=0; j<(mstk->nb_brain); j+=1) {
-
-                    int idx = i*(mstk->nb_brain)+j;
-                    std::string idstr = std::to_string(allBrains[idx].bid1)+"s"+std::to_string(allBrains[idx].bid2)+".pt";
-                    selection_clients[i].push_back(idstr);
-                    scores_clients[i].push_back(allFloats[idx]);
-
-                }
-            }         
             
+            for(int j = 0; j < 1+nb_client/2; j+=1){
+                std::vector<std::string> selectioned;
+                std::vector<float> scores;
+                for(int i=0; i<(mstk->nb_brain); i+=1) {
+                    std::string idstr = std::to_string(allBrains[i+j*(mstk->nb_brain)].bid1)+"s"+std::to_string(allBrains[i+j*(mstk->nb_brain)].bid2)+".pt";
+                    selectioned.push_back(idstr);
+                    scores.push_back(allFloats[i]);
+                }
+
+                // Packaging it in json to send it
+                packageSelectionned.push_back(vects_to_jsonstring(selectioned));  
+                packageScores.push_back(vectf_to_jsonstring(scores));           
+            }
+
             // Clearing memory
             // (I think this is not necessery but why not :/
             allFloats.clear();
@@ -267,16 +269,26 @@ void LogicServer::logic_loop() {
         	    // Cleaning up
         	    cfinished = 0;
                 genresults.clear();
-                
+
+                logm("bap");
+
                 // Sending nextgen packet
-        	    Packet ngen("nextgen",packageSelectionned,packageScores,"");
-        	    send_all(ngen);
+                
+                
+                int half_clients = 1;
+
+                if(nb_client == 1){
+                    half_clients = 1;
+                } else {
+                    half_clients = nb_client/2;
+                }
 
                 int i = 0;
                 for (auto &pair : connections) {
-                    logm("Sent generation data to client#"+std::to_string(i));
-                    Packet ngen("nextgen",vects_to_jsonstring(selection_clients[i%(nb_client/2)]),vectf_to_jsonstring(scores_clients[i%(nb_client/2)]),"");
-                    send(ngen, pair.first);
+                    logm("Sending nextgen to Client# "+std::to_string(connections[pair.first]),"Server");
+                    logm("Selectioned files: "+ std::to_string(i%half_clients) ,"Server");
+                    Packet pck("nextgen",packageSelectionned[i%half_clients],packageScores[i%half_clients],"");
+		            send(pck, pair.first);
                     i += 1;
                 }
 
