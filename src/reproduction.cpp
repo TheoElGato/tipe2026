@@ -44,7 +44,7 @@ void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
     std::vector<Brain> new_agents;
     new_agents.reserve(NB_BRAIN - num_best_to_keep);
     
-    int mode_repr = 1;
+    int mode_repr = 0;
     int j = 0;
     
     for (int i = num_best_to_keep; i < NB_BRAIN; i+=1) {
