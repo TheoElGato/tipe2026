@@ -136,7 +136,7 @@ void LogicServer::logic_loop() {
     		
     		// Creating sds
     		sds = SimDataStruct("save",mstk->sim_name,0,0,mstk->evolution,mstk->nb_brain,mstk->nb_agent,1);
-
+            sds.save();
     		
     		logm("Asking clients to start sim #"+std::to_string(task_done));
     		Packet startpacket("startsim",std::to_string(task_done),"","");
@@ -144,6 +144,7 @@ void LogicServer::logic_loop() {
     		
     		// Get a time stamp
     		started_at = std::time(nullptr);
+    		gen_started_at = std::time(nullptr);
     		
     		genresults.clear(); // We never know...
     		generation = 0;
@@ -270,8 +271,6 @@ void LogicServer::logic_loop() {
         	    cfinished = 0;
                 genresults.clear();
 
-                logm("bap");
-
                 // Sending nextgen packet
                 
                 
@@ -285,8 +284,8 @@ void LogicServer::logic_loop() {
 
                 int i = 0;
                 for (auto &pair : connections) {
-                    logm("Sending nextgen to Client# "+std::to_string(connections[pair.first]),"Server");
-                    logm("Selectioned files: "+ std::to_string(i%half_clients) ,"Server");
+                    logm("Sending nextgen to Client#"+std::to_string(connections[pair.first]));
+                    logm("Selectioned files: "+ std::to_string(i%half_clients));
                     Packet pck("nextgen",packageSelectionned[i%half_clients],packageScores[i%half_clients],"");
 		            send(pck, pair.first);
                     i += 1;
