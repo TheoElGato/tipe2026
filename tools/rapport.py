@@ -2,6 +2,7 @@ from fpdf import FPDF
 import json
 import stats
 import os
+import numpy as np
 
 def unfs(number):
         return (((50*number+96)%255)/255, ((69*number+24)%255)/255, ((42*number+93)%255)/255)
@@ -104,7 +105,7 @@ def create_pdf(fname):
     pdf.cell(0, 10, f"Nombre de generations :  {data['generation']}", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Nombre de sous-generations :  {sg}", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Nombre de sessions d'entrainements :  {data['train_sessions']}", new_x="LMARGIN", new_y="NEXT")
-    pdf.cell(0, 10, f"Temps total :  {format_time(data['total_trained_time'])}", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 10, f"Temps total :  {format_time(data['total_trained_time'])}, en seconde : {data['total_trained_time']}", new_x="LMARGIN", new_y="NEXT")
     
     # PARA
     pdf.set_font("Times", size=20, style="B")
@@ -117,6 +118,18 @@ def create_pdf(fname):
     pdf.cell(0, 10, f"Nombre d'agents : {data['agents-number']} ", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Temps par simulation : {data['simu_time']} ", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Facteur d'évolution : {data['evolution']} ", new_x="LMARGIN", new_y="NEXT")
+    
+    # Result
+    pdf.set_font("Times", size=20, style="B")
+    pdf.cell(20)
+    pdf.cell(30, 10, "Résultats", border=0, align="C")
+    pdf.ln(10)
+    
+    pdf.set_font("Times", size=18)
+    pdf.cell(0, 10, f"Score maximal : {max(stats.best_agent_score)} ", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 10, f"Score moyen : {max(stats.mean)} ", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 10, f"Temps par simulation : {np.mean(stats.all_time_for_one_gen)} ", new_x="LMARGIN", new_y="NEXT")    
+    
     
     h=30
     pdf.add_page()

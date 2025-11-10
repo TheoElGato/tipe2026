@@ -20,7 +20,21 @@ mean = []
 best_agent_score = []
 time_for_one_gen = []
 
+gen_max = 0
+all_generation = []
+all_mean = []
+all_best_agent_score = []
+all_time_for_one_gen = []
+
+
 def clear_all():
+    global gen_max
+    gen_max = max(generation[-1],gen_max)
+    all_generation.append(generation)
+    all_mean.append(mean)
+    all_best_agent_score.append(best_agent_score)
+    all_time_for_one_gen.append(time_for_one_gen)
+    
     generation.clear()
     agent0score.clear()
     agent1score.clear()
