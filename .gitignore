@@ -45,6 +45,9 @@ buildrun.sh
 task.json
 save/*
 tools/myenv/
+tools/rapports/*
+tools/saves/*
+tools/__pycache__/
 
 
 # debug information files
