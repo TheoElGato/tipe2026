@@ -184,4 +184,4 @@ for i in os.listdir("saves"):
     stats.clear_all()
 
 
-stats.generate_total_ultimate_custom_super_cool_plot(f"{FPATH}/scoremax.png",f"{FPATH}/scoremean.png",f"{FPATH}/timemax.png")
+stats.generate_total_ultimate_custom_super_cool_plot(f"{OPATH}/scoremax.png",f"{FPATH}/scoremean.png",f"{FPATH}/timemax.png")

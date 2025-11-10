@@ -149,7 +149,7 @@ def generate_total_ultimate_custom_super_cool_plot(path1,path2,path3):
     plt.legend()
     plt.grid()
     plt.savefig(path1)
-    
+    plt.close()
     
     plt.figure()
     for i in range(len(all_paths)): plt.plot(all_generation[i], all_mean[i], label=all_paths[i])
@@ -159,6 +159,7 @@ def generate_total_ultimate_custom_super_cool_plot(path1,path2,path3):
     plt.legend()
     plt.grid()
     plt.savefig(path2)
+    plt.close()
     
     
     plt.figure()
@@ -169,9 +170,7 @@ def generate_total_ultimate_custom_super_cool_plot(path1,path2,path3):
     plt.legend()
     plt.grid()
     plt.savefig(path3)
-    
-   
-    plt.show()
+    plt.close()
     
 
 def open_plot(path):
