@@ -21,19 +21,22 @@ best_agent_score = []
 time_for_one_gen = []
 
 gen_max = 0
+current_path = ""
 all_generation = []
 all_mean = []
 all_best_agent_score = []
 all_time_for_one_gen = []
+all_paths = []
 
 
 def clear_all():
-    global gen_max
+    global gen_max, current_path
     gen_max = max(generation[-1],gen_max)
     all_generation.append(generation)
     all_mean.append(mean)
     all_best_agent_score.append(best_agent_score)
     all_time_for_one_gen.append(time_for_one_gen)
+    all_paths.append(current_path)
     
     generation.clear()
     agent0score.clear()
@@ -51,11 +54,12 @@ def clear_all():
     time_for_one_gen.clear()
 
 
-def load_stats(path):
+def load_stats(path,name=""):
+    global current_path
     if not os.path.exists(path):
         print(f"[ERROR] Stats : The file {path} does not exist.")
         return
-    
+    current_path = name
     with open(path, mode='r') as file:
         reader = csv.reader(file)
         next(reader)  # Skip the header row
@@ -133,6 +137,47 @@ def generate_meanplot(path):
     plt.savefig(path)
     plt.close()
 
+
+def generate_total_ultimate_custom_super_cool_plot(path1,path2,path3):
+    gen = [x for x in range(int(gen_max))]
+    
+    plt.figure()
+    for i in range(len(all_paths)): plt.plot(all_generation[i],all_best_agent_score[i],label=all_paths[i])
+    plt.title("Score du meilleur cerveau en fonction de la generation")
+    plt.xlabel("Generation")
+    plt.ylabel("Score")
+    plt.legend()
+    plt.grid()
+    plt.savefig(path1)
+    plt.close()
+    
+    plt2.figure()
+    for i in range(len(all_paths)): plt2.plot(all_generation[i], all_mean[i], label=all_paths[i])
+    plt2.title("Moyenne des agents en fonction de la génération")
+    plt2.xlabel("Génération")
+    plt2.ylabel("Moyenne")
+    plt2.legend()
+    plt2.grid()
+    plt2.savefig(path2)
+    
+    
+    plt3.figure()
+    for i in range(len(all_paths)): plt3.plot(all_generation[i],all_time_for_one_gen[i],label=all_paths[i])
+    plt3.title("Temps en moyenne en fonction de la generation")
+    plt3.xlabel("Generation")
+    plt3.ylabel("Temps")
+    plt3.legend()
+    plt3.grid()
+    plt3.savefig(path3)
+    
+    plt.show()
+    plt2.show()
+    plt3.show()
+
+     
+    plt.close()
+    plt2.close()
+    plt3.close()
 
 def open_plot(path):
     webbrowser.get('windows-default').open('file://'+os.path.realpath(path))

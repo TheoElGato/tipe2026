@@ -4,6 +4,9 @@ import stats
 import os
 import numpy as np
 
+FPATH = "saves"
+OPATH = "rapports"
+
 def unfs(number):
         return (((50*number+96)%255)/255, ((69*number+24)%255)/255, ((42*number+93)%255)/255)
 
@@ -60,19 +63,12 @@ class PDF(FPDF):
 
 def create_pdf(fname):
     
-    FPATH = "saves"
+    
     FNAME = fname
     
-    OPATH = "rapports"
+    
     ONAME = FNAME
     
-    stats.load_stats(f"{FPATH}/{FNAME}/{FNAME}.csv")
-    stats.generate_scoreplot(f"{FPATH}/{FNAME}/scoreplot.png")
-    stats.generate_timeplot(f"{FPATH}/{FNAME}/timeplot.png")
-    stats.generate_meanplot(f"{FPATH}/{FNAME}/meanplot.png")
-    
-    for i in range(0, 10):
-        stats.generate_brainplot(f"{FPATH}/{FNAME}/brain{i}plot.png", i,unfs(i))
     
     data = load_sim(FPATH, FNAME)
     sg = data["generation"]*11
@@ -84,6 +80,15 @@ def create_pdf(fname):
     del(raw_name[-1])
 
     name = " ".join(raw_name)
+    
+    stats.load_stats(f"{FPATH}/{FNAME}/{FNAME}.csv",date)
+    stats.generate_scoreplot(f"{FPATH}/{FNAME}/scoreplot.png")
+    stats.generate_timeplot(f"{FPATH}/{FNAME}/timeplot.png")
+    stats.generate_meanplot(f"{FPATH}/{FNAME}/meanplot.png")
+    
+    for i in range(0, 10):
+        stats.generate_brainplot(f"{FPATH}/{FNAME}/brain{i}plot.png", i,unfs(i))
+    
     
     
     # Instantiation of inherited class
@@ -177,4 +182,6 @@ for i in os.listdir("saves"):
     print(i)
     create_pdf(i)
     stats.clear_all()
-    
+
+
+stats.generate_total_ultimate_custom_super_cool_plot(f"{FPATH}/scoremax.png",f"{FPATH}/scoremean.png",f"{FPATH}/timemax.png")
