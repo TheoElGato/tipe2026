@@ -44,6 +44,7 @@ build/*
 buildrun.sh
 task.json
 save/*
+tools/myenv/
 
 
 # debug information files
