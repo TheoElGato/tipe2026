@@ -82,7 +82,7 @@ def create_pdf(fname):
     date = raw_name[-2] + " " +raw_name[-1]
     del(raw_name[-1])
     del(raw_name[-1])
-    print(raw_name)
+
     name = " ".join(raw_name)
     
     
@@ -177,3 +177,4 @@ for i in os.listdir("saves"):
     print(i)
     create_pdf(i)
     stats.clear_all()
+    
