@@ -71,7 +71,7 @@ bool str_to_uint16(const char *str, uint16_t *res) {
     return true;
 }
 
-SimDataStruct::SimDataStruct(std::string path, std::string name, int generation, int simu_time, int evolution, int brains_number,int agents_number,int train_sessions,bool empty) {
+SimDataStruct::SimDataStruct(std::string path, std::string name, int generation, int sgeneration, int simu_time, int evolution, int brains_number,int agents_number,int train_sessions,bool empty) {
     if (empty) return;
 	std::string host_name = getHostName();
 
@@ -90,6 +90,7 @@ SimDataStruct::SimDataStruct(std::string path, std::string name, int generation,
         {"name", name},
         {"host_name", host_name},
         {"generation", generation},
+        {"Sgeneration", sgeneration},
         {"simu_time", simu_time},
         {"evolution", evolution},
         {"brains-number", brains_number},

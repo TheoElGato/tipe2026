@@ -152,7 +152,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
     // Init the SimDataStruct
     std::string sim_name = SIM_NAME;
     if (LOAD_FROM_FILE) sim_name=LOAD_NAME;
-    SimDataStruct sds("save",sim_name,0,0,evolution,nb_brain,nb_agent,1,mc);
+    SimDataStruct sds("save",sim_name,0, SOUS_SIM,0,evolution,nb_brain,nb_agent,1,mc);
     
     // If needed, load the sim
     if (LOAD_FROM_FILE) {

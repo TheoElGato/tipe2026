@@ -120,7 +120,7 @@ void LogicServer::logic_loop() {
     
     logm("All clients are connected. Starting Logic Loop...");
     
-    SimDataStruct sds("save","",0,0,0,0,0,1,true);
+    SimDataStruct sds("save","",0,0,0,0,0,0,1,true);
 
 	int task_done = 0;
 	int started_at = 0;
@@ -136,7 +136,7 @@ void LogicServer::logic_loop() {
     		mstk->loadTask(task_done);
     		
     		// Creating sds
-    		sds = SimDataStruct("save",mstk->sim_name,0,0,mstk->evolution,mstk->nb_brain,mstk->nb_agent,1);
+    		sds = SimDataStruct("save",mstk->sim_name,0,mstk->sous_sim,0,mstk->evolution,mstk->nb_brain,mstk->nb_agent,1);
             sds.save();
     		
     		logm("Asking clients to start sim #"+std::to_string(task_done));
@@ -203,22 +203,22 @@ void LogicServer::logic_loop() {
                allFloats[best_score_index], std::time(nullptr)-gen_started_at);
             
             // Autosave check
+            /*
             if (mstk->autosave && generation % mstk->autosave_freq == 0) {
                 // Time to autosave !
-                /*
                 for (int i=0; i<nb_brain; i++)
                 {
                     std::string istring = std::to_string(i);
                     brain_agent[i].saveFile(sds.getFullPath()+istring+".pt");
-                }*/
-                sds.data["generation"] = generation;
-                sds.data["simu_time"] = mstk->sim_time;
-                sds.data["evolution"] = mstk->evolution;
-                sds.data["total_trained_time"] = (std::time(nullptr) - started_at);
-                sds.save();
-                
-                logm("Autosaved.", "INFO");
-            }
+                }   
+            }*/
+            sds.data["generation"] = generation;
+            sds.data["simu_time"] = mstk->sim_time;
+            sds.data["evolution"] = mstk->evolution;
+            sds.data["total_trained_time"] = (std::time(nullptr) - started_at);
+            sds.save();
+            
+            logm("Autosaved.", "SAVE");
                         
             // Sort by score descending
             reverse_sorting_brain(&allBrains, &allFloats, 0, allBrains.size() - 1);

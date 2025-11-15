@@ -88,7 +88,7 @@ class SimTasker {
 
 class SimDataStruct {
 public:
-   SimDataStruct(std::string path, std::string name, int generation, int simu_time, int evolution, int brains_number,int agents_number,int train_sessions,bool empty=false);
+   SimDataStruct(std::string path, std::string name, int generation, int sgeneration, int simu_time, int evolution, int brains_number,int agents_number,int train_sessions,bool empty=false);
    void save();
    void loadFromFile(std::string load_name);
    std::string getFullPath();
