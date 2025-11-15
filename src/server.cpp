@@ -226,7 +226,7 @@ void LogicServer::logic_loop() {
             // Selected whitch files need to be send to the clients
             // The bests 
 
-			selectioned.clear();
+			packageSelectionned.clear();
 			packageScores.clear();
             
             for(int j = 0; j < 1+nb_client/2; j+=1){
