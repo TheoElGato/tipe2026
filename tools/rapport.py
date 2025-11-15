@@ -71,17 +71,18 @@ def create_pdf(fname):
     
     
     data = load_sim(FPATH, FNAME)
-    sg = data["generation"]*11
+    sg = data["Sgeneration"]
     
-    raw_name = data["name"]
-    raw_name = raw_name.split("_")
+    raw_name = fname.split("_")
     date = raw_name[-2] + " " +raw_name[-1]
     del(raw_name[-1])
     del(raw_name[-1])
 
     name = " ".join(raw_name)
     
-    stats.load_stats(f"{FPATH}/{FNAME}/{FNAME}.csv",date)
+
+
+    generation, mean, best_agent_score, time_for_one_gen = stats.load_stats(f"{FPATH}/{FNAME}/{FNAME}.csv",date)
     stats.generate_scoreplot(f"{FPATH}/{FNAME}/scoreplot.png")
     stats.generate_timeplot(f"{FPATH}/{FNAME}/timeplot.png")
     stats.generate_meanplot(f"{FPATH}/{FNAME}/meanplot.png")
@@ -94,7 +95,6 @@ def create_pdf(fname):
     # Instantiation of inherited class
     pdf = PDF(name)
     pdf.add_page()
-    
     
     
     
@@ -133,8 +133,7 @@ def create_pdf(fname):
     pdf.set_font("Times", size=18)
     pdf.cell(0, 10, f"Score maximal : {max(stats.best_agent_score)} ", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Score moyen : {max(stats.mean)} ", new_x="LMARGIN", new_y="NEXT")
-    pdf.cell(0, 10, f"Temps par simulation : {np.mean(stats.all_time_for_one_gen)} ", new_x="LMARGIN", new_y="NEXT")    
-    
+    pdf.cell(0, 10, f"Temps par simulation : {np.mean(stats.time_for_one_gen)} ", new_x="LMARGIN", new_y="NEXT")    
     
     h=30
     pdf.add_page()
@@ -177,11 +176,19 @@ def create_pdf(fname):
     pdf.image(f"{FPATH}/{FNAME}/brain9plot.png",x=110,w=100)
     
     pdf.output(OPATH+"/"+ONAME+".pdf")
+    return generation, mean, best_agent_score, time_for_one_gen
+
+tg, tm, tb, tt = [], [], [], []
 
 for i in os.listdir("saves"):
     print(i)
-    create_pdf(i)
+    
+    g, m, b, t = create_pdf(i)
+    tg.append(g)
+    tm.append(m)
+    tb.append(b)
+    tt.append(t)
     stats.clear_all()
 
 
-stats.generate_total_ultimate_custom_super_cool_plot(f"{OPATH}/scoremax.png",f"{FPATH}/scoremean.png",f"{FPATH}/timemax.png")
+stats.generate_total_ultimate_custom_super_cool_plot(f"{OPATH}/scoremax.png",f"{OPATH}/scoremean.png",f"{OPATH}/timemax.png", tg, tm, tb, tt)

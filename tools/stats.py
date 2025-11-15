@@ -38,7 +38,6 @@ def clear_all():
     all_time_for_one_gen.append(time_for_one_gen)
     all_paths.append(current_path)
     
-    generation.clear()
     agent0score.clear()
     agent1score.clear()
     agent2score.clear()
@@ -49,16 +48,15 @@ def clear_all():
     agent7score.clear()
     agent8score.clear()
     agent9score.clear()
-    mean.clear()
-    best_agent_score.clear()
-    time_for_one_gen.clear()
 
 
 def load_stats(path,name=""):
     global current_path
+
     if not os.path.exists(path):
         print(f"[ERROR] Stats : The file {path} does not exist.")
         return
+    
     current_path = name
     with open(path, mode='r') as file:
         reader = csv.reader(file)
@@ -78,6 +76,8 @@ def load_stats(path,name=""):
             mean.append(float(row[11]))
             best_agent_score.append(float(row[12]))
             time_for_one_gen.append(float(row[13]))
+    
+    return generation, mean, best_agent_score, time_for_one_gen
 
 
 def save_stats(gen, agents, ba_score, ba_distance, goal, start, distance, fps, path):
@@ -138,11 +138,12 @@ def generate_meanplot(path):
     plt.close()
 
 
-def generate_total_ultimate_custom_super_cool_plot(path1,path2,path3):
-    gen = [x for x in range(int(gen_max))]
+def generate_total_ultimate_custom_super_cool_plot(path1, path2, path3, tg, tm, tb, tt):  
+
     
+
     plt.figure()
-    for i in range(len(all_paths)): plt.plot(all_generation[i],all_best_agent_score[i],label=all_paths[i])
+    for i in range(len(all_paths)): plt.plot(tg[i],tb[i],label=all_paths[i])
     plt.title("Score du meilleur cerveau en fonction de la generation")
     plt.xlabel("Generation")
     plt.ylabel("Score")
@@ -152,7 +153,7 @@ def generate_total_ultimate_custom_super_cool_plot(path1,path2,path3):
     plt.close()
     
     plt.figure()
-    for i in range(len(all_paths)): plt.plot(all_generation[i], all_mean[i], label=all_paths[i])
+    for i in range(len(all_paths)): plt.plot(tg[i], tm[i], label=all_paths[i])
     plt.title("Moyenne des agents en fonction de la génération")
     plt.xlabel("Génération")
     plt.ylabel("Moyenne")
@@ -163,7 +164,7 @@ def generate_total_ultimate_custom_super_cool_plot(path1,path2,path3):
     
     
     plt.figure()
-    for i in range(len(all_paths)): plt.plot(all_generation[i],all_time_for_one_gen[i],label=all_paths[i])
+    for i in range(len(all_paths)): plt.plot(tg[i],tt[i],label=all_paths[i])
     plt.title("Temps en moyenne en fonction de la generation")
     plt.xlabel("Generation")
     plt.ylabel("Temps")
