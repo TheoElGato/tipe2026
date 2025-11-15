@@ -22,22 +22,15 @@ time_for_one_gen = []
 
 gen_max = 0
 current_path = ""
-all_generation = []
-all_mean = []
-all_best_agent_score = []
-all_time_for_one_gen = []
 all_paths = []
 
 
 def clear_all():
     global gen_max, current_path
     gen_max = max(generation[-1],gen_max)
-    all_generation.append(generation)
-    all_mean.append(mean)
-    all_best_agent_score.append(best_agent_score)
-    all_time_for_one_gen.append(time_for_one_gen)
     all_paths.append(current_path)
     
+    generation.clear()
     agent0score.clear()
     agent1score.clear()
     agent2score.clear()
@@ -48,6 +41,9 @@ def clear_all():
     agent7score.clear()
     agent8score.clear()
     agent9score.clear()
+    best_agent_score.clear()
+    time_for_one_gen.clear()
+    mean.clear()
 
 
 def load_stats(path,name=""):

@@ -82,7 +82,7 @@ def create_pdf(fname):
     
 
 
-    generation, mean, best_agent_score, time_for_one_gen = stats.load_stats(f"{FPATH}/{FNAME}/{FNAME}.csv",date)
+    generation, mean, best_agent_score, time_for_one_gen = stats.load_stats(f"{FPATH}/{FNAME}/{FNAME}.csv",raw_name[0])
     stats.generate_scoreplot(f"{FPATH}/{FNAME}/scoreplot.png")
     stats.generate_timeplot(f"{FPATH}/{FNAME}/timeplot.png")
     stats.generate_meanplot(f"{FPATH}/{FNAME}/meanplot.png")
@@ -176,7 +176,7 @@ def create_pdf(fname):
     pdf.image(f"{FPATH}/{FNAME}/brain9plot.png",x=110,w=100)
     
     pdf.output(OPATH+"/"+ONAME+".pdf")
-    return generation, mean, best_agent_score, time_for_one_gen
+    return generation.copy(), mean.copy(), best_agent_score.copy(), time_for_one_gen.copy()
 
 tg, tm, tb, tt = [], [], [], []
 

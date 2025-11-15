@@ -288,7 +288,6 @@ void LogicServer::logic_loop() {
                 int i = 0;
                 for (auto &pair : connections) {
                     logm("Sending nextgen to Client#"+std::to_string(connections[pair.first]));
-                    logm("Selectioned files: "+ std::to_string(i%half_clients));
                     Packet pck("nextgen",packageSelectionned[i%half_clients],packageScores[i%half_clients],"");
 		            send(pck, pair.first);
                     i += 1;
