@@ -71,7 +71,7 @@ bool str_to_uint16(const char *str, uint16_t *res) {
     return true;
 }
 
-SimDataStruct::SimDataStruct(std::string path, std::string name, int generation, int sgeneration, int simu_time, int evolution, int brains_number,int agents_number,int train_sessions,bool empty) {
+SimDataStruct::SimDataStruct(std::string path, std::string name, int generation, int sgeneration, int simu_time, int evolution, float brain_acc, int brains_number,int agents_number,int train_sessions,bool empty) {
     if (empty) return;
 	std::string host_name = getHostName();
 
@@ -93,6 +93,7 @@ SimDataStruct::SimDataStruct(std::string path, std::string name, int generation,
         {"Sgeneration", sgeneration},
         {"simu_time", simu_time},
         {"evolution", evolution},
+        {"brain_acc", brain_acc},
         {"brains-number", brains_number},
         {"agents-number", agents_number},
         {"total_trained_time", 0},
@@ -217,6 +218,7 @@ void SimTasker::loadTask(int id) {
     this->load_name = data["LOAD_NAME"];
     this->sim_time = data["SIM_TIME"];
     this->evolution = data["EVOLUTION"];
+    this->brain_acc = data["BRAIN_ACC"];
     this->nb_brain = data["NB_BRAIN"];
     this->nb_agent = nb_brain*threads;
     this->nb_hidden_layer = data["NB_HIDDEN_LAYER"];

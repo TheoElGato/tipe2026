@@ -120,7 +120,7 @@ void LogicServer::logic_loop() {
     
     logm("All clients are connected. Starting Logic Loop...");
     
-    SimDataStruct sds("save","",0,0,0,0,0,0,1,true);
+    SimDataStruct sds("save","",0,0,0,0,0,0,0,1,true);
 
 	int task_done = 0;
 	int started_at = 0;
@@ -136,7 +136,7 @@ void LogicServer::logic_loop() {
     		mstk->loadTask(task_done);
     		
     		// Creating sds
-    		sds = SimDataStruct("save",mstk->sim_name,0,mstk->sous_sim,0,mstk->evolution,mstk->nb_brain,mstk->nb_agent,1);
+    		sds = SimDataStruct("save",mstk->sim_name,0,mstk->sous_sim,0,mstk->evolution,mstk->brain_acc,mstk->nb_brain,mstk->nb_agent,1);
             sds.save();
     		
     		logm("Asking clients to start sim #"+std::to_string(task_done));

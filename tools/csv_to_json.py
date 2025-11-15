@@ -90,6 +90,7 @@ for i in reversed(range(n)):
         data[i]['LOAD_NAME'] = ''
         data[i]['SIM_TIME'] = int(data[i]['Temps par sous-simulation'])
         data[i]['EVOLUTION'] = float(data[i]['Evolution'].replace(',','.'))
+        data[i]['BRAIN_ACC'] = 0.25
         data[i]['NB_BRAIN'] = int(data[i]['Nombre de cerveaux'])
         data[i]['NB_AGENT'] = "THIS IS AUTOMATIC : NB_BRAIN*THREADS"
         data[i]['NB_HIDDEN_LAYER'] = int(data[i]['Nombre d\'hidden layer'])

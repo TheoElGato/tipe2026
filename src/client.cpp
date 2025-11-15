@@ -97,6 +97,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
     std::string SIM_NAME = stk.sim_name;
     int SIM_TIME = stk.sim_time;
     float EVOLUTION = stk.evolution;
+    float BRAIN_ACC = stk.brain_acc;
     int NB_BRAIN = stk.nb_brain;
     int NB_AGENT = stk.nb_agent;
     int NB_HIDDEN_LAYER = stk.nb_hidden_layer;
@@ -326,7 +327,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                 // Initialize agents with brain from file
                 for (int i=0; i<nb_brain; i++)
                 {
-                    brain_agent.emplace_back(9,6,cl->sbfpath+cl->selectioned[i],DEVICE,NB_HIDDEN_LAYER);
+                    brain_agent.emplace_back(9,6,cl->sbfpath+"/"+cl->selectioned[i],DEVICE,NB_HIDDEN_LAYER);
                 }
                 reproduce(&brain_agent, score_agent,  nb_brain, evolution, BEST_KEEP, SELECTION_POL);
                 for(int j=0;j<nb_brain;j++) score_agent[j] = 0;
@@ -541,7 +542,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                 sous_sim_started+=1;
                 logm("Starting sous-sim " + std::to_string(sous_sim_next_index) + " on group " + std::to_string(group_index) + " with " + std::to_string(agentPartitions[group_index].size()) + " agents.", "THREAD");
                     
-                sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goals[sous_sim_next_index], brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ss_dt, simu_time, ss_dt*4);
+                sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goals[sous_sim_next_index], brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ss_dt, simu_time, BRAIN_ACC);
                 sous_sim_threads[sous_sim_next_index].detach(); // Detach the thread to make it run on is own
     
                 sous_sim_state[sous_sim_next_index] = 1; // Mark it as running

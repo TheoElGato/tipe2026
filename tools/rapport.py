@@ -123,6 +123,7 @@ def create_pdf(fname):
     pdf.cell(0, 10, f"Nombre d'agents : {data['agents-number']} ", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Temps par simulation : {data['simu_time']} ", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Facteur d'évolution : {data['evolution']} ", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 10, f"Fréquence d'activation du cerveaux : {data['brain_acc']} ", new_x="LMARGIN", new_y="NEXT")
     
     # Result
     pdf.set_font("Times", size=20, style="B")

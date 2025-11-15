@@ -51,6 +51,7 @@ class SimTasker {
       // SIM //
       int sim_time;
       float evolution;
+      float brain_acc;
       int nb_brain;
       int nb_agent;
       int nb_hidden_layer;
@@ -88,7 +89,7 @@ class SimTasker {
 
 class SimDataStruct {
 public:
-   SimDataStruct(std::string path, std::string name, int generation, int sgeneration, int simu_time, int evolution, int brains_number,int agents_number,int train_sessions,bool empty=false);
+   SimDataStruct(std::string path, std::string name, int generation, int sgeneration, int simu_time, int evolution, float brain_acc, int brains_number,int agents_number,int train_sessions,bool empty=false);
    void save();
    void loadFromFile(std::string load_name);
    std::string getFullPath();
