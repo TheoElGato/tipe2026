@@ -43,6 +43,15 @@ Vous pouvez maintenant éxecuter le programme.
 
 > **_NOTE:_** Le répertoire de travail courant doit contenir le dossier assets, un dossier save (Vous devez le créer), et task.json (Utilisez le template, taskDefault.json) 
 
+### Création des json
+- Créer un fichier `data.csv` avec les différents paramètres (donner dans le `csv_to_json.py`)
+- Lancer `csv_to_json.py` pour obtenir un fichier json utilisable par le projet
+
+### Exploitation des résultats
+- Dans tools créer 2 fichiers "saves" et "rapports"
+- Mettre les résultats à traiter dans "saves"
+- Lancer `rapport.py` pour obtenir un pdf par simulation
+
 ## Modules utilisés
 - SFML : https://github.com/SFML/SFML
 - libtorch : https://github.com/pytorch/pytorch
