@@ -273,6 +273,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
     sf::Clock clock;
     float fps = 0.0f;
 
+    // Generate goals
     std::vector<sf::Vector2f> goals;
 
     for(int i=0; i<sous_sim_total; i++) {
@@ -561,7 +562,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
             }
         }
 
-        drawStats(window, font, {{"FPS", std::round(fps)}, {"Nb agents", agents.size()}, {"SGen Selected", groups_avail[selected_agents]}, {"Current Gen", generation},{"Current SGen", sous_sim_started},{"Tps",round(acu)},{"Tps max", simu_time}, {"Evolution", evolution}});
+        drawStats(window, font, {{"FPS", std::round(fps)}, {"Nb agents", agents.size()}, {"SGen Selected", groups_avail[selected_agents]}, {"Current Gen", generation},{"SGen started", sous_sim_started},{"Time",round(acu)},{"Time per SGen", simu_time}, {"Evolution", evolution}});
         if (mc) window.draw(wifiSprite);
         
         window.display();

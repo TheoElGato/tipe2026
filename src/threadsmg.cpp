@@ -35,6 +35,8 @@ void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Ve
         if (accbrain > brainAcc) {
             for (int i = 0; i < agents.size(); ++i) {
                 agents[i]->brainUpdate(objectif, brains[i]);
+                
+                // Move agent if they reached the objective
                 agents[i]->update(*dt);
                 if(distance(agents[i]->vertices[0].position, objectif) < 20.0f) {
                     float angle = fmod(acc*5, 2 * M_PI);

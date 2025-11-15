@@ -56,6 +56,7 @@ LogicServer::LogicServer() {
         if (r.cmd == "genfinished") {
             std::vector<float> result = jsonstring_to_vectf(r.arg2);
             logm("Client#"+std::to_string(from)+": "+ clients_hn[from] +" finished gen #"+r.arg1,"Server");
+
             if (result.size() == 0) {
                 logm("Client#"+std::to_string(from)+": "+clients_hn[from]+" send a result of 0 on a generation","ERROR");
                 genresults.emplace_back(std::vector<float>{}, std::vector<Brain>{});
@@ -69,18 +70,18 @@ LogicServer::LogicServer() {
                 }
                 genresults.emplace_back(result, vb);
             }
+
             if (step == 1) {
                 timetime = std::time(nullptr);
                 step = 2;
             }
             cfinished +=1;
         }
+        
         if (r.cmd == "simfinished") {
             logm("Client#"+std::to_string(from)+": "+ clients_hn[from] +" finished task","Server");
             cfinished += 1;
         }
-        
-
         
     });
 }
