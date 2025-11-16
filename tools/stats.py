@@ -114,7 +114,7 @@ def generate_brainplot(path,num,color):
     plt.plot(gen, bb[num], color=color, label="Brain " + str(num))  # RGB equivalent of cyan
     plt.title("Brain "+str(num)+" score en fonction de la generation")
     plt.xlabel("Generation")
-    plt.ylabel("FPS")
+    plt.ylabel("score")
     plt.legend()
     plt.grid()
     plt.savefig(path)
