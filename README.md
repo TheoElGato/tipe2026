@@ -74,3 +74,77 @@ Il est également inclut tous les fichiers NOTICE requis par ces modules (NOTICE
 ## Note additionnelle
 
 **MP2I >> MPSI**
+
+
+# English section
+## Problematic : *How can to optimize the walking cycle of a four-legged creature using a neural network?*
+
+
+We want to create a two-dimensional simulation in which a four-legged creature tries to move to a specific point. The creature is controlled by artificial intelligence equipped with a neural network.
+We want to vary the following parameters in the simulation to save training time, while keeping:
+
+##### Variable :
+- Selection method/criterion (distance or time for a distance)
+- Score & rewards/penalties
+- Selection percentage
+- Simulation time per series (constant or variable)
+- Neural network size (+ smaller -> faster)(+ larger -> more complex behavior)
+- Network initialization method
+
+##### Fixed parameters:
+- Reproduction method
+- Goal/Total distance to reach
+- Starting point
+- Network input and output nodes
+- Neuron function (Relu, Hyperbolic tangent)
+- Creature
+
+##### Observable variables :
+- Total simulated time
+- Method used by the creature (walking speed)
+- Random factor (repeat several times using the same parameters)
+
+##### Why URSAF ???
+Good question. In reality, URSAF is an acronyme for Stride Learning Simulation Research Unit (in french: Unité de Recherche de Simulation d'Apprentissage de la Foulée).
+I'm sure this was you're expected answer.
+
+## How to build
+- Install cmake.
+- Install every dependency of SFML 2.5.1
+- Install libtorch (cuda is supported) and give the path to cmake with `-DCMAKE_PREFIX_PATH=/absolute/path/to/libtorch`
+- Use cmake to build, for example :
+  `cmake -S . -B build`
+  `cmake --build build`
+  
+You can now run the program.
+
+> **_NOTE:_** The current working directory must contain the assets folder, a save folder (you must create it), and task.json (use the template, taskDefault.json). 
+
+### Creation of the json
+- Create a `data.csv` file with the various parameters (specified in `csv_to_json.py`)
+- Run `csv_to_json.py` to obtain a json file that can be used by the project
+
+### Using the results
+- In tools, create two files: “saves” and “reports.”
+- Put the results to be processed in “saves.”
+- Run `report.py` to obtain a PDF for each simulation.
+
+## Used module
+- SFML : https://github.com/SFML/SFML
+- libtorch : https://github.com/pytorch/pytorch
+- JSON for Modern C++ : https://github.com/nlohmann/json
+- csv-parser : https://github.com/vincentlaucsb/csv-parser
+- websocketpp : https://github.com/zaphoyd/websocketpp
+- asio : https://github.com/chriskohlhoff/asio
+
+## License and third-party attributions
+
+This project is licensed under Apache License, Version 2.0. See the « LICENSE » file for the full text.
+
+Copyright :
+- elycraft (2025)
+- TheoElGato (2025)
+
+The third-party modules used by this project and the full text of their licenses are collected in the file “THIRD_PARTY_LICENSES.”
+It also includes all NOTICE files required by these modules (NOTICE from PyTorch/libtorch). 
+
