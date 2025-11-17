@@ -142,6 +142,7 @@ for i in reversed(range(n)):
         del data[i]['Param B']
         del data[i]['Param C']
         del data[i]['Param D']
+        del data[i]['brain_acc']
 
 
 # write to json file
