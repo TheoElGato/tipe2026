@@ -17,7 +17,7 @@
 
 */
 
-LogicServer::LogicServer() {
+LogicServer::LogicServer(std::string sbf_path) {
     m_server.init_asio();
     m_server.clear_access_channels(websocketpp::log::alevel::all);
 	m_server.clear_error_channels(websocketpp::log::elevel::all);
@@ -84,6 +84,7 @@ LogicServer::LogicServer() {
         }
         
     });
+    sbfpath = sbf_path+"/";
 }
 
 void LogicServer::send(Packet pck, websocketpp::connection_hdl hdl) {
@@ -202,32 +203,34 @@ void LogicServer::logic_loop() {
                allFloats[7], allFloats[8], allFloats[9], average(allFloats),
                allFloats[best_score_index], std::time(nullptr)-gen_started_at);
             
-            // Autosave check
-            /*
-            if (mstk->autosave && generation % mstk->autosave_freq == 0) {
-                // Time to autosave !
-                for (int i=0; i<nb_brain; i++)
-                {
-                    std::string istring = std::to_string(i);
-                    brain_agent[i].saveFile(sds.getFullPath()+istring+".pt");
-                }   
-            }*/
+           
             sds.data["generation"] = generation;
             sds.data["simu_time"] = mstk->sim_time;
             sds.data["evolution"] = mstk->evolution;
             sds.data["total_trained_time"] = (std::time(nullptr) - started_at);
             sds.save();
-            
-            logm("Autosaved.", "SAVE");
-                        
+
             // Sort by score descending
             reverse_sorting_brain(&allBrains, &allFloats, 0, allBrains.size() - 1);
+            
+            // Making a copy of the best brains
+            for (int i=0;i<mstk->nb_brain;i+=1) {
+                std::string idstr = std::to_string(allBrains[i].bid1)+"s"+std::to_string(allBrains[i].bid2)+".pt";
+
+                std::ifstream  src(sbfpath+idstr,std::ios::binary);
+                std::string istring = std::to_string(i);
+                std::ofstream  dst(sds.getFullPath()+istring+".pt",std::ios::binary);
+                dst << src.rdbuf();
+            }
+            logm("Autosaved.", "SAVE");
+            
+            ////
             
             // Selected whitch files need to be send to the clients
             // The bests 
 
-			packageSelectionned.clear();
-			packageScores.clear();
+            packageSelectionned.clear();
+            packageScores.clear();
             
             for(int j = 0; j < 1+nb_client/2; j+=1){
                 std::vector<std::string> selectioned;

@@ -16,13 +16,14 @@ typedef websocketpp::server<websocketpp::config::asio> server;
 
 class LogicServer {
 public:
-    LogicServer();
+    LogicServer(std::string sbf_path);
     void run(uint16_t port, SimTasker* test);
     int timeout = 60;
      
 
 private:
     server m_server;
+    std::string sbfpath = "";
     std::atomic<uint64_t> next_id = 0;
 	std::map<websocketpp::connection_hdl, uint64_t, std::owner_less<websocketpp::connection_hdl>> connections;
 	std::map<uint64_t, std::string> clients_hn;

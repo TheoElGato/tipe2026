@@ -45,7 +45,7 @@ int main(int argc, char* argv[]) {
     } else if (mode==2) {
         // Start server on localhost and listening on port
         logm("Server mode for "+std::to_string(mainSimTasker.len)+" simulations today.");
-        LogicServer sv;
+        LogicServer sv(sbf_path);
         sv.run(port,&mainSimTasker);
     } 
     
