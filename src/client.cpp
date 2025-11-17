@@ -153,7 +153,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
     // Init the SimDataStruct
     std::string sim_name = SIM_NAME;
     if (LOAD_FROM_FILE) sim_name=LOAD_NAME;
-    SimDataStruct sds("save",sim_name,0, SOUS_SIM,0,evolution,nb_brain,nb_agent,1,mc);
+    SimDataStruct sds("save",sim_name,0, SOUS_SIM,0,evolution, BRAIN_ACC, nb_brain,nb_agent,1,mc);
     
     // If needed, load the sim
     if (LOAD_FROM_FILE) {
@@ -503,7 +503,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                     for (int i=0; i<nb_brain; i++)
                     {
                         std::string istring = std::to_string(i);
-                        brain_agent[i].saveFile(cl->sbfpath+"/"+cl->srvid+"s"+istring+".pt");
+                        brain_agent[i].saveFile(cl->sbfpath+cl->srvid+"s"+istring+".pt");
                     }
                     
                     std::string temptest = vectf_to_jsonstring(score_agent);
