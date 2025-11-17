@@ -327,7 +327,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                 // Initialize agents with brain from file
                 for (int i=0; i<nb_brain; i++)
                 {
-                    brain_agent.emplace_back(9,6,cl->sbfpath+"/"+cl->selectioned[i],DEVICE,NB_HIDDEN_LAYER);
+                    brain_agent.emplace_back(9,6,cl->sbfpath+cl->selectioned[i],DEVICE,NB_HIDDEN_LAYER);
                 }
                 reproduce(&brain_agent, score_agent,  nb_brain, evolution, BEST_KEEP, SELECTION_POL);
                 for(int j=0;j<nb_brain;j++) score_agent[j] = 0;
@@ -579,7 +579,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
 }
 
 SimpleClient::SimpleClient(const std::string &uri, const std::string path) {
-    sbfpath = path;
+    sbfpath = path+"/";
     m_client.init_asio();
     m_client.clear_access_channels(websocketpp::log::alevel::all);
     m_client.clear_error_channels(websocketpp::log::elevel::all);
