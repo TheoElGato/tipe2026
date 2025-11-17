@@ -542,7 +542,7 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                 sous_sim_started+=1;
                 logm("Starting sous-sim " + std::to_string(sous_sim_next_index) + " on group " + std::to_string(group_index) + " with " + std::to_string(agentPartitions[group_index].size()) + " agents.", "THREAD");
                     
-                sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goals[sous_sim_next_index], brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ss_dt, simu_time, BRAIN_ACC);
+                sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goals[sous_sim_next_index], brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ss_dt, simu_time, ss_dt*BRAIN_ACC);
                 sous_sim_threads[sous_sim_next_index].detach(); // Detach the thread to make it run on is own
     
                 sous_sim_state[sous_sim_next_index] = 1; // Mark it as running
