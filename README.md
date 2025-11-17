@@ -77,7 +77,7 @@ Il est également inclut tous les fichiers NOTICE requis par ces modules (NOTICE
 
 
 # English section
-## Problematic : *How can to optimize the walking cycle of a four-legged creature using a neural network?*
+## Problematic : *How to optimize the walking cycle of a four-legged creature using a neural network?*
 
 
 We want to create a two-dimensional simulation in which a four-legged creature tries to move to a specific point. The creature is controlled by artificial intelligence equipped with a neural network.
@@ -105,12 +105,12 @@ We want to vary the following parameters in the simulation to save training time
 - Random factor (repeat several times using the same parameters)
 
 ##### Why URSAF ???
-Good question. In reality, URSAF is an acronyme for Stride Learning Simulation Research Unit (in french: Unité de Recherche de Simulation d'Apprentissage de la Foulée).
-I'm sure this was you're expected answer.
+Good question. In reality, URSAF is an acronyme for Stride Learning Simulation Research Unit (In French: Unité de Recherche de Simulation d'Apprentissage de la Foulée).
+I'm sure this was the answer you were expecting.
 
 ## How to build
-- Install cmake.
-- Install every dependency of SFML 2.5.1
+- Install cmake
+- Install every dependencies of SFML 2.5.1
 - Install libtorch (cuda is supported) and give the path to cmake with `-DCMAKE_PREFIX_PATH=/absolute/path/to/libtorch`
 - Use cmake to build, for example :
   `cmake -S . -B build`
