@@ -73,7 +73,7 @@ private:
     sf::Sprite music_disc_othersideSprite;
 };
 
-int simulate(SimTasker stk, bool mc = false, SimpleClient* cl = nullptr);
+int simulate(SimTasker stk, bool mc = false, bool headless = false, SimpleClient* cl = nullptr);
 
 
 #endif // CLIENT_H

@@ -85,7 +85,7 @@ void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::
     
 }
 
-int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
+int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
     
     logm("Welcome to the URSAF Sim");
     
@@ -225,7 +225,6 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
     }
 
     // DisplayService init
-    bool headless = cl->headless;
     bool running = true;
     DisplayService dpl_srvc(headless, &running, &clean_exit, agentPartitions.size(),mc);
 
@@ -486,7 +485,11 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
 }
 
 DisplayService::DisplayService(bool headless, bool* runningptr, bool* clean_exitptr, int agentPartitionsSize, bool mc) {
-    if (headless) return;
+    if (headless) {
+        logm("Headless mode was selected");
+        logm("DisplayService will not start");
+        return;
+    }
 
     this->runningptr = runningptr;
     this->clean_exitptr = clean_exitptr;
@@ -676,7 +679,7 @@ void SimpleClient::run(SimTasker* stk, bool hl) {
     while (state != -1) {
         if (state==0) {continue;}
         if (state==1) {
-            simulate(*mstk, true, this);
+            simulate(*mstk, true, headless, this);
             state=0;
             Packet simfnsh("simfinished","","","");
             send(simfnsh);

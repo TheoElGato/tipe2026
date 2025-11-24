@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
         logm("Starting Classic mode for "+std::to_string(mainSimTasker.len)+" simulations");
         for(int i=0;i<mainSimTasker.len;i+=1) {
             mainSimTasker.loadTask(i);
-            simulate(mainSimTasker);
+            simulate(mainSimTasker,false,headless);
         }
     } else if (mode==1) {
         // Start client on ip and port
