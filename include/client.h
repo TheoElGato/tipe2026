@@ -45,6 +45,9 @@ public:
     DisplayService(bool headless,bool* runningptr, bool* clean_exitptr, int agentPartitionsSize, bool mc);
     void render(std::vector<int>* groups_avail,std::vector<std::vector<Creature*>>*agentPartitions,float fps,int agent_size, int generation,int sous_sim_started,float acu,float simu_time,float evolution, sf::Vector2f start, std::vector<sf::Vector2f> goals);
 private:
+    void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<std::string, float>& stats);
+    void draw_items(sf::RenderWindow& window, sf::Sprite sp, sf::Sprite ob, sf::Vector2f start,std::vector<sf::Vector2f> g, int idsssim);
+
     bool* runningptr;
     bool* clean_exitptr;
     sf::RenderWindow window;

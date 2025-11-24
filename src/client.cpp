@@ -13,7 +13,7 @@ std::string remove_zero_ts(float value) {
 }
 
 
-void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<std::string, float>& stats) {
+void DisplayService::drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<std::string, float>& stats) {
     // Draw statistics on the window
 
     sf::Vector2u size = window.getSize();
@@ -45,7 +45,7 @@ void drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<st
     }
 }
 
-void draw_items(sf::RenderWindow& window, sf::Sprite sp, sf::Sprite ob, sf::Vector2f start,std::vector<sf::Vector2f> g, int idsssim) {
+void DisplayService::draw_items(sf::RenderWindow& window, sf::Sprite sp, sf::Sprite ob, sf::Vector2f start,std::vector<sf::Vector2f> g, int idsssim) {
     if (idsssim < 0) idsssim = 0;
     sp.scale({0.6f, 0.6f});
     ob.scale({0.6f, 0.6f});
