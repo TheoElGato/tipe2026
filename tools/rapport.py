@@ -41,9 +41,7 @@ class PDF(FPDF):
         super().__init__()
         self.name = name
 
-    def header(self):
-        # Rendering logo:
-        #self.image("../docs/fpdf2-logo.png", 10, 8, 33)
+    def header(self):     
         # Setting font: helvetica bold 15
         self.set_font("helvetica", style="B", size=26)
         # Moving cursor to the right:
@@ -61,15 +59,10 @@ class PDF(FPDF):
         # Printing page number:
         self.cell(0, 10, f"Page {self.page_no()}/{{nb}}", align="C")
 
+
 def create_pdf(fname):
     
-    
     FNAME = fname
-    
-    
-    ONAME = FNAME
-    
-    
     data = load_sim(FPATH, FNAME)
     sg = data["Sgeneration"]
     
@@ -80,8 +73,6 @@ def create_pdf(fname):
 
     name = " ".join(raw_name)
     
-
-
     generation, mean, best_agent_score, time_for_one_gen = stats.load_stats(f"{FPATH}/{FNAME}/{FNAME}.csv",raw_name[0])
     stats.generate_scoreplot(f"{FPATH}/{FNAME}/scoreplot.png")
     stats.generate_timeplot(f"{FPATH}/{FNAME}/timeplot.png")
@@ -91,11 +82,9 @@ def create_pdf(fname):
         stats.generate_brainplot(f"{FPATH}/{FNAME}/brain{i}plot.png", i,unfs(i))
     
     
-    
     # Instantiation of inherited class
     pdf = PDF(name)
     pdf.add_page()
-    
     
     
     # INFO
@@ -176,7 +165,7 @@ def create_pdf(fname):
     pdf.set_y(h)
     pdf.image(f"{FPATH}/{FNAME}/brain9plot.png",x=110,w=100)
     
-    pdf.output(OPATH+"/"+ONAME+".pdf")
+    pdf.output(OPATH+"/"+FNAME+".pdf")
     return generation.copy(), mean.copy(), best_agent_score.copy(), time_for_one_gen.copy()
 
 tg, tm, tb, tt = [], [], [], []
