@@ -25,7 +25,8 @@ public:
     SimpleClient(const std::string &uri, const std::string path);
     ~SimpleClient();
     void send(Packet pck);
-    void run(SimTasker* stk);
+    void run(SimTasker* stk,bool hl);
+    bool headless = false;
     int state = 0;
     std::string sbfpath = "";
     std::string srvid = "";

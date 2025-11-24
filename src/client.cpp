@@ -302,15 +302,6 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
     {
         if (dt < 1e-6f) dt = 1e-6f;
         fps = 1.0f / dt;
-
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-            {
-                window.close();
-            }
-        }
         
         if (!is_infinite && !mc) {
             if (acc > time_allowed) {
@@ -351,40 +342,6 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
                 clean_exit = true;
             }
             
-        }
-
-        // Manager keys pressed :
-        if (inputdelay == inputdelayBase) {
-
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
-            {
-                selected_agents = (selected_agents - 1) % agentPartitions.size();
-                inputdelay = 0;
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::E))
-            {
-                selected_agents = (selected_agents + 1) % agentPartitions.size();
-                inputdelay = 0;
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F))
-            {
-                drawall = !drawall;
-                inputdelay = 0;
-            }
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::K))
-            {
-                if (mc) {
-                    logm("You should not do that !","WARNING");
-                    logm("If you really need to close this client, crash it.","WARNING");
-                    continue;
-                }
-                clean_exit = true;
-                logm("Wainting for threads to finish before exiting...");
-                inputdelay = 0;
-            }
-
-        } else {
-            inputdelay +=1;
         }
 
         // Check if any sous-sim thread has finished
@@ -552,7 +509,53 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
             }
         
         }
+        
+        //// Window drawing block here
+        
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+            {
+                window.close();
+            }
+        }
 
+        // Manager keys pressed :
+        if (inputdelay == inputdelayBase) {
+
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
+            {
+                selected_agents = (selected_agents - 1) % agentPartitions.size();
+                inputdelay = 0;
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::E))
+            {
+                selected_agents = (selected_agents + 1) % agentPartitions.size();
+                inputdelay = 0;
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F))
+            {
+                drawall = !drawall;
+                inputdelay = 0;
+            }
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::K))
+            {
+                if (mc) {
+                    logm("You should not do that !","WARNING");
+                    logm("If you really need to close this client, crash it.","WARNING");
+                    continue;
+                }
+                clean_exit = true;
+                logm("Wainting for threads to finish before exiting...");
+                inputdelay = 0;
+            }
+
+        } else {
+            inputdelay +=1;
+        }
+        
+        
         window.clear();
         window.draw(backgroundSprite);
         draw_items(window,startSprite,diamondSprite,start,goals,groups_avail[selected_agents]);
@@ -565,8 +568,8 @@ int simulate(SimTasker stk, bool mc, SimpleClient* cl) {
 
         drawStats(window, font, {{"FPS", std::round(fps)}, {"Nb agents", agents.size()}, {"SGen Selected", groups_avail[selected_agents]}, {"Current Gen", generation},{"SGen started", sous_sim_started},{"Time",round(acu)},{"Time per SGen", simu_time}, {"Evolution", evolution}});
         if (mc) window.draw(wifiSprite);
-        
         window.display();
+        ////
 
         acc += dt;
         acu += dt;
@@ -645,8 +648,8 @@ void SimpleClient::send(Packet pck) {
     }
 }
 
-void SimpleClient::run(SimTasker* stk) {
-    
+void SimpleClient::run(SimTasker* stk, bool hl) {
+    headless = hl;
     mstk = stk;
     
     // Connecting...
