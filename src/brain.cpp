@@ -85,7 +85,15 @@ void Brain::mutate(float valeur) {
 }
 
 Brain Brain::copy() {
-    Brain new_brain(this->input_size, this->output_size, "", "cpu", this->nb_hidden_neurones);
+    
+    std::string device;
+    if (this->device == torch::kCUDA){
+        device = "cuda";
+    } else {
+        device = "cpu";
+    }
+
+    Brain new_brain(this->input_size, this->output_size, "", device, this->nb_hidden_neurones);
     torch::NoGradGuard no_grad;
     new_brain.fc1->weight.copy_(this->fc1->weight.detach().clone());
     new_brain.fc1->bias.copy_(this->fc1->bias.detach().clone());
