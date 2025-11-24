@@ -587,7 +587,7 @@ void DisplayService::render(std::vector<int>* groups_avail,std::vector<std::vect
         }
     }
 
-    drawStats(window, font, {{"FPS", std::round(fps)}, {"Nb agents", agent_size}, {"SGen Selected", (groups_avail*)[selected_agents]}, {"Current Gen", generation},{"SGen started", sous_sim_started},{"Time",round(acu)},{"Time per SGen", simu_time}, {"Evolution", evolution}});
+    drawStats(window, font, {{"FPS", std::round(fps)}, {"Nb agents", agent_size}, {"SGen Selected", (*groups_avail)[selected_agents]}, {"Current Gen", generation},{"SGen started", sous_sim_started},{"Time",round(acu)},{"Time per SGen", simu_time}, {"Evolution", evolution}});
     if (mc) window.draw(wifiSprite);
     window.display();
     
