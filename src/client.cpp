@@ -3,7 +3,7 @@
 void error(const std::string& message) {
     // Standardized error function
     logm(message, "ERROR");
-    exit(EXIT_FAILURE);
+    assert(false);
 }
 
 std::string remove_zero_ts(float value) {
@@ -60,29 +60,25 @@ void draw_items(sf::RenderWindow& window, sf::Sprite sp, sf::Sprite ob, sf::Vect
 }
 
 void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::vector<Creature>* agents, std::vector<Brain>* brains, std::string device, int nb_hidden_layer, std::string brainFile="") {
-    for(int i=0; i<countAgents; i++)
-    {
-        agents->emplace_back(x, y, i);
+    // initialise agent and brain related objects
 
+    for(int i=0; i<countAgents; i+=1) {
+        agents->emplace_back(x, y, i);
     }
-    if (brainFile == "")
-    {
+
+    if (brainFile == ""){
         // Initialize agents with default brain
-        for (int i=0; i<countBrains; i++)
-        {
+        for (int i=0; i<countBrains; i+=1) {
             brains->emplace_back(9,6,"",device,nb_hidden_layer);
         }
     } else {
         // Initialize agents with brain from file
-        for (int i=0; i<countBrains; i++)
-        {
+        for (int i=0; i<countBrains; i+=1) {
             std::string istring = std::to_string(i);
             logm("Loading brain"+istring+" from file.");
             brains->emplace_back(9,6,brainFile+istring+".pt",device,nb_hidden_layer);
         }
     }
-
-    
 }
 
 int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
@@ -138,8 +134,6 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
     float acu = 0; // Used for the time for a generation 
     int cyl = 0;
 
-    
-
     // Some necessery data for brains and agents
     std::vector<Brain> brain_agent;
     std::vector<Creature> agents;
@@ -167,11 +161,12 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
         sds.data["train_sessions"] = temp + 1;
         
         init_agents_and_brain(nb_agent, nb_brain, start.x, start.y, &agents, &brain_agent, DEVICE,NB_HIDDEN_LAYER,"save/"+LOAD_NAME+"/");
-    }
-    else {
+    
+    } else {
         // Initialize simulation state
         init_agents_and_brain(nb_agent, nb_brain, start.x, start.y, &agents, &brain_agent, DEVICE,NB_HIDDEN_LAYER);
     }
+
     if (!mc) sds.save();
 
     // Data for agents and brains
@@ -210,13 +205,14 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
     
     // Partition agents for each thread
     std::vector<std::vector<Creature*>> agentPartitions(THREADS);
-    for(int i = 0; i < THREADS; i++)
-    {
+    for(int i = 0; i < THREADS; i++) {
         auto start = agents.begin() + i * (agents.size() / THREADS);
         auto end = (i == THREADS - 1) ? agents.end() : agents.begin() + (i + 1) * (agents.size() / THREADS);
+
         for (auto it = start; it != end; ++it) {
             agentPartitions[i].push_back(&(*it));
         }
+
         logm("Created partition " + std::to_string(i) + " with " + std::to_string(agentPartitions[i].size()) + " agents.");
     }
 
@@ -243,7 +239,6 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
         goals.emplace_back(sf::Vector2f(x, y));
     }
 
-
     // Initialisation of score variables
     for(int i = 0; i < SOUS_SIM; i++) {
         sous_sim_scores[i] = std::vector<float>(nb_brain, 0.0f);
@@ -256,11 +251,13 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
     
     logm("All variable initialized. Starting main loop.", "INFO");
     
-    while (running)
-    {
+    // Main loop
+    while (running) {
+
         if (dt < 1e-6f) dt = 1e-6f;
         fps = 1.0f / dt;
         
+        // stop program if it take to much time and in client mode
         if (!is_infinite && !mc) {
             if (acc > time_allowed) {
             clean_exit = true;
@@ -270,36 +267,44 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
         // Checks for the client mode (mc stand for client mode)
         if(mc) {
             if (cl->state == 2) continue;
-            if (cl->state == 3) { // End of generation for client mode
+            if (cl->state == 3) { 
+                // End of generation for client mode
+
                 score_agent = cl->scores;
                 brain_agent.clear();
+
                 // Initialize agents with brain from file
-                for (int i=0; i<nb_brain; i++)
-                {
+                for (int i=0; i<nb_brain; i++) {
                     brain_agent.emplace_back(9,6,cl->sbfpath+cl->selectioned[i],DEVICE,NB_HIDDEN_LAYER);
                 }
+
                 reproduce(&brain_agent, score_agent,  nb_brain, evolution, BEST_KEEP, SELECTION_POL);
+                
                 for(int j=0;j<nb_brain;j++) score_agent[j] = 0;
                 sous_sim_next_index = 0;
                 sous_sim_started = 0;
                 sous_sim_completed = 0;
                 sous_sim_threads.clear();
                 sous_sim_state.clear();
+
                 for(int i=0; i<sous_sim_total; i++) {
                     sous_sim_threads.emplace_back(std::thread());
                     sous_sim_state.emplace_back(0);
                 }
+
                 generation += 1;
+
                 if (use_evolution_curve) {
                     evolution = curve_a*std::exp(curve_b*generation+curve_c)+curve_d;
                 }
+
                 acu = 0;
                 cl->state = 1;
             }
+
             if (cl->state == 4) {
                 clean_exit = true;
             }
-            
         }
 
         // Check if any sous-sim thread has finished
@@ -318,15 +323,15 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
 
                 sous_sim_state[i] = 3; // Mark as collected
                 sous_sim_completed += 1;
-                
             }
         }
         
+        // Handle a clean exit of the simulation to avoid segmentation falt
         if(clean_exit) {
+            // Wait the end of all threads
             if (threads_used == 0) {
                 if (!mc) {
-                    for (int i=0; i<nb_brain; i++)
-                    {
+                    for (int i=0; i<nb_brain; i++) {
                         std::string istring = std::to_string(i);
                         brain_agent[i].saveFile(sds.getFullPath()+istring+".pt");
                     }
@@ -348,7 +353,6 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
         if(sous_sim_started >= sous_sim_total) {
             
             // Waiting for threads to finish
-            
             if (sous_sim_completed >= sous_sim_total) {
                 // All of it is finished
                 // Change of sim :
@@ -357,21 +361,16 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
                 
                 for(int i=0;i<sous_sim_scores.size();i++) {
                     for(int j=0;j<nb_brain;j++) {
-                        //logm(std::to_string(sous_sim_scores[i][j]),"DEBUG");
                         score_agent[j] += sous_sim_scores[i][j];
                     }
                 }
-                
-                // Visibly this portion is making the rest bug and I don't know why...
-                // So for now I comment it out.
-                // Edit : I think it's okay to put this back now.
+
+                // Normalise the score to be able too compare them
                 for(int j=0;j<nb_brain;j++) {
                         if(score_agent[j] != 0) score_agent[j] /= sous_sim_total;
                 }
                 
                 int best_score_index = std::distance(score_agent.begin(), std::max_element(score_agent.begin(), score_agent.end()));
-                
-                
                 
                 if (!mc) { // We only want to save brain in classic mode here.
                 
@@ -383,8 +382,7 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
                     // Autosave check
                     if (AUTOSAVE && generation % AUTOSAVE_FREQ == 0) {
                         // Time to autosave !
-                        for (int i=0; i<nb_brain; i++)
-                        {
+                        for (int i=0; i<nb_brain; i++) {
                             std::string istring = std::to_string(i);
                             brain_agent[i].saveFile(sds.getFullPath()+istring+".pt");
                         }
@@ -396,27 +394,31 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
                         
                         logm("Autosaved.", "INFO");
                     }
+
                     // Initialization the variables for the next generation
                     reproduce(&brain_agent, score_agent,  nb_brain, evolution, BEST_KEEP, SELECTION_POL);
+
                     for(int j=0;j<nb_brain;j++) score_agent[j] = 0;
                     sous_sim_next_index = 0;
                     sous_sim_started = 0;
                     sous_sim_completed = 0;
                     sous_sim_threads.clear();
                     sous_sim_state.clear();
+
                     for(int i=0; i<sous_sim_total; i++) {
                         sous_sim_threads.emplace_back(std::thread());
                         sous_sim_state.emplace_back(0);
                     }
+
                     generation += 1;
                     if (use_evolution_curve) {
                         evolution = curve_a*std::exp(curve_b*generation+curve_c)+curve_d;
                     }
                     acu = 0;
-                } else {
-                
-                    for (int i=0; i<nb_brain; i++)
-                    {
+
+                } else { // We are in client mode so we save the brains here
+                    
+                    for (int i=0; i<nb_brain; i++) {
                         std::string istring = std::to_string(i);
                         brain_agent[i].saveFile(cl->sbfpath+cl->srvid+"s"+istring+".pt");
                     }
@@ -436,6 +438,7 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
                 // Avoid starting sous-sim that don't exist
                 if(sous_sim_started >= sous_sim_total) break;
 
+                // find on of the available thread
                 int group_index = -1;
                 for (int i = 0; i < groups_avail.size(); i++) {
                     if (groups_avail[i] == -1) { // Group is available
@@ -452,20 +455,16 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
                 // Making a Vector of Brain pointers for the group
                 std::vector<Brain*> brain_agent_ptrs;
                 for (auto& b : brain_agent) brain_agent_ptrs.push_back(&b);
-    
                 
                 sous_sim_started+=1;
                 logm("Starting sous-sim " + std::to_string(sous_sim_next_index) + " on group " + std::to_string(group_index) + " with " + std::to_string(agentPartitions[group_index].size()) + " agents.", "THREAD");
                     
                 sous_sim_threads[sous_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goals[sous_sim_next_index], brain_agent_ptrs, &sous_sim_state[sous_sim_next_index], &sous_sim_scores[sous_sim_next_index], &ss_dt, simu_time, ss_dt*BRAIN_ACC);
                 sous_sim_threads[sous_sim_next_index].detach(); // Detach the thread to make it run on is own
-    
                 sous_sim_state[sous_sim_next_index] = 1; // Mark it as running
-    
                 threads_used += 1;
                 sous_sim_next_index += 1;
             }
-        
         }
         
         //// Window drawing block here
@@ -485,6 +484,9 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
 }
 
 DisplayService::DisplayService(bool headless, bool* runningptr, bool* clean_exitptr, int agentPartitionsSize, bool mc) {
+    // initialisation of the Display object
+
+
     if (headless) {
         logm("Headless mode was selected");
         logm("DisplayService will not start");
@@ -512,7 +514,6 @@ DisplayService::DisplayService(bool headless, bool* runningptr, bool* clean_exit
     wifiTexture.loadFromFile("assets/textures/wifi.png");
     
     // Item textures
-    
     startTexture.loadFromFile("assets/textures/start.png");
     diamondTexture.loadFromFile("assets/items/diamond.png");
     emeraldTexture.loadFromFile("assets/items/emerald.png");
@@ -535,7 +536,10 @@ DisplayService::DisplayService(bool headless, bool* runningptr, bool* clean_exit
     wifiSprite.scale({0.1f, 0.1f});
 }
 
+
 void DisplayService::render(std::vector<int>* groups_avail,std::vector<std::vector<Creature*>>*agentPartitions,float fps,int agent_size, int generation,int sous_sim_started,float acu,float simu_time,float evolution, sf::Vector2f start, std::vector<sf::Vector2f> goals) {
+    
+    // handle event
     sf::Event event;
     while (window.pollEvent(event))
     {
@@ -579,7 +583,6 @@ void DisplayService::render(std::vector<int>* groups_avail,std::vector<std::vect
         inputdelay +=1;
     }
     
-    
     window.clear();
     window.draw(backgroundSprite);
     draw_items(window,startSprite,diamondSprite,start,goals,(*groups_avail)[selected_agents]);
@@ -598,6 +601,7 @@ void DisplayService::render(std::vector<int>* groups_avail,std::vector<std::vect
 }
 
 SimpleClient::SimpleClient(const std::string &uri, const std::string path) {
+
     sbfpath = path+"/";
     m_client.init_asio();
     m_client.clear_access_channels(websocketpp::log::alevel::all);
@@ -634,7 +638,6 @@ SimpleClient::SimpleClient(const std::string &uri, const std::string path) {
         	logm("Server requested exiting...","Client");
         	state = -1;
         }
-        
     });
 
     websocketpp::lib::error_code ec;
@@ -665,6 +668,7 @@ void SimpleClient::send(Packet pck) {
 }
 
 void SimpleClient::run(SimTasker* stk, bool hl) {
+
     headless = hl;
     mstk = stk;
     
@@ -685,6 +689,7 @@ void SimpleClient::run(SimTasker* stk, bool hl) {
             send(simfnsh);
         }
     }
+
     logm("Shuting down...","Client");
     
     // Close connection with the server
@@ -697,8 +702,8 @@ void SimpleClient::run(SimTasker* stk, bool hl) {
     // Stop the ASIO event loop and wait for the thread to end
     // For once...
     m_client.stop();
-    if (m_thread.joinable())
+    if (m_thread.joinable()){
         m_thread.join();
-    
+    }
     logm("Shutdown.","Client");
 }
