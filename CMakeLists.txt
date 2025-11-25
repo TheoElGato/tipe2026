@@ -59,21 +59,48 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 # To test for memory leaks, uncomment the line below :
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g")
 
-add_executable(ursafsim
+# Common (non-graphics) sources
+set(COMMON_SRCS
     src/main.cpp
     src/physics.cpp
-    src/creature.cpp
     src/brain.cpp
     src/threadsmg.cpp
     src/reproduction.cpp
     src/filemanager.cpp
     src/client.cpp
     src/server.cpp
+    src/creature.cpp
 )
 
-target_compile_definitions(ursafsim PRIVATE ASIO_STANDALONE)
+# Graphical-only sources
+set(GRAPHICS_SRCS
+    src/displayservice.cpp
+)
+
+# Headless-only sources
+set(HEADLESS_SRCS
+    src/displayservice_headless.cpp
+)
+
+# Graphical executable (uses SFML graphics/window)
+add_executable(ursafsim
+    ${COMMON_SRCS}
+    ${GRAPHICS_SRCS}
+)
+
+target_compile_definitions(ursafsim PRIVATE ASIO_STANDALONE USE_SFML_GRAPHICS)
 target_include_directories(ursafsim PRIVATE include ${asio_SOURCE_DIR}/asio/include)
-target_link_libraries(ursafsim PRIVATE nlohmann_json::nlohmann_json sfml-graphics csv websocketpp "${TORCH_LIBRARIES}" )
+target_link_libraries(ursafsim PRIVATE nlohmann_json::nlohmann_json sfml-graphics sfml-window sfml-system sfml-audio csv websocketpp "${TORCH_LIBRARIES}" )
+
+# Headless executable (NO sfml-graphics or sfml-window)
+add_executable(ursafsim_headless
+    ${COMMON_SRCS}
+    ${HEADLESS_SRCS}
+)
+
+target_compile_definitions(ursafsim_headless PRIVATE ASIO_STANDALONE)
+target_include_directories(ursafsim_headless PRIVATE include ${asio_SOURCE_DIR}/asio/include)
+target_link_libraries(ursafsim_headless PRIVATE nlohmann_json::nlohmann_json sfml-system sfml-audio sfml-network csv websocketpp "${TORCH_LIBRARIES}" )
 
 # The following code block is suggested to be used on Windows.
 # However our code is not compatible for it.

@@ -1,9 +1,10 @@
 #ifndef PHYSICS_H
 #define PHYSICS_H
 
-#include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
 #include <cmath>
 #include <map>
+#include <vector>
 
 
 class Creature; // Forward declaration

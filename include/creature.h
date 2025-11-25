@@ -1,7 +1,7 @@
 #ifndef CREATURE_H
 #define CREATURE_H
 
-#include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
 #include <vector>
 #include <string>
 #include <tuple>
@@ -27,26 +27,14 @@ public:
     std::vector<Spring> muscles;
     float dir;
     std::vector<float> leg_up;
-    std::vector<sf::Color> colors;
-
-
+    int bodyColorSeed;
 
     void brainUpdate(sf::Vector2f goal, Brain* brain);
     void update(float dt);
     void moveTo(float x, float y);
-    void draw(sf::RenderWindow& window);
-
-
 
 private:
-    // Préparer les formes à l'avance pour éviter les allocations répétées
-    sf::CircleShape pawUp;
-    sf::CircleShape pawDown;
-    sf::CircleShape body;
-    sf::CircleShape eyeWhite;
-    sf::CircleShape eyeBlack;
-    
-    sf::Color unique_color_from_single_number(int number);
+
 };
 
 

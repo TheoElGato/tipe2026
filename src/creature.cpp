@@ -53,36 +53,7 @@ Creature::Creature(float sx, float sy, int bodyColorSeed, std::string brainFile)
 
     this->dir = 0.0f;
     this->leg_up = {0, 0, 0, 0};
-
-
-    // Color of the creature
-    this->colors = {
-        sf::Color(0, 0, 255),
-        sf::Color(0, 255, 255),
-        sf::Color(255, 0, 255),
-        sf::Color(34, 0, 25),
-        unique_color_from_single_number(bodyColorSeed)
-    };
-    
-    pawUp = sf::CircleShape(5);
-    pawDown = sf::CircleShape(10);
-    body = sf::CircleShape(20);
-    eyeWhite = sf::CircleShape(8);
-    eyeBlack = sf::CircleShape(2);
-    
-    pawUp.setOrigin({5, 5});
-    pawDown.setOrigin({10, 10});
-    body.setFillColor(this->colors[4]);
-    body.setOrigin({20, 20});
-    eyeWhite.setFillColor(sf::Color::White);
-    eyeWhite.setOrigin({8, 8});
-    eyeBlack.setFillColor(sf::Color::Black);
-    eyeBlack.setOrigin({2, 2});
-}
-
-sf::Color Creature::unique_color_from_single_number(int number)
-{
-    return sf::Color((50*number+96)%255, (69*number+24)%255, (42*number+93)%255);
+    this->bodyColorSeed = bodyColorSeed;
 }
 
 void Creature::brainUpdate(sf::Vector2f target, Brain * brain)
@@ -177,59 +148,4 @@ void Creature::moveTo(float x, float y) {
     this->leg_up = {0, 0, 0, 0};
     this->muscle_con = {0, 0};
     this->dir = 0.0f;
-}
-
-
-void Creature::draw(sf::RenderWindow &window)
-{
-    // Drawing of legs and body-leg lines
-    
-    for (int i = 0; i < 4; ++i) {
-        sf::CircleShape* paw = this->leg_up[i] ? &pawUp : &pawDown;
-        paw->setFillColor(this->colors[i]);
-        paw->setPosition(this->vertices[i+1].position);
-        window.draw(*paw);
-
-        // Line between the body and the leg
-        std::array line =
-        {
-            sf::Vertex{this->vertices[0].position, this->colors[i]},
-            sf::Vertex{this->vertices[i+1].position, this->colors[i]}
-        };
-        window.draw(line.data(), line.size(), sf::PrimitiveType::Lines);
-    }
-
-    // Drawing of muscles (simple lines)
-    for (int i = 0; i < 2; ++i) {
-        std::array line =
-        {
-            sf::Vertex{this->vertices[i*2+1].position, this->colors[i]},
-            sf::Vertex{this->vertices[i*2+2].position, this->colors[i]}
-        };
-        window.draw(line.data(), line.size(), sf::PrimitiveType::Lines);
-    }
-
-    // Body drawing
-    
-    body.setPosition(this->vertices[0].position);
-    window.draw(body);
-
-    // Drawing eyes (reusing shapes)
-    float eye_offset1 = this->dir - 0.3f;
-    float eye_offset2 = this->dir + 0.3f;
-    sf::Vector2f center = this->vertices[0].position;
-    sf::Vector2f eye1 = center + sf::Vector2f(20 * std::cos(eye_offset1), 20 * std::sin(eye_offset1));
-    sf::Vector2f eye2 = center + sf::Vector2f(20 * std::cos(eye_offset2), 20 * std::sin(eye_offset2));
-
-    
-    eyeWhite.setPosition(eye1);
-    window.draw(eyeWhite);
-    eyeWhite.setPosition(eye2);
-    window.draw(eyeWhite);
-
-    
-    eyeBlack.setPosition(eye1);
-    window.draw(eyeBlack);
-    eyeBlack.setPosition(eye2);
-    window.draw(eyeBlack);
 }

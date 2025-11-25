@@ -1,4 +1,5 @@
 #include "client.h"
+#include "displayservice.h"
 
 void error(const std::string& message) {
     // Standardized error function
@@ -10,53 +11,6 @@ std::string remove_zero_ts(float value) {
     std::ostringstream oss;
     oss << std::setprecision(8) << std::noshowpoint << value;
     return oss.str();
-}
-
-
-void DisplayService::drawStats(sf::RenderWindow& window, const sf::Font& font, const std::map<std::string, float>& stats) {
-    // Draw statistics on the window
-
-    sf::Vector2u size = window.getSize();
-    float rectangleWidth = 200.f;
-    float rectangleHeight = 50.f + stats.size() * 20.f;
-
-    float margin = 10.f;
-    float rectX = size.x - rectangleWidth - margin;
-    float rectY = 0 + margin;
-
-    sf::RectangleShape rectangle({rectangleWidth, rectangleHeight});
-    rectangle.setFillColor(sf::Color(200,200,200));
-    rectangle.setPosition({rectX, rectY});
-    window.draw(rectangle);
-
-    float count = 0;
-    for (const auto& [key, value] : stats)
-    {
-        // Create a text object for each statistic
-        sf::Text text;
-        text.setFont(font);
-
-        text.setString(key + ": " + remove_zero_ts(value));
-        text.setCharacterSize(20);
-        text.setFillColor(sf::Color::Black);
-        text.setPosition({rectX + margin, rectY + margin + count});
-        count += 25.f;
-        window.draw(text);
-    }
-}
-
-void DisplayService::draw_items(sf::RenderWindow& window, sf::Sprite sp, sf::Sprite ob, sf::Vector2f start,std::vector<sf::Vector2f> g, int idsssim) {
-    if (idsssim < 0) idsssim = 0;
-    sp.scale({0.6f, 0.6f});
-    ob.scale({0.6f, 0.6f});
-    sf::FloatRect spb = sp.getLocalBounds();
-    sf::FloatRect obb = ob.getLocalBounds();
-    sp.setOrigin(spb.width/2, spb.height/2);
-    ob.setOrigin(obb.width/2, obb.height/2);
-    sp.setPosition(start);
-    ob.setPosition(g[idsssim]);
-    window.draw(sp);
-    window.draw(ob);
 }
 
 void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::vector<Creature>* agents, std::vector<Brain>* brains, std::string device, int nb_hidden_layer, std::string brainFile="") {
@@ -222,7 +176,8 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
 
     // DisplayService init
     bool running = true;
-    DisplayService dpl_srvc(headless, &running, &clean_exit, agentPartitions.size(),mc);
+    std::unique_ptr<DisplayService> dpl_srvc = CreateDisplayService();
+    dpl_srvc->init(headless, &running, &clean_exit, agentPartitions.size(), mc);
 
     // Manage Clock
     sf::Clock clock;
@@ -469,7 +424,7 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
         
         //// Window drawing block here
         if (!headless) {
-            dpl_srvc.render(&groups_avail,&agentPartitions,fps,agents.size(),generation,sous_sim_started,acu,simu_time,evolution,start,goals);
+            dpl_srvc->render(&groups_avail, &agentPartitions, fps, agents.size(), generation, sous_sim_started, acu, simu_time, evolution, start, goals, mc);
         }
         ////
 
@@ -481,123 +436,6 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
 
     logm("Exiting simulation.", "INFO");
     return 0;
-}
-
-DisplayService::DisplayService(bool headless, bool* runningptr, bool* clean_exitptr, int agentPartitionsSize, bool mc) {
-    // initialisation of the Display object
-
-
-    if (headless) {
-        logm("Headless mode was selected");
-        logm("DisplayService will not start");
-        return;
-    }
-
-    this->runningptr = runningptr;
-    this->clean_exitptr = clean_exitptr;
-    this->mc = mc;
-    this->window.create(sf::VideoMode({1050u, 750u}), "URSAFSIM");
-    this->window.setFramerateLimit(60);
-    
-    // Var input handling
-    inputdelayBase = 10;
-    inputdelay = (float)inputdelayBase;
-    
-    // Selected agents
-    selected_agents = 0;
-    drawall = false;
-    agent_partitions_size = agentPartitionsSize;
-    
-    // Load Textures
-    font.loadFromFile("assets/fonts/arial.ttf");
-    backgroundTexture.loadFromFile("assets/textures/background.png");
-    wifiTexture.loadFromFile("assets/textures/wifi.png");
-    
-    // Item textures
-    startTexture.loadFromFile("assets/textures/start.png");
-    diamondTexture.loadFromFile("assets/items/diamond.png");
-    emeraldTexture.loadFromFile("assets/items/emerald.png");
-    nether_starTexture.loadFromFile("assets/items/nether_star.png");
-    netherite_ingotTexture.loadFromFile("assets/items/netherite_ingot.png");
-    music_disc_othersideTexture.loadFromFile("assets/items/zzmusic_disc_otherside.png");
-
-    // Create Sprite
-    backgroundSprite.setTexture(backgroundTexture);
-    wifiSprite.setTexture(wifiTexture);
-    startSprite.setTexture(startTexture);
-    
-    diamondSprite.setTexture(diamondTexture);
-    emeraldSprite.setTexture(emeraldTexture);
-    nether_starSprite.setTexture(nether_starTexture);
-    netherite_ingotSprite.setTexture(netherite_ingotTexture);
-    music_disc_othersideSprite.setTexture(music_disc_othersideTexture);
-    
-    wifiSprite.setPosition({0, 0});
-    wifiSprite.scale({0.1f, 0.1f});
-}
-
-
-void DisplayService::render(std::vector<int>* groups_avail,std::vector<std::vector<Creature*>>*agentPartitions,float fps,int agent_size, int generation,int sous_sim_started,float acu,float simu_time,float evolution, sf::Vector2f start, std::vector<sf::Vector2f> goals) {
-    
-    // handle event
-    sf::Event event;
-    while (window.pollEvent(event))
-    {
-        if (event.type == sf::Event::Closed)
-        {
-            window.close();
-        }
-    }
-
-    // Manager keys pressed :
-    if (inputdelay == inputdelayBase) {
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
-        {
-            selected_agents = (selected_agents - 1) % agent_partitions_size;
-            inputdelay = 0;
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::E))
-        {
-            selected_agents = (selected_agents + 1) % agent_partitions_size;
-            inputdelay = 0;
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F))
-        {
-            drawall = !drawall;
-            inputdelay = 0;
-        }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::K))
-        {
-            if (mc) {
-                logm("You should not do that !","WARNING");
-                logm("If you really need to close this client, crash it.","WARNING");
-            } else {
-                *clean_exitptr = true;
-                logm("Wainting for threads to finish before exiting...");
-            }
-            inputdelay = 0;
-        }
-
-    } else {
-        inputdelay +=1;
-    }
-    
-    window.clear();
-    window.draw(backgroundSprite);
-    draw_items(window,startSprite,diamondSprite,start,goals,(*groups_avail)[selected_agents]);
-    // Drawing of the agents
-    if (drawall) {
-        for ( Creature* agent : (*agentPartitions)[selected_agents]) {
-            agent->draw(window);
-        }
-    }
-
-    drawStats(window, font, {{"FPS", std::round(fps)}, {"Nb agents", agent_size}, {"SGen Selected", (*groups_avail)[selected_agents]}, {"Current Gen", generation},{"SGen started", sous_sim_started},{"Time",round(acu)},{"Time per SGen", simu_time}, {"Evolution", evolution}});
-    if (mc) window.draw(wifiSprite);
-    window.display();
-    
-    *runningptr = window.isOpen();
 }
 
 SimpleClient::SimpleClient(const std::string &uri, const std::string path) {
