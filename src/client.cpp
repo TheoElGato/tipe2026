@@ -1,5 +1,5 @@
-#include "client.h"
-#include "displayservice.h"
+#include "client.hpp"
+#include "displayservice.hpp"
 
 void error(const std::string& message) {
     // Standardized error function

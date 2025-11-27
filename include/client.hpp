@@ -9,12 +9,12 @@
 #include <websocketpp/config/asio_no_tls_client.hpp>
 #include <websocketpp/client.hpp>
 
-#include "reproduction.h"
-#include "physics.h"
-#include "creature.h"
-#include "brain.h"
-#include "threadsmg.h"
-#include "filemanager.h"
+#include "reproduction.hpp"
+#include "physics.hpp"
+#include "creature.hpp"
+#include "brain.hpp"
+#include "threadsmg.hpp"
+#include "filemanager.hpp"
 
 typedef websocketpp::client<websocketpp::config::asio_client> client;
 

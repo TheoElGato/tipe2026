@@ -4,8 +4,8 @@
 #include <thread>
 #include <mutex>
 #include <vector>
-#include "physics.h"
-#include "creature.h"
+#include "physics.hpp"
+#include "creature.hpp"
 
 
 void reproduce(std::vector<Brain>* agents, std::vector<float> score_agent, int NB_BRAIN, float EVOLUTION, int bestKeep, int selectionPol);

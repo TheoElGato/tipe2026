@@ -6,8 +6,8 @@
 #include <string>
 #include <tuple>
 
-#include "physics.h"
-#include "brain.h"
+#include "physics.hpp"
+#include "brain.hpp"
 
 
 class Creature {

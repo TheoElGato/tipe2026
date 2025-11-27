@@ -4,8 +4,8 @@
 #include <thread>
 #include <mutex>
 #include <vector>
-#include "physics.h"
-#include "creature.h"
+#include "physics.hpp"
+#include "creature.hpp"
 
 float distance(sf::Vector2f a, sf::Vector2f b);
 void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents,

@@ -1,4 +1,4 @@
-#include "threadsmg.h"
+#include "threadsmg.hpp"
 #include <iostream>
 
 float distance(sf::Vector2f a, sf::Vector2f b) {

@@ -8,7 +8,7 @@
 #include <SFML/System/Vector2.hpp>
 #include <vector>
 #include <memory>
-#include "filemanager.h"
+#include "filemanager.hpp"
 
 class Creature; // forward
 

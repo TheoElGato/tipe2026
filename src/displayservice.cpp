@@ -1,5 +1,5 @@
-#include "displayservice.h"
-#include "creature.h" // we need Creature definition for drawing
+#include "displayservice.hpp"
+#include "creature.hpp" // we need Creature definition for drawing
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include <memory>

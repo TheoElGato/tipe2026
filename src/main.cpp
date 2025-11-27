@@ -1,6 +1,6 @@
-#include "server.h"
-#include "client.h"
-#include "filemanager.h"
+#include "server.hpp"
+#include "client.hpp"
+#include "filemanager.hpp"
 
 int main(int argc, char* argv[]) {
     // Read args

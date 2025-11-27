@@ -1,4 +1,4 @@
-#include "creature.h"
+#include "creature.hpp"
 
 float score_distance(Creature* agent, sf::Vector2f goal) {
     return (std::sqrt(std::pow(agent->vertices[0].position.x - goal.x, 2) + std::pow(agent->vertices[0].position.y - goal.y, 2)));

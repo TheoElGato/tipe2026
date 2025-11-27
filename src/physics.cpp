@@ -1,4 +1,4 @@
-#include "physics.h"
+#include "physics.hpp"
 
 Point::Point(float x, float y, float mass)
 {

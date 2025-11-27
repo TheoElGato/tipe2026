@@ -3,14 +3,14 @@
 
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
-#include "filemanager.h"
+#include "filemanager.hpp"
 #include <map>
 #include <string>
 #include <iostream>
 #include <unordered_map>
 #include <atomic>
-#include "brain.h"
-#include "reproduction.h"
+#include "brain.hpp"
+#include "reproduction.hpp"
 
 typedef websocketpp::server<websocketpp::config::asio> server;
 
