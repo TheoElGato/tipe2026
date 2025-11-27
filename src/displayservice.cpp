@@ -106,7 +106,7 @@ public:
         window.draw(backgroundSprite);
 
         // Draw start and item sprites
-        draw_items(window, startSprite, diamondSprite, start, std::vector<sf::Vector2f>(), (*groups_avail)[selected_agents]);
+        draw_items(window, startSprite, diamondSprite, start, goals[selected_agents], (*groups_avail)[selected_agents]);
 
         if (drawall) {
             for (Creature* agent : (*agentPartitions)[selected_agents]) {
@@ -231,7 +231,7 @@ private:
         }
     }
 
-    void draw_items(sf::RenderWindow& window, sf::Sprite sp, sf::Sprite ob, sf::Vector2f /*start*/, std::vector<sf::Vector2f> /*g*/, int idsssim) {
+    void draw_items(sf::RenderWindow& window, sf::Sprite sp, sf::Sprite ob, sf::Vector2f start, sf::Vector2f goal, int idsssim) {
         if (idsssim < 0) idsssim = 0;
         sp.scale({0.6f, 0.6f});
         ob.scale({0.6f, 0.6f});
@@ -239,8 +239,8 @@ private:
         sf::FloatRect obb = ob.getLocalBounds();
         sp.setOrigin(spb.width/2, spb.height/2);
         ob.setOrigin(obb.width/2, obb.height/2);
-        sp.setPosition({0,0});
-        ob.setPosition({100,100});
+        sp.setPosition(start);
+        ob.setPosition(goal);
         window.draw(sp);
         window.draw(ob);
     }

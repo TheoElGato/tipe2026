@@ -96,8 +96,8 @@ public:
    
    void addStatRow(float generation, float agent0score, float agent1score, float agent2score, 
                    float agent3score, float agent4score, float agent5score, float agent6score,
-                   float agent7score, float agent8score, float agent9score, float mean,
-                   float bestAgentScore, float timeForOneGen);
+                   float agent7score, float agent8score, float agent9score, float mean, float median,
+                   float bestAgentScore,float timeForOneGen);
                    
    nlohmann::json data;
    std::vector<float> generationV;
@@ -112,6 +112,7 @@ public:
    std::vector<float> agent8scoreV;
    std::vector<float> agent9scoreV;
    std::vector<float> meanV;
+   std::vector<float> medianV;
    std::vector<float> bestAgentScoreV;
    std::vector<float> timeForOneGenV;
    

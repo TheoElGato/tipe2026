@@ -328,11 +328,33 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
                 int best_score_index = std::distance(score_agent.begin(), std::max_element(score_agent.begin(), score_agent.end()));
                 
                 if (!mc) { // We only want to save brain in classic mode here.
-                
-                   sds.addStatRow(generation, score_agent[0], score_agent[1], score_agent[2], 
-                   score_agent[3], score_agent[4], score_agent[5], score_agent[6],
-                   score_agent[7], score_agent[8], score_agent[9], average(score_agent),
-                   score_agent[best_score_index], acu);
+                   
+                    float generationTemp = generation;
+                    float agent0scoreTemp= score_agent[0];
+                    float agent1scoreTemp= score_agent[1];
+                    float agent2scoreTemp= score_agent[2];
+                    float agent3scoreTemp= score_agent[3];
+                    float agent4scoreTemp= score_agent[4];
+                    float agent5scoreTemp= score_agent[5];
+                    float agent6scoreTemp= score_agent[6];
+                    float agent7scoreTemp= score_agent[7];
+                    float agent8scoreTemp= score_agent[8];
+                    float agent9scoreTemp= score_agent[9];
+                    float meanTemp = average(score_agent);
+                    float bestAgentScoreTemp = score_agent[best_score_index];
+                    float timeForOneGenTemp = acu;
+
+                    // Initialization the variables for the next generation
+                    reproduce(&brain_agent, score_agent,  nb_brain, evolution, BEST_KEEP, SELECTION_POL);
+                    
+                    // Saving data
+                    int midid = score_agent.size()/2;
+                    float median = score_agent[midid];
+                    
+                    sds.addStatRow(generationTemp, agent0scoreTemp, agent1scoreTemp, agent2scoreTemp, 
+                       agent3scoreTemp, agent4scoreTemp, agent5scoreTemp, agent6scoreTemp,
+                       agent7scoreTemp, agent8scoreTemp, agent9scoreTemp, meanTemp, median,
+                       bestAgentScoreTemp,timeForOneGenTemp);
                 
                     // Autosave check
                     if (AUTOSAVE && generation % AUTOSAVE_FREQ == 0) {
@@ -349,10 +371,8 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
                         
                         logm("Autosaved.", "INFO");
                     }
-
-                    // Initialization the variables for the next generation
-                    reproduce(&brain_agent, score_agent,  nb_brain, evolution, BEST_KEEP, SELECTION_POL);
-
+                    
+                    
                     for(int j=0;j<nb_brain;j++) score_agent[j] = 0;
                     sous_sim_next_index = 0;
                     sous_sim_started = 0;

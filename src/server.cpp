@@ -197,21 +197,41 @@ void LogicServer::logic_loop() {
             }
             
             int best_score_index = std::distance(allFloats.begin(), std::max_element(allFloats.begin(), allFloats.end()));
-
-            sds.addStatRow(generation, allFloats[0], allFloats[1], allFloats[2], 
-               allFloats[3], allFloats[4], allFloats[5], allFloats[6],
-               allFloats[7], allFloats[8], allFloats[9], average(allFloats),
-               allFloats[best_score_index], std::time(nullptr)-gen_started_at);
             
+            float generationTemp = generation;
+            float agent0scoreTemp= allFloats[0];
+            float agent1scoreTemp= allFloats[1];
+            float agent2scoreTemp= allFloats[2];
+            float agent3scoreTemp= allFloats[3];
+            float agent4scoreTemp= allFloats[4];
+            float agent5scoreTemp= allFloats[5];
+            float agent6scoreTemp= allFloats[6];
+            float agent7scoreTemp= allFloats[7];
+            float agent8scoreTemp= allFloats[8];
+            float agent9scoreTemp= allFloats[9];
+            float meanTemp = average(allFloats);
+            float bestAgentScoreTemp = allFloats[best_score_index];
+            float timeForOneGenTemp = std::time(nullptr)-gen_started_at;
+            
+            
+
+            // Sort by score descending
+            reverse_sorting_brain(&allBrains, &allFloats, 0, allBrains.size() - 1);
+            
+            // Saving data
+            int midid = allFloats.size()/2;
+            float median = allFloats[midid];
+            
+            sds.addStatRow(generationTemp, agent0scoreTemp, agent1scoreTemp, agent2scoreTemp, 
+               agent3scoreTemp, agent4scoreTemp, agent5scoreTemp, agent6scoreTemp,
+               agent7scoreTemp, agent8scoreTemp, agent9scoreTemp, meanTemp, median,
+               bestAgentScoreTemp,timeForOneGenTemp);
            
             sds.data["generation"] = generation;
             sds.data["simu_time"] = mstk->sim_time;
             sds.data["evolution"] = mstk->evolution;
             sds.data["total_trained_time"] = (std::time(nullptr) - started_at);
             sds.save();
-
-            // Sort by score descending
-            reverse_sorting_brain(&allBrains, &allFloats, 0, allBrains.size() - 1);
             
             // Making a copy of the best brains
             for (int i=0;i<mstk->nb_brain;i+=1) {
