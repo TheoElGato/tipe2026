@@ -58,6 +58,21 @@ public:
 
         wifiSprite.setPosition({0, 0});
         wifiSprite.scale({0.1f, 0.1f});
+        
+        pawUp = sf::CircleShape(5);
+	    pawDown = sf::CircleShape(10);
+	    body = sf::CircleShape(20);
+	    eyeWhite = sf::CircleShape(8);
+	    eyeBlack = sf::CircleShape(2);
+	    
+	    // Drawing of legs and body-leg lines
+	    pawUp.setOrigin({5, 5});
+	    pawDown.setOrigin({10, 10});
+	    body.setOrigin({20, 20});
+	    eyeWhite.setFillColor(sf::Color::White);
+	    eyeWhite.setOrigin({8, 8});
+	    eyeBlack.setFillColor(sf::Color::Black);
+	    eyeBlack.setOrigin({2, 2});
     }
 
     void render(std::vector<int>* groups_avail,
@@ -109,6 +124,7 @@ public:
         draw_items(window, startSprite, diamondSprite, start, goals[selected_agents], (*groups_avail)[selected_agents]);
 
         if (drawall) {
+            //logm(std::to_string( (*agentPartitions)[0].size()),"DEBUG");
             for (Creature* agent : (*agentPartitions)[selected_agents]) {
                 draw_creature(agent);
             }
@@ -122,7 +138,7 @@ public:
     }
     
     void draw_creature(Creature* creature) override {
-    	// This is highly unoptimised, but should work for now.
+    	
         std::vector<sf::Color> colors = {
 	        sf::Color(0, 0, 255),
 	        sf::Color(0, 255, 255),
@@ -130,27 +146,8 @@ public:
 	        sf::Color(34, 0, 25),
 	        sf::Color((50*creature->bodyColorSeed+96)%255, (69*creature->bodyColorSeed+24)%255, (42*creature->bodyColorSeed+93)%255)
 	    };
-	    // Drawing of legs and body-leg lines
-	    sf::CircleShape pawUp;
-	    sf::CircleShape pawDown;
-	    sf::CircleShape body;
-	    sf::CircleShape eyeWhite;
-	    sf::CircleShape eyeBlack;
-	    pawUp = sf::CircleShape(5);
-	    pawDown = sf::CircleShape(10);
-	    body = sf::CircleShape(20);
-	    eyeWhite = sf::CircleShape(8);
-	    eyeBlack = sf::CircleShape(2);
-	    
-	    pawUp.setOrigin({5, 5});
-	    pawDown.setOrigin({10, 10});
 	    body.setFillColor(colors[4]);
-	    body.setOrigin({20, 20});
-	    eyeWhite.setFillColor(sf::Color::White);
-	    eyeWhite.setOrigin({8, 8});
-	    eyeBlack.setFillColor(sf::Color::Black);
-	    eyeBlack.setOrigin({2, 2});
-	    
+
 	    for (int i = 0; i < 4; ++i) {
 	        sf::CircleShape* paw = creature->leg_up[i] ? &pawUp : &pawDown;
 	        paw->setFillColor(colors[i]);
@@ -251,7 +248,12 @@ private:
     sf::Texture backgroundTexture, wifiTexture;
     sf::Texture startTexture, diamondTexture, emeraldTexture, nether_starTexture, netherite_ingotTexture, music_disc_othersideTexture;
     sf::Sprite backgroundSprite, wifiSprite, startSprite, diamondSprite, emeraldSprite, nether_starSprite, netherite_ingotSprite, music_disc_othersideSprite;
-
+    sf::CircleShape pawUp;
+    sf::CircleShape pawDown;
+    sf::CircleShape body;
+    sf::CircleShape eyeWhite;
+    sf::CircleShape eyeBlack;
+    
     // state
     bool mc = false;
     bool is_headless = false;
