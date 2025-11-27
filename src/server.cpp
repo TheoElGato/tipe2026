@@ -165,7 +165,7 @@ void LogicServer::logic_loop() {
     	        // TODO, but I don't know if this is usefull
     	        // since if the client crash he's already disconnecting
     	        // from the server...
-    	        logm("KIKING NOT IMPLEMENTED","WARNING");
+    	        //logm("KIKING NOT IMPLEMENTED","WARNING");
     	        //step=3; For now this is disabled
     	    }
     	}
@@ -307,10 +307,10 @@ void LogicServer::logic_loop() {
                 } else {
                     half_clients = nb_client/2;
                 }
-
+                
+                logm("Sending nextgen to Clients");
                 int i = 0;
                 for (auto &pair : connections) {
-                    logm("Sending nextgen to Client#"+std::to_string(connections[pair.first]));
                     Packet pck("nextgen",packageSelectionned[i%half_clients],packageScores[i%half_clients],"");
 		            send(pck, pair.first);
                     i += 1;
