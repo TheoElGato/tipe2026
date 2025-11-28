@@ -539,7 +539,7 @@ void SimpleClient::run(SimTasker* stk, bool hl) {
     logm("Connected to server with id #" + srvid,"Client");
     
     while (state != -1) {
-        if (state==0) {continue;}
+        if (state==0) {std::this_thread::sleep_for(std::chrono::milliseconds(200));}
         if (state==1) {
             simulate(*mstk, true, headless, this);
             state=0;

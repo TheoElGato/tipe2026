@@ -156,6 +156,7 @@ void LogicServer::logic_loop() {
     	
     	if (step==1) {
     	    // Clients are working on a generation. We are waiting...
+    	    std::this_thread::sleep_for(std::chrono::milliseconds(200));
     	}
     	
     	if (step==2) { // One client have finished.
