@@ -221,44 +221,49 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
         
         // Checks for the client mode (mc stand for client mode)
         if(mc) {
-            if (cl->state == 2) continue;
-            if (cl->state == 3) { 
-                // End of generation for client mode
+            switch (cl->state) {
+                case 2: break;;
+                case 3: 
+                    // End of generation for client mode
 
-                score_agent = cl->scores;
-                brain_agent.clear();
+                    score_agent = cl->scores;
+                    brain_agent.clear();
 
-                // Initialize agents with brain from file
-                for (int i=0; i<nb_brain; i++) {
-                    brain_agent.emplace_back(9,6,cl->sbfpath+cl->selectioned[i],DEVICE,NB_HIDDEN_LAYER);
-                }
+                    // Initialize agents with brain from file
+                    for (int i=0; i<nb_brain; i++) {
+                        brain_agent.emplace_back(9,6,cl->sbfpath+cl->selectioned[i],DEVICE,NB_HIDDEN_LAYER);
+                    }
 
-                reproduce(&brain_agent, score_agent,  nb_brain, evolution, BEST_KEEP, SELECTION_POL);
-                
-                for(int j=0;j<nb_brain;j++) score_agent[j] = 0;
-                sous_sim_next_index = 0;
-                sous_sim_started = 0;
-                sous_sim_completed = 0;
-                sous_sim_threads.clear();
-                sous_sim_state.clear();
+                    reproduce(&brain_agent, score_agent,  nb_brain, evolution, BEST_KEEP, SELECTION_POL);
+                    
+                    for(int j=0;j<nb_brain;j++) score_agent[j] = 0;
+                    sous_sim_next_index = 0;
+                    sous_sim_started = 0;
+                    sous_sim_completed = 0;
+                    sous_sim_threads.clear();
+                    sous_sim_state.clear();
 
-                for(int i=0; i<sous_sim_total; i++) {
-                    sous_sim_threads.emplace_back(std::thread());
-                    sous_sim_state.emplace_back(0);
-                }
+                    for(int i=0; i<sous_sim_total; i++) {
+                        sous_sim_threads.emplace_back(std::thread());
+                        sous_sim_state.emplace_back(0);
+                    }
 
-                generation += 1;
+                    generation += 1;
 
-                if (use_evolution_curve) {
-                    evolution = curve_a*std::exp(curve_b*generation+curve_c)+curve_d;
-                }
+                    if (use_evolution_curve) {
+                        evolution = curve_a*std::exp(curve_b*generation+curve_c)+curve_d;
+                    }
 
-                acu = 0;
-                cl->state = 1;
-            }
+                    acu = 0;
+                    cl->state = 1;
+                break;
 
-            if (cl->state == 4) {
-                clean_exit = true;
+                case 4:
+                    clean_exit = true;
+                break;
+                default:
+                    logm("sommeting went wrong", "WARNING");
+
             }
         }
 
@@ -281,7 +286,7 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
             }
         }
         
-        // Handle a clean exit of the simulation to avoid segmentation falt
+        // Handle a clean exit of the simulation to avoid segmentation fault
         if(clean_exit) {
             // Wait the end of all threads
             if (threads_used == 0) {
