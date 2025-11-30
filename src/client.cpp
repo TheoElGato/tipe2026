@@ -222,7 +222,9 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
         // Checks for the client mode (mc stand for client mode)
         if(mc) {
             switch (cl->state) {
-                case 2: break;;
+                case 2: 
+                break;
+
                 case 3: 
                     // End of generation for client mode
 
@@ -261,8 +263,9 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
                 case 4:
                     clean_exit = true;
                 break;
+
                 default:
-                    logm("sommeting went wrong", "WARNING");
+                    logm("sommeting whent wrong", "WARNING");
 
             }
         }
