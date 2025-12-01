@@ -222,6 +222,10 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
         // Checks for the client mode (mc stand for client mode)
         if(mc) {
             switch (cl->state) {
+                case -1:
+                    return 1;
+                break;
+
                 case 2: 
                 break;
 
@@ -550,6 +554,7 @@ void SimpleClient::run(SimTasker* stk, bool hl) {
         if (state==0) {std::this_thread::sleep_for(std::chrono::milliseconds(200));}
         if (state==1) {
             simulate(*mstk, true, headless, this);
+            if (state == -1) break;
             state=0;
             Packet simfnsh("simfinished","","","");
             send(simfnsh);

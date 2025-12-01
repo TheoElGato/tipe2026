@@ -110,9 +110,26 @@ void LogicServer::run(uint16_t port,SimTasker* test) {
     mstk = test;
     // Launch the logic loop in another thread
     std::thread([this]() { this->logic_loop(); }).detach();
+    std::thread([this]() { this->handle_input(); }).detach();
     
     m_server.run();
 }
+
+void LogicServer::handle_input() {
+    
+    while (this->running) {
+     
+        char input[25];
+        std::cin.get(input, 25);
+        
+        if (input == "kill") {
+            Packet exitpck("exit","","","");
+            send_all(exitpck);
+        }   
+    }
+
+}
+
 
 void LogicServer::logic_loop() {
     // We are waiting for clients to connect
@@ -162,7 +179,7 @@ void LogicServer::logic_loop() {
     	if (step==2) { // One client have finished.
     	    if (cfinished==nb_client) step=3;
     	    else if(std::time(nullptr)>(timetime+timeout)) {
-    	        logm("Some clients need to be kicked. Reason : timeout","WARNING");
+    	        //logm("Some clients need to be kicked. Reason : timeout","WARNING");
     	        // TODO, but I don't know if this is usefull
     	        // since if the client crash he's already disconnecting
     	        // from the server...
@@ -334,6 +351,8 @@ void LogicServer::logic_loop() {
     	}
     }
     
+    this->running = false;
+
     logm("Asking all clients to shutdown...");
     Packet exitpck("exit","","","");
     send_all(exitpck);
