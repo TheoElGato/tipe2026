@@ -32,12 +32,14 @@ private:
 	int cfinished = 0;
 	int nb_client = 0;
 	int step = 0;
+	bool running = true;
 	std::vector<std::string> packageSelectionned;
 	std::vector<std::string> packageScores;
 	std::vector<std::pair<std::vector<float>,std::vector<Brain>>> genresults;
 	void logic_loop();
 	void send_all(Packet pck);
 	void send(Packet pck, websocketpp::connection_hdl hdl);
+	void handle_input();
 
 };
 

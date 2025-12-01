@@ -111,14 +111,14 @@ for i in reversed(range(n)):
 
 
         data[i]['USE_EVOLUTION_CURVE'] = True if data[i]['use curve'].upper() == 'TRUE' else False
-        data[i]['PARAM_A'] = float(data[i]['Param A'].replace(',','.'))
-        data[i]['PARAM_B'] = float(data[i]['Param B'].replace(',','.'))
-        data[i]['PARAM_C'] = float(data[i]['Param C'].replace(',','.'))
-        data[i]['PARAM_D'] = float(data[i]['Param D'].replace(',','.'))
+        data[i]['CURVE_A'] = float(data[i]['Param A'].replace(',','.'))
+        data[i]['CURVE_B'] = float(data[i]['Param B'].replace(',','.'))
+        data[i]['CURVE_C'] = float(data[i]['Param C'].replace(',','.'))
+        data[i]['CURVE_D'] = float(data[i]['Param D'].replace(',','.'))
         
 
         data[i]['IS_INFINITE'] = True
-        data[i]['TIME_ALLOWED'] = 126000
+        data[i]['TIME_ALLOWED'] = 12600
 
         # Remove unused fields
         del data[i]['Id']
@@ -148,6 +148,7 @@ for i in reversed(range(n)):
 # write to json file
 with open('data.json', mode='w', encoding='utf-8') as json_file:
     json.dump(data, json_file, indent=4)
+
 
 
 
