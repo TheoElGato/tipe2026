@@ -122,10 +122,11 @@ void LogicServer::handle_input() {
         char input[25];
         std::cin.get(input, 25);
         
-        if (input == "kill") {
+        if (strcmp(input, "kill") == 0) {
+            logm("Recive kill command");
             Packet exitpck("exit","","","");
             send_all(exitpck);
-        }   
+        }
     }
 
 }
@@ -351,6 +352,8 @@ void LogicServer::logic_loop() {
     	}
     }
     
+    logm("There was" + std::to_string(nb_client) + " clients connected", "INFO");
+
     this->running = false;
 
     logm("Asking all clients to shutdown...");

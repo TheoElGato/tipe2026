@@ -268,9 +268,6 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
                     clean_exit = true;
                 break;
 
-                default:
-                    logm("sommeting whent wrong", "WARNING");
-
             }
         }
 
