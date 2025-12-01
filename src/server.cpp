@@ -215,8 +215,11 @@ void LogicServer::logic_loop() {
                 allBrains.insert(allBrains.end(), pair.second.begin(), pair.second.end());
             }
             
-            int best_score_index = std::distance(allFloats.begin(), std::max_element(allFloats.begin(), allFloats.end()));
+            // Sort by score descending
+            reverse_sorting_brain(&allBrains, &allFloats, 0, allBrains.size() - 1);
+
             
+            int best_score_index = std::distance(allFloats.begin(), std::max_element(allFloats.begin(), allFloats.end())); 
             float generationTemp = generation;
             float agent0scoreTemp= allFloats[0];
             float agent1scoreTemp= allFloats[1];
@@ -229,13 +232,12 @@ void LogicServer::logic_loop() {
             float agent8scoreTemp= allFloats[8];
             float agent9scoreTemp= allFloats[9];
             float meanTemp = average(allFloats);
-            float bestAgentScoreTemp = allFloats[best_score_index];
+            float bestAgentScoreTemp = allFloats[0];
             float timeForOneGenTemp = std::time(nullptr)-gen_started_at;
             
             
 
-            // Sort by score descending
-            reverse_sorting_brain(&allBrains, &allFloats, 0, allBrains.size() - 1);
+            
             
             // Saving data
             int midid = allFloats.size()/2;

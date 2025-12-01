@@ -187,4 +187,3 @@ def open_plot(path):
 
 if __name__ == "__main__":
     load_stats("/home/ely/Documents/prog/tipe2026/tools/saves/simu_0_20251128_180409/simu_0_20251128_180409.csv")
-    print(median)

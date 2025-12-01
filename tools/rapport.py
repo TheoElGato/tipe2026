@@ -77,7 +77,6 @@ def create_pdf(fname):
     stats.generate_scoreplot(f"{FPATH}/{FNAME}/scoreplot.png")
     stats.generate_timeplot(f"{FPATH}/{FNAME}/timeplot.png")
     stats.generate_meanplot(f"{FPATH}/{FNAME}/meanplot.png")
-    print(stats.median)
     stats.generate_medianplot(f"{FPATH}/{FNAME}/medianplot.png")
     
     for i in range(0, 10):
