@@ -77,6 +77,8 @@ def create_pdf(fname):
     stats.generate_scoreplot(f"{FPATH}/{FNAME}/scoreplot.png")
     stats.generate_timeplot(f"{FPATH}/{FNAME}/timeplot.png")
     stats.generate_meanplot(f"{FPATH}/{FNAME}/meanplot.png")
+    print(stats.median)
+    stats.generate_medianplot(f"{FPATH}/{FNAME}/medianplot.png")
     
     for i in range(0, 10):
         stats.generate_brainplot(f"{FPATH}/{FNAME}/brain{i}plot.png", i,unfs(i))
@@ -135,6 +137,8 @@ def create_pdf(fname):
     h+=80
     pdf.set_y(h)
     pdf.image(f"{FPATH}/{FNAME}/meanplot.png",w=100)
+    pdf.set_y(h)
+    pdf.image(f"{FPATH}/{FNAME}/medianplot.png",x=110,w=100)
     
     pdf.add_page()
     h=30

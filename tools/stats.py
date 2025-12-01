@@ -17,6 +17,7 @@ agent7score = []
 agent8score = []
 agent9score = []
 mean = []
+median = []
 best_agent_score = []
 time_for_one_gen = []
 
@@ -44,6 +45,7 @@ def clear_all():
     best_agent_score.clear()
     time_for_one_gen.clear()
     mean.clear()
+    median.clear()
 
 
 def load_stats(path,name=""):
@@ -55,23 +57,24 @@ def load_stats(path,name=""):
     
     current_path = name
     with open(path, mode='r') as file:
-        reader = csv.reader(file)
+        reader = csv.DictReader(file)
         next(reader)  # Skip the header row
         for row in reader:
-            generation.append((float(row[0])))
-            agent0score.append(float(row[1]))
-            agent1score.append(float(row[2]))
-            agent2score.append(float(row[3]))
-            agent3score.append(float(row[4]))
-            agent4score.append(float(row[5]))
-            agent5score.append(float(row[6]))
-            agent6score.append(float(row[7]))
-            agent7score.append(float(row[8]))
-            agent8score.append(float(row[9]))
-            agent9score.append(float(row[10]))
-            mean.append(float(row[11]))
-            best_agent_score.append(float(row[12]))
-            time_for_one_gen.append(float(row[13]))
+            generation.append((float(row["Generation"])))
+            agent0score.append(float(row["Agent0Score"]))
+            agent1score.append(float(row["Agent1Score"]))
+            agent2score.append(float(row["Agent2Score"]))
+            agent3score.append(float(row["Agent3Score"]))
+            agent4score.append(float(row["Agent4Score"]))
+            agent5score.append(float(row["Agent5Score"]))
+            agent6score.append(float(row["Agent6Score"]))
+            agent7score.append(float(row["Agent7Score"]))
+            agent8score.append(float(row["Agent8Score"]))
+            agent9score.append(float(row["Agent9Score"]))
+            mean.append(float(row["Mean"]))
+            median.append(float(row["Median"]))
+            best_agent_score.append(float(row["BestAgentScore"]))
+            time_for_one_gen.append(float(row["TimeForOneGen"]))
     
     return generation, mean, best_agent_score, time_for_one_gen
 
@@ -133,10 +136,19 @@ def generate_meanplot(path):
     plt.savefig(path)
     plt.close()
 
+def generate_medianplot(path):
+    gen = generation
+    plt.figure()
+    plt.plot(gen, median, color="red", label="Mediane des agents")
+    plt.title("Mediane des agents en fonction de la génération")
+    plt.xlabel("Génération")
+    plt.ylabel("Mediane")
+    plt.legend()
+    plt.grid()
+    plt.savefig(path)
+    plt.close()
 
 def generate_total_ultimate_custom_super_cool_plot(path1, path2, path3, tg, tm, tb, tt):  
-
-    
 
     plt.figure()
     for i in range(len(all_paths)): plt.plot(tg[i],tb[i],label=all_paths[i])
@@ -172,3 +184,7 @@ def generate_total_ultimate_custom_super_cool_plot(path1, path2, path3, tg, tm, 
 
 def open_plot(path):
     webbrowser.get('windows-default').open('file://'+os.path.realpath(path))
+
+if __name__ == "__main__":
+    load_stats("/home/ely/Documents/prog/tipe2026/tools/saves/simu_0_20251128_180409/simu_0_20251128_180409.csv")
+    print(median)
