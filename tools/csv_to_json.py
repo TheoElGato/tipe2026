@@ -118,7 +118,7 @@ for i in reversed(range(n)):
         
 
         data[i]['IS_INFINITE'] = True
-        data[i]['TIME_ALLOWED'] = 126000
+        data[i]['TIME_ALLOWED'] = 12600
 
         # Remove unused fields
         del data[i]['Id']
