@@ -268,7 +268,7 @@ void LogicServer::logic_loop() {
             sds.addStatRow(generationTemp, agent0scoreTemp, agent1scoreTemp, agent2scoreTemp, 
                agent3scoreTemp, agent4scoreTemp, agent5scoreTemp, agent6scoreTemp,
                agent7scoreTemp, agent8scoreTemp, agent9scoreTemp, meanTemp, median,
-               bestAgentScoreTemp,timeForOneGenTemp,seperation_time,processing_time,std::time(nullptr));
+               bestAgentScoreTemp,timeForOneGenTemp,seperation_time,processing_time,std::time(nullptr), nb_client);
            
             sds.data["generation"] = generation;
             sds.data["simu_time"] = mstk->sim_time;

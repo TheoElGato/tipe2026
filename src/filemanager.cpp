@@ -97,7 +97,8 @@ SimDataStruct::SimDataStruct(std::string path, std::string name, int generation,
         {"brains-number", brains_number},
         {"agents-number", agents_number},
         {"total_trained_time", 0},
-        {"train_sessions",train_sessions}
+        {"train_sessions",train_sessions},
+        {"nb_clients",0}
     };
     
 }
@@ -106,7 +107,7 @@ void SimDataStruct::addStatRow(float generation, float agent0score, float agent1
                    float agent3score, float agent4score, float agent5score, float agent6score,
                    float agent7score, float agent8score, float agent9score, float mean, float median,
                    float bestAgentScore, float timeForOneGen, float timeWaitingClients,
-                   float timeForProcessing, float localTime) {
+                   float timeForProcessing, float localTime, int nb_clients) {
     generationV.push_back(generation);
     agent0scoreV.push_back(agent0score);
     agent1scoreV.push_back(agent1score);
@@ -125,6 +126,7 @@ void SimDataStruct::addStatRow(float generation, float agent0score, float agent1
     timeWaitingClientsV.push_back(timeWaitingClients);
     timeForProcessingV.push_back(timeForProcessing);
     localTimeV.push_back(localTime);
+    data["nb_clients"] = nb_clients;
 }
 
 void SimDataStruct::save() {

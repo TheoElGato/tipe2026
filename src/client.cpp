@@ -406,7 +406,7 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
                     sds.addStatRow(generationTemp, agent0scoreTemp, agent1scoreTemp, agent2scoreTemp, 
                        agent3scoreTemp, agent4scoreTemp, agent5scoreTemp, agent6scoreTemp,
                        agent7scoreTemp, agent8scoreTemp, agent9scoreTemp, meanTemp, median,
-                       bestAgentScoreTemp,timeForOneGenTemp,0,0,std::time(nullptr));
+                       bestAgentScoreTemp,timeForOneGenTemp,0,0,std::time(nullptr),0);
                 
                     // Autosave check
                     if (AUTOSAVE && generation % AUTOSAVE_FREQ == 0) {

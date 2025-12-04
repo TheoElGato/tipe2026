@@ -98,7 +98,7 @@ public:
                    float agent3score, float agent4score, float agent5score, float agent6score,
                    float agent7score, float agent8score, float agent9score, float mean, float median,
                    float bestAgentScore,float timeForOneGen, float timeWaitingClients,
-                   float timeForProcessing, float localTime);
+                   float timeForProcessing, float localTime, int nb_clients);
                    
    nlohmann::json data;
    std::vector<float> generationV;
