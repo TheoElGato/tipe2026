@@ -35,6 +35,44 @@ void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::
     }
 }
 
+
+void init_goals(std::vector<std::vector<sf::Vector2f>> *goals, sf::Vector2f start, int MINDIST, int MAXDIST, int NB_GOAL, int sous_sim_total){
+    // Random number setup
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+
+    (*goals).clear();
+
+    float ran = 0;
+    float angle = 0;
+    float radius = 0;
+    float x = 0;
+    float y = 0;
+
+    for(int i=0; i<sous_sim_total; i++) {
+        std::vector<sf::Vector2f> temp;
+    
+
+        angle = (2 * M_PI / sous_sim_total) * i;
+        radius = (MAXDIST-MINDIST)*dist(gen) + MINDIST;
+        x = start.x + radius * cos(angle);
+        y = start.y + radius * sin(angle);
+        temp.emplace_back(sf::Vector2f(x, y));
+
+        for(int j=1; j<NB_GOAL; j+=1){
+            ran = dist(gen)*2*M_PI;  // [0,2*pi[
+            radius = (MAXDIST-MINDIST)*dist(gen) + MINDIST;
+            x += start.x + radius * cos(ran);
+            y += start.y + radius * sin(ran);
+            temp.emplace_back(sf::Vector2f(x, y));   
+        }
+        (*goals).emplace_back(temp);
+        temp.clear();
+    }
+}
+
+
 int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
     
     logm("Welcome to the URSAF Sim");
@@ -185,38 +223,8 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
 
     // Generate goals
     std::vector<std::vector<sf::Vector2f>> goals;
-
-    // Random number setup
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<float> dist(0.0f, 1.0f);
-
-    float ran = 0;
-    float angle = 0;
-    float radius = 0;
-    float x = 0;
-    float y = 0;
-
-    for(int i=0; i<sous_sim_total; i++) {
-        std::vector<sf::Vector2f> temp;
-
-        angle = (2 * M_PI / sous_sim_total) * i;
-        radius = (MAXDIST-MINDIST)*dist(gen) + MINDIST;
-        x = start.x + radius * cos(angle);
-        y = start.y + radius * sin(angle);
-        temp.emplace_back(sf::Vector2f(x, y));
-
-        for(int j=1; j<NB_GOAL; j+=1){
-            ran = dist(gen)*2*M_PI;  // [0,2*pi[
-            radius = (MAXDIST-MINDIST)*dist(gen) + MINDIST;
-            x += start.x + radius * cos(ran);
-            y += start.y + radius * sin(ran);
-            temp.emplace_back(sf::Vector2f(x, y));   
-        }
-        goals.emplace_back(temp);
-        temp.clear();
-    }
-
+    init_goals(&goals, start, MINDIST, MAXDIST, NB_GOAL, sous_sim_total);
+    
     // Initialisation of score variables
     for(int i = 0; i < SOUS_SIM; i++) {
         sous_sim_scores[i] = std::vector<float>(nb_brain, 0.0f);
@@ -358,25 +366,7 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
                 
                 int best_score_index = std::distance(score_agent.begin(), std::max_element(score_agent.begin(), score_agent.end()));
                 
-                for(int i=0; i<sous_sim_total; i++) {
-                    std::vector<sf::Vector2f> temp;
-
-                    angle = (2 * M_PI / sous_sim_total) * i;
-                    radius = (MAXDIST-MINDIST)*dist(gen) + MINDIST;
-                    x = start.x + radius * cos(angle);
-                    y = start.y + radius * sin(angle);
-                    temp.emplace_back(sf::Vector2f(x, y));
-
-                    for(int j=1; j<NB_GOAL; j+=1){
-                        ran = dist(gen)*2*M_PI;  // [0,2*pi[
-                        radius = (MAXDIST-MINDIST)*dist(gen) + MINDIST;
-                        x += start.x + radius * cos(ran);
-                        y += start.y + radius * sin(ran);
-                        temp.emplace_back(sf::Vector2f(x, y));   
-                    }
-                    goals.emplace_back(temp);
-                    temp.clear();
-                }
+                init_goals(&goals, start, MINDIST, MAXDIST, NB_GOAL, sous_sim_total);
 
 
                 if (!mc) { // We only want to save brain in classic mode here.

@@ -41,5 +41,4 @@ private:
 
 int simulate(SimTasker stk, bool mc = false, bool headless = false, SimpleClient* cl = nullptr);
 
-
 #endif // CLIENT_H
