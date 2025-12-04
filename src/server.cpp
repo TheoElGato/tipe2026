@@ -145,6 +145,7 @@ void LogicServer::logic_loop() {
 	int started_at = 0;
 	int gen_started_at = 0;
 	int generation = 0;
+    int seperation_time = 0;
 
     while (task_done != mstk->len) {
 
@@ -191,6 +192,9 @@ void LogicServer::logic_loop() {
     	
     	if (step==3) { // Now we analyse the results here
     	    logm("Generation done. Processing...");
+
+            seperation_time = std::time(nullptr) - timetime;
+            int processing_time = std::time(nullptr);
     	    
     	    std::vector<float> allFloats;
             std::vector<Brain> allBrains;
@@ -218,7 +222,7 @@ void LogicServer::logic_loop() {
             // Sort by score descending
             reverse_sorting_brain(&allBrains, &allFloats, 0, allBrains.size() - 1);
 
-            
+            // Saving data
             int best_score_index = std::distance(allFloats.begin(), std::max_element(allFloats.begin(), allFloats.end())); 
             float generationTemp = generation;
             float agent0scoreTemp= allFloats[0];
@@ -234,36 +238,8 @@ void LogicServer::logic_loop() {
             float meanTemp = average(allFloats);
             float bestAgentScoreTemp = allFloats[0];
             float timeForOneGenTemp = std::time(nullptr)-gen_started_at;
-            
-            
-
-            
-            
-            // Saving data
             int midid = allFloats.size()/2;
             float median = allFloats[midid];
-            
-            sds.addStatRow(generationTemp, agent0scoreTemp, agent1scoreTemp, agent2scoreTemp, 
-               agent3scoreTemp, agent4scoreTemp, agent5scoreTemp, agent6scoreTemp,
-               agent7scoreTemp, agent8scoreTemp, agent9scoreTemp, meanTemp, median,
-               bestAgentScoreTemp,timeForOneGenTemp);
-           
-            sds.data["generation"] = generation;
-            sds.data["simu_time"] = mstk->sim_time;
-            sds.data["evolution"] = mstk->evolution;
-            sds.data["total_trained_time"] = (std::time(nullptr) - started_at);
-            sds.save();
-            
-            // Making a copy of the best brains
-            for (int i=0;i<mstk->nb_brain;i+=1) {
-                std::string idstr = std::to_string(allBrains[i].bid1)+"s"+std::to_string(allBrains[i].bid2)+".pt";
-
-                std::ifstream  src(sbfpath+idstr,std::ios::binary);
-                std::string istring = std::to_string(i);
-                std::ofstream  dst(sds.getFullPath()+istring+".pt",std::ios::binary);
-                dst << src.rdbuf();
-            }
-            logm("Autosaved.", "SAVE");
             
             ////
             
@@ -286,6 +262,30 @@ void LogicServer::logic_loop() {
                 packageSelectionned.push_back(vects_to_jsonstring(selectioned));  
                 packageScores.push_back(vectf_to_jsonstring(scores));           
             }
+
+            processing_time = std::time(nullptr) - processing_time;
+
+            sds.addStatRow(generationTemp, agent0scoreTemp, agent1scoreTemp, agent2scoreTemp, 
+               agent3scoreTemp, agent4scoreTemp, agent5scoreTemp, agent6scoreTemp,
+               agent7scoreTemp, agent8scoreTemp, agent9scoreTemp, meanTemp, median,
+               bestAgentScoreTemp,timeForOneGenTemp,seperation_time,processing_time,std::time(nullptr));
+           
+            sds.data["generation"] = generation;
+            sds.data["simu_time"] = mstk->sim_time;
+            sds.data["evolution"] = mstk->evolution;
+            sds.data["total_trained_time"] = (std::time(nullptr) - started_at);
+            sds.save();
+
+            // Making a copy of the best brains
+            for (int i=0;i<mstk->nb_brain;i+=1) {
+                std::string idstr = std::to_string(allBrains[i].bid1)+"s"+std::to_string(allBrains[i].bid2)+".pt";
+
+                std::ifstream  src(sbfpath+idstr,std::ios::binary);
+                std::string istring = std::to_string(i);
+                std::ofstream  dst(sds.getFullPath()+istring+".pt",std::ios::binary);
+                dst << src.rdbuf();
+            }
+            logm("Autosaved.", "SAVE");
 
             // Clearing memory
             // (I think this is not necessery but why not :/

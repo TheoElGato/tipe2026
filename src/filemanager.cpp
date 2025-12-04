@@ -105,7 +105,8 @@ SimDataStruct::SimDataStruct(std::string path, std::string name, int generation,
 void SimDataStruct::addStatRow(float generation, float agent0score, float agent1score, float agent2score, 
                    float agent3score, float agent4score, float agent5score, float agent6score,
                    float agent7score, float agent8score, float agent9score, float mean, float median,
-                   float bestAgentScore, float timeForOneGen) {
+                   float bestAgentScore, float timeForOneGen, float timeWaitingClients,
+                   float timeForProcessing, float localTime) {
     generationV.push_back(generation);
     agent0scoreV.push_back(agent0score);
     agent1scoreV.push_back(agent1score);
@@ -121,6 +122,9 @@ void SimDataStruct::addStatRow(float generation, float agent0score, float agent1
     medianV.push_back(median);
     bestAgentScoreV.push_back(bestAgentScore);
     timeForOneGenV.push_back(timeForOneGen);
+    timeWaitingClientsV.push_back(timeWaitingClients);
+    timeForProcessingV.push_back(timeForProcessing);
+    localTimeV.push_back(localTime);
 }
 
 void SimDataStruct::save() {
@@ -136,7 +140,7 @@ void SimDataStruct::save() {
     
     writer << std::vector<std::string>({"Generation","Agent0Score", "Agent1Score", "Agent2Score", "Agent3Score", 
                          "Agent4Score", "Agent5Score", "Agent6Score", "Agent7Score", "Agent8Score", 
-                         "Agent9Score", "Mean", "Median", "BestAgentScore", "TimeForOneGen"});
+                         "Agent9Score", "Mean", "Median", "BestAgentScore", "TimeForOneGen","TimeWaitingClients","TimeForProcessing","LocalTime"});
     for(int i=0;i<this->generationV.size();i+=1) {
         writer << std::vector<float>({ generationV[i],
                                        agent0scoreV[i],
@@ -152,7 +156,10 @@ void SimDataStruct::save() {
                                        meanV[i],
                                        medianV[i],
                                        bestAgentScoreV[i],
-                                       timeForOneGenV[i]});
+                                       timeForOneGenV[i],
+                                       timeWaitingClientsV[i],
+                                       timeForProcessingV[i],
+                                       localTimeV[i]});
     }
     
     
@@ -192,6 +199,9 @@ void SimDataStruct::loadFromFile(std::string load_name) {
         medianV.push_back(row["Median"].get<float>());
         bestAgentScoreV.push_back(row["BestAgentScore"].get<float>());
         timeForOneGenV.push_back(row["TimeForOneGen"].get<float>());
+        timeWaitingClientsV.push_back(row["TimeWaitingClients"].get<float>());
+        timeForProcessingV.push_back(row["TimeForProcessing"].get<float>());
+        localTimeV.push_back(row["LocalTime"].get<float>());
     }
 }
 
