@@ -9,7 +9,7 @@ float distance(sf::Vector2f a, sf::Vector2f b) {
 
 
 void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Vector2f start, 
-                  sf::Vector2f objectif, std::vector<Brain*> brains, int* state, 
+                  std::vector<sf::Vector2f> objectif, std::vector<Brain*> brains, int* state, 
                   std::vector<float>* scores, float* dt, float time,float brainAcc)
 {
     
@@ -17,8 +17,12 @@ void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Ve
     float acc = 0.0f;
     float accbrain = 0.0f;
 
+    std::vector<int> obj;
+    int nb_goal = objectif.size(); 
+
     for (int i = 0; i < agents.size(); ++i) {
         agents[i]->moveTo(start.x, start.y);
+        obj.push_back(0);
     }
 
     while (acc < time) {
@@ -34,16 +38,14 @@ void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Ve
         // because only agent0 had time to update...
         if (accbrain > brainAcc) {
             for (int i = 0; i < agents.size(); ++i) {
-                agents[i]->brainUpdate(objectif, brains[i]);
+                agents[i]->brainUpdate(objectif[obj[i]], brains[i]);
                 
                 // Move agent if they reached the objective
                 agents[i]->update(*dt);
-                if(distance(agents[i]->vertices[0].position, objectif) < 20.0f) {
-                    float angle = fmod(acc*5, 2 * M_PI);
-                    float x = objectif.x + 300 * cos(angle);
-                    float y = objectif.y + 300 * sin(angle);
-                    agents[i]->moveTo(fmod(x, 1050) , fmod(y, 750));
+                if(distance(agents[i]->vertices[0].position, objectif[obj[i]]) < 20.0f) {
                     (*scores)[i] += 1.0f;
+                    if (obj[i] == nb_goal - 1) obj[i]=0;
+                    else obj[i]+=1;
                 }
             }
             accbrain = 0;
@@ -56,11 +58,12 @@ void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Ve
     // Evaluation of the simulation results
     for (int i = 0; i < agents.size(); ++i) {
         Creature* agent = agents[i];
-        float dst = distance(agent->vertices[0].position, objectif);
+        float dst = distance(agent->vertices[0].position, objectif[obj[i]]);
         float scr = 1/(1+dst);
         (*scores)[i] = scr;
     }
 
+    obj.clear();
 
     // Mark the thread as finished
     *state = 2; // 2 means finished

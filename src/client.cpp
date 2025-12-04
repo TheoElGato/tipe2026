@@ -184,14 +184,37 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
     float fps = 0.0f;
 
     // Generate goals
-    std::vector<sf::Vector2f> goals;
+    std::vector<std::vector<sf::Vector2f>> goals;
+
+    // Random number setup
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+
+    float ran = 0;
+    float angle = 0;
+    float radius = 0;
+    float x = 0;
+    float y = 0;
 
     for(int i=0; i<sous_sim_total; i++) {
-        float angle = (2 * M_PI / sous_sim_total) * i;
-        float radius = MINDIST;
-        float x = start.x + radius * cos(angle);
-        float y = start.y + radius * sin(angle);
-        goals.emplace_back(sf::Vector2f(x, y));
+        std::vector<sf::Vector2f> temp;
+
+        angle = (2 * M_PI / sous_sim_total) * i;
+        radius = (MAXDIST-MINDIST)*dist(gen) + MINDIST;
+        x = start.x + radius * cos(angle);
+        y = start.y + radius * sin(angle);
+        temp.emplace_back(sf::Vector2f(x, y));
+
+        for(int j=1; j<NB_GOAL; j+=1){
+            ran = dist(gen)*2*M_PI;  // [0,2*pi[
+            radius = (MAXDIST-MINDIST)*dist(gen) + MINDIST;
+            x += start.x + radius * cos(ran);
+            y += start.y + radius * sin(ran);
+            temp.emplace_back(sf::Vector2f(x, y));   
+        }
+        goals.emplace_back(temp);
+        temp.clear();
     }
 
     // Initialisation of score variables
@@ -226,7 +249,7 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
                     return 1;
                 break;
 
-                case 2: 
+                case 2: continue;
                 break;
 
                 case 3: 
@@ -259,7 +282,7 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
                     if (use_evolution_curve) {
                         evolution = curve_a*std::exp(curve_b*generation+curve_c)+curve_d;
                     }
-
+                    
                     acu = 0;
                     cl->state = 1;
                 break;
@@ -320,7 +343,6 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
             if (sous_sim_completed >= sous_sim_total) {
                 // All of it is finished
                 // Change of sim :
-
                 logm("Generation finished. Processing...", "INFO");
                 
                 for(int i=0;i<sous_sim_scores.size();i++) {
@@ -336,6 +358,27 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
                 
                 int best_score_index = std::distance(score_agent.begin(), std::max_element(score_agent.begin(), score_agent.end()));
                 
+                for(int i=0; i<sous_sim_total; i++) {
+                    std::vector<sf::Vector2f> temp;
+
+                    angle = (2 * M_PI / sous_sim_total) * i;
+                    radius = (MAXDIST-MINDIST)*dist(gen) + MINDIST;
+                    x = start.x + radius * cos(angle);
+                    y = start.y + radius * sin(angle);
+                    temp.emplace_back(sf::Vector2f(x, y));
+
+                    for(int j=1; j<NB_GOAL; j+=1){
+                        ran = dist(gen)*2*M_PI;  // [0,2*pi[
+                        radius = (MAXDIST-MINDIST)*dist(gen) + MINDIST;
+                        x += start.x + radius * cos(ran);
+                        y += start.y + radius * sin(ran);
+                        temp.emplace_back(sf::Vector2f(x, y));   
+                    }
+                    goals.emplace_back(temp);
+                    temp.clear();
+                }
+
+
                 if (!mc) { // We only want to save brain in classic mode here.
                    
                     float generationTemp = generation;
@@ -453,7 +496,7 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
         
         //// Window drawing block here
         if (!headless) {
-            dpl_srvc->render(&groups_avail, &agentPartitions, fps, agents.size(), generation, sous_sim_started, acu, simu_time, evolution, start, goals, mc);
+            dpl_srvc->render(&groups_avail, &agentPartitions, fps, agents.size(), generation, sous_sim_started, acu, simu_time, evolution, start, goals[0], mc);
         }
         ////
 
