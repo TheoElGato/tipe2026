@@ -194,7 +194,7 @@ void LogicServer::logic_loop() {
     	    logm("Generation done. Processing...");
 
             seperation_time = std::time(nullptr) - timetime;
-            int processing_time = std::time(nullptr);
+            float processing_time = std::time(nullptr);
     	    
     	    std::vector<float> allFloats;
             std::vector<Brain> allBrains;
