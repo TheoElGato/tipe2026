@@ -110,14 +110,14 @@ void LogicServer::run(uint16_t port,SimTasker* test) {
     mstk = test;
     // Launch the logic loop in another thread
     std::thread([this]() { this->logic_loop(); }).detach();
-    std::thread([this]() { this->handle_input(); }).detach();
+    
     
     m_server.run();
 }
 
 void LogicServer::handle_input() {
-    
-    while (this->running) {
+
+    while (true) {
      
         char input[25];
         std::cin.get(input, 25);
@@ -136,6 +136,9 @@ void LogicServer::logic_loop() {
     // We are waiting for clients to connect
     logm("Press ENTER when all clients are connected sucessfully");
     std::getc(stdin);
+    
+    // Launching input thread in background
+    std::thread([this]() { this->handle_input(); }).detach();
     
     logm("All clients are connected. Starting Logic Loop...");
     
