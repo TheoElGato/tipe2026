@@ -145,7 +145,7 @@ void LogicServer::logic_loop() {
 	int started_at = 0;
 	int gen_started_at = 0;
 	int generation = 0;
-    int seperation_time = 0;
+    float seperation_time = 0;
 
     while (task_done != mstk->len) {
 
