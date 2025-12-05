@@ -265,6 +265,16 @@ void LogicServer::logic_loop() {
                 packageSelectionned.push_back(vects_to_jsonstring(selectioned));  
                 packageScores.push_back(vectf_to_jsonstring(scores));           
             }
+            
+            // Making a copy of the best brains
+            for (int i=0;i<mstk->nb_brain;i+=1) {
+                std::string idstr = std::to_string(allBrains[i].bid1)+"s"+std::to_string(allBrains[i].bid2)+".pt";
+
+                std::ifstream  src(sbfpath+idstr,std::ios::binary);
+                std::string istring = std::to_string(i);
+                std::ofstream  dst(sds.getFullPath()+istring+".pt",std::ios::binary);
+                dst << src.rdbuf();
+            }
 
             processing_time = std::time(nullptr) - processing_time;
 
@@ -279,15 +289,7 @@ void LogicServer::logic_loop() {
             sds.data["total_trained_time"] = (std::time(nullptr) - started_at);
             sds.save();
 
-            // Making a copy of the best brains
-            for (int i=0;i<mstk->nb_brain;i+=1) {
-                std::string idstr = std::to_string(allBrains[i].bid1)+"s"+std::to_string(allBrains[i].bid2)+".pt";
-
-                std::ifstream  src(sbfpath+idstr,std::ios::binary);
-                std::string istring = std::to_string(i);
-                std::ofstream  dst(sds.getFullPath()+istring+".pt",std::ios::binary);
-                dst << src.rdbuf();
-            }
+            
             logm("Autosaved.", "SAVE");
 
             // Clearing memory
