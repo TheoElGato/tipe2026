@@ -78,6 +78,8 @@ def create_pdf(fname):
     stats.generate_timeplot(f"{FPATH}/{FNAME}/timeplot.png")
     stats.generate_meanplot(f"{FPATH}/{FNAME}/meanplot.png")
     stats.generate_medianplot(f"{FPATH}/{FNAME}/medianplot.png")
+    stats.generate_time_waiting_clients_plot(f"{FPATH}/{FNAME}/time_waiting_clients_plot.png")
+    stats.generate_time_for_processing_plot(f"{FPATH}/{FNAME}/time_for_processing_plot.png")
     
     for i in range(0, 10):
         stats.generate_brainplot(f"{FPATH}/{FNAME}/brain{i}plot.png", i,unfs(i))
@@ -124,7 +126,9 @@ def create_pdf(fname):
     pdf.set_font("Times", size=18)
     pdf.cell(0, 10, f"Score maximal : {max(stats.best_agent_score)} ", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Score moyen : {max(stats.mean)} ", new_x="LMARGIN", new_y="NEXT")
-    pdf.cell(0, 10, f"Temps par simulation : {np.mean(stats.time_for_one_gen)} ", new_x="LMARGIN", new_y="NEXT")    
+    pdf.cell(0, 10, f"Temps par simulation : {np.mean(stats.time_for_one_gen)} ", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 10, f"Temps d'attente des clients par génération : {np.mean(stats.time_waiting_clients)} ", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 10, f"Temps de traitement par génération : {np.mean(stats.time_for_processing)} ", new_x="LMARGIN", new_y="NEXT")
     
     h=30
     pdf.add_page()
@@ -139,6 +143,13 @@ def create_pdf(fname):
     pdf.set_y(h)
     pdf.image(f"{FPATH}/{FNAME}/medianplot.png",x=110,w=100)
     
+    h+=80
+    pdf.set_y(h)
+    pdf.image(f"{FPATH}/{FNAME}/time_waiting_clients_plot.png",w=100)
+    pdf.set_y(h)
+    pdf.image(f"{FPATH}/{FNAME}/time_for_processing_plot.png",x=110,w=100)
+
+
     pdf.add_page()
     h=30
     pdf.set_y(h)
@@ -171,11 +182,13 @@ def create_pdf(fname):
     pdf.output(OPATH+"/"+FNAME+".pdf")
     return generation.copy(), mean.copy(), best_agent_score.copy(), time_for_one_gen.copy()
 
-tg, tm, tb, tt = [], [], [], []
+tg, tm, tb, tt, filename = [], [], [], [], []
 
 for i in os.listdir("saves"):
     print(i)
-    
+
+    filename.append(i[5:i.rfind("2025")-1])
+
     g, m, b, t = create_pdf(i)
     tg.append(g)
     tm.append(m)
@@ -184,4 +197,4 @@ for i in os.listdir("saves"):
     stats.clear_all()
 
 
-stats.generate_total_ultimate_custom_super_cool_plot(f"{OPATH}/scoremax.png",f"{OPATH}/scoremean.png",f"{OPATH}/timemax.png", tg, tm, tb, tt)
+stats.generate_total_ultimate_custom_super_cool_plot(f"{OPATH}/scoremax.png",f"{OPATH}/scoremean.png",f"{OPATH}/timemax.png", tg, tm, tb, tt, filename)

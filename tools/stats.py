@@ -20,6 +20,9 @@ mean = []
 median = []
 best_agent_score = []
 time_for_one_gen = []
+time_waiting_clients = []
+time_for_processing = []
+local_time = []
 
 gen_max = 0
 current_path = ""
@@ -46,7 +49,10 @@ def clear_all():
     time_for_one_gen.clear()
     mean.clear()
     median.clear()
-
+    time_for_one_gen.clear()
+    time_waiting_clients.clear()
+    time_for_processing.clear()
+    local_time.clear()
 
 def load_stats(path,name=""):
     global current_path
@@ -75,6 +81,9 @@ def load_stats(path,name=""):
             median.append(float(row["Median"]))
             best_agent_score.append(float(row["BestAgentScore"]))
             time_for_one_gen.append(float(row["TimeForOneGen"]))
+            time_waiting_clients.append(float(row["TimeWaitingClients"]))
+            time_for_processing.append(float(row["TimeForProcessing"]))
+            local_time.append(float(row["LocalTime"]))
     
     return generation, mean, best_agent_score, time_for_one_gen
 
@@ -148,10 +157,34 @@ def generate_medianplot(path):
     plt.savefig(path)
     plt.close()
 
-def generate_total_ultimate_custom_super_cool_plot(path1, path2, path3, tg, tm, tb, tt):  
+def generate_time_waiting_clients_plot(path):
+    gen = generation
+    plt.figure()
+    plt.plot(gen, time_waiting_clients, color="blue", label="Temps d'attente des clients")
+    plt.title("Temps d'attente des clients en fonction de la génération")
+    plt.xlabel("Génération")
+    plt.ylabel("Temps d'attente des clients")
+    plt.legend()
+    plt.grid()
+    plt.savefig(path)
+    plt.close()
+
+def generate_time_for_processing_plot(path):
+    gen = generation
+    plt.figure()
+    plt.plot(gen, time_for_processing, color="green", label="Temps de traitement")
+    plt.title("Temps de traitement en fonction de la génération")
+    plt.xlabel("Génération")
+    plt.ylabel("Temps de traitement")
+    plt.legend()
+    plt.grid()
+    plt.savefig(path)
+    plt.close()
+
+def generate_total_ultimate_custom_super_cool_plot(path1, path2, path3, tg, tm, tb, tt, filenames):  
 
     plt.figure()
-    for i in range(len(all_paths)): plt.plot(tg[i],tb[i],label=all_paths[i])
+    for i in range(len(filenames)): plt.plot(tg[i],tb[i],label=filenames[i])
     plt.title("Score du meilleur cerveau en fonction de la generation")
     plt.xlabel("Generation")
     plt.ylabel("Score")
@@ -161,7 +194,7 @@ def generate_total_ultimate_custom_super_cool_plot(path1, path2, path3, tg, tm, 
     plt.close()
     
     plt.figure()
-    for i in range(len(all_paths)): plt.plot(tg[i], tm[i], label=all_paths[i])
+    for i in range(len(filenames)): plt.plot(tg[i], tm[i], label=filenames[i])
     plt.title("Moyenne des agents en fonction de la génération")
     plt.xlabel("Génération")
     plt.ylabel("Moyenne")
@@ -172,7 +205,7 @@ def generate_total_ultimate_custom_super_cool_plot(path1, path2, path3, tg, tm, 
     
     
     plt.figure()
-    for i in range(len(all_paths)): plt.plot(tg[i],tt[i],label=all_paths[i])
+    for i in range(len(filenames)): plt.plot(tg[i],tt[i],label=filenames[i])
     plt.title("Temps en moyenne en fonction de la generation")
     plt.xlabel("Generation")
     plt.ylabel("Temps")
