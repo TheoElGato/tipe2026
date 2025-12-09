@@ -149,6 +149,7 @@ void LogicServer::logic_loop() {
 	int gen_started_at = 0;
 	int generation = 0;
     float seperation_time = 0;
+    timeout = mstk->sim_time*2; // 100% more time than the sim time
 
     while (task_done != mstk->len) {
 
@@ -184,12 +185,32 @@ void LogicServer::logic_loop() {
     	if (step==2) { // One client have finished.
     	    if (cfinished==nb_client) step=3;
     	    else if(std::time(nullptr)>(timetime+timeout)) {
-    	        //logm("Some clients need to be kicked. Reason : timeout","WARNING");
-    	        // TODO, but I don't know if this is usefull
-    	        // since if the client crash he's already disconnecting
-    	        // from the server...
-    	        //logm("KIKING NOT IMPLEMENTED","WARNING");
-    	        //step=3; For now this is disabled
+    	        logm("Some clients need to be kicked. Reason : timeout","WARNING");
+
+                // /!\ DANGER /!\
+                // this NEED testing to ensure it works as intended and does not kick wrong clients
+                // /!\ DANGER /!\
+
+                // Identify which clients have actually sent results (collect ids from genresults)
+                std::vector<uint64_t> finished_ids;
+                for (auto &pair : genresults) {
+                    for (auto &b : pair.second) {
+                        finished_ids.push_back(b.bid1);
+                    }
+                }
+
+                // Send "exit" to any connected client that is not in finished_ids
+                Packet exitpck("exit","","","");
+                for (auto &pair : connections) {
+                    uint64_t cid = pair.second;
+                    if (std::find(finished_ids.begin(), finished_ids.end(), cid) == finished_ids.end()) {
+                        std::string hn = clients_hn.count(cid) ? clients_hn[cid] : "unknown";
+                        logm("Kicking Client#"+std::to_string(cid)+": "+ hn +" (did not finish)", "WARNING");
+                        send(exitpck, pair.first);
+                    }
+                }
+
+                step=3;
     	    }
     	}
     	
