@@ -194,9 +194,7 @@ void LogicServer::logic_loop() {
                 // Identify which clients have actually sent results (collect ids from genresults)
                 std::vector<uint64_t> finished_ids;
                 for (auto &pair : genresults) {
-                    for (auto &b : pair.second) {
-                        finished_ids.push_back(b.bid1);
-                    }
+                    finished_ids.push_back(pair.second.bid1);
                 }
 
                 // Send "exit" to any connected client that is not in finished_ids
