@@ -47,6 +47,7 @@ LogicServer::LogicServer(std::string sbf_path) {
         
         if (r.cmd == "connect") {
         	clients_hn[from] = r.arg1;
+            finished[from] = false;
         	
         	Packet resp("connected",std::to_string(from),"","");
         	send(resp, hdl);
@@ -56,6 +57,7 @@ LogicServer::LogicServer(std::string sbf_path) {
         if (r.cmd == "genfinished") {
             std::vector<float> result = jsonstring_to_vectf(r.arg2);
             logm("Client#"+std::to_string(from)+": "+ clients_hn[from] +" finished gen #"+r.arg1,"Server");
+            finished[from] = true;
 
             if (result.size() == 0) {
                 logm("Client#"+std::to_string(from)+": "+clients_hn[from]+" send a result of 0 on a generation","ERROR");
@@ -169,6 +171,10 @@ void LogicServer::logic_loop() {
     		started_at = std::time(nullptr);
     		gen_started_at = std::time(nullptr);
             timeout = mstk->sim_time*2;  // 100% more time than the sim time
+
+            for (auto &pair : connections){
+                finished[pair.second] = false;
+            }
     		
     		genresults.clear(); // We never know...
     		generation = 0;
@@ -190,20 +196,11 @@ void LogicServer::logic_loop() {
                 // this NEED testing to ensure it works as intended and does not kick wrong clients
                 // /!\ DANGER /!\
 
-                // Identify which clients have actually sent results (collect ids from genresults)
-                std::vector<uint64_t> finished_ids;
-                for (auto &pair : genresults) {
-                    finished_ids.push_back(pair.second.bid1);
-                }
-
-                // Send "exit" to any connected client that is not in finished_ids
+                // Send "exit" to any connected client that is not in finished
                 Packet exitpck("exit","","","");
                 for (auto &pair : connections) {
-                    uint64_t cid = pair.second;
-                    if (std::find(finished_ids.begin(), finished_ids.end(), cid) == finished_ids.end()) {
-                        std::string hn = clients_hn.count(cid) ? clients_hn[cid] : "unknown";
-                        logm("Kicking Client#"+std::to_string(cid)+": "+ hn +" (did not finish)", "WARNING");
-                        send(exitpck, pair.first);
+                    if (! finished[pair.second]) {
+                       send(exitpck, pair.first);
                     }
                 }
 

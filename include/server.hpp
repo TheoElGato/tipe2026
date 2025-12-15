@@ -27,6 +27,7 @@ private:
     std::atomic<uint64_t> next_id = 0;
 	std::map<websocketpp::connection_hdl, uint64_t, std::owner_less<websocketpp::connection_hdl>> connections;
 	std::map<uint64_t, std::string> clients_hn;
+	std::map<uint64_t, bool> finished;
 	SimTasker* mstk;
 	int timetime = 0;
 	int cfinished = 0;
