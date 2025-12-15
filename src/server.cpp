@@ -149,12 +149,10 @@ void LogicServer::logic_loop() {
 	int gen_started_at = 0;
 	int generation = 0;
     float seperation_time = 0;
-    timeout = mstk->sim_time*2; // 100% more time than the sim time
 
     while (task_done != mstk->len) {
 
     	if (step == 0) { // Asking client to start a sim
-    		
     		
     		// Load the right task
     		mstk->loadTask(task_done);
@@ -170,6 +168,7 @@ void LogicServer::logic_loop() {
     		// Get a time stamp
     		started_at = std::time(nullptr);
     		gen_started_at = std::time(nullptr);
+            timeout = mstk->sim_time*2;  // 100% more time than the sim time
     		
     		genresults.clear(); // We never know...
     		generation = 0;
