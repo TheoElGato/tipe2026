@@ -124,7 +124,9 @@ void LogicServer::handle_input() {
         char input[25];
         std::cin.get(input, 25);
         
-        if (strcmp(input, "kill") == 0) {
+        std::string sinput = input;
+
+        if (sinput.find("kill") != std::string::npos) {
             logm("Recive kill command");
             Packet exitpck("exit","","","");
             send_all(exitpck);
