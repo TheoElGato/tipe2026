@@ -201,6 +201,7 @@ void LogicServer::logic_loop() {
                 // Send "exit" to any connected client that is not in finished
                 Packet exitpck("exit","","","");
                 for (auto &pair : connections) {
+                    logm(std::to_string(pair.first) + std::to_string(finished[pair.second]));
                     if (! finished[pair.second]) {
                        send(exitpck, pair.first);
                     }
