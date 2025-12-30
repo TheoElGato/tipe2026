@@ -4,6 +4,7 @@ project(TIPE2026 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(PcLycee FALSE)
 
@@ -12,9 +13,9 @@ FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download
 FetchContent_MakeAvailable(json)
 
 FetchContent_Declare(
-  csv  
+  csv
   GIT_REPOSITORY https://github.com/vincentlaucsb/csv-parser.git
-  GIT_SHALLOW TRUE 
+  GIT_SHALLOW TRUE
   GIT_TAG 2.3.0
 )
 FetchContent_MakeAvailable(csv)
@@ -22,7 +23,7 @@ FetchContent_MakeAvailable(csv)
 FetchContent_Declare(
   websocketpp
   GIT_REPOSITORY https://github.com/zaphoyd/websocketpp.git
-  GIT_SHALLOW TRUE 
+  GIT_SHALLOW TRUE
   GIT_TAG 0.8.2
 )
 FetchContent_MakeAvailable(websocketpp)
@@ -114,4 +115,3 @@ if (MSVC)
                      ${TORCH_DLLS}
                      $<TARGET_FILE_DIR:example-app>)
 endif (MSVC)
-
