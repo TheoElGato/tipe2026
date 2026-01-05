@@ -2,8 +2,9 @@
     physics.cpp
 
     Description:
-        DESCRIPTION
-        
+        This allow's to have a simple physics engine.
+        It is based on an upgraded Euler method, PBD (Position Based Dynamic method).
+
     Author:
         R. Benichou
         A. Spadone
@@ -11,8 +12,8 @@
 
 #include "physics.hpp"
 
-Point::Point(float x, float y, float mass)
-{
+Point::Point(float x, float y, float mass){
+    // Point class used in physics object
     this->position = {x, y};
     this->mass = mass;
     this->velocity = {0.0f, 0.0f};
@@ -20,42 +21,47 @@ Point::Point(float x, float y, float mass)
 
 }
 
-Link::Link(int a, int b, float restLength)
-{
+Link::Link(int a, int b, float restLength){
+    // Solid link, maintain a constant distance beetween two point
     this->pointA = a;
     this->pointB = b;
     this->restLength = restLength;
 }
 
-Spring::Spring(int a, int b, float restLength, float springStrength)
-{
+Spring::Spring(int a, int b, float restLength, float springStrength){
+    // Is an ideal spring with set force and rest length
     this->pointA = a;
     this->pointB = b;
     this->restLength = restLength;
     this->springStrength = springStrength;
 }
 
-PhysicsWorker::PhysicsWorker()
-{
+PhysicsWorker::PhysicsWorker(){}
 
-}
 
-float PhysicsWorker::distance(Point a, Point b)
-{
+float PhysicsWorker::distance(Point a, Point b) {
+    // Calculate the distance beetween two point
     float dx = b.position.x - a.position.x;
     float dy = b.position.y - a.position.y;
     return sqrt(dx * dx + dy * dy);
 }
 
-void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, std::vector<Spring> springs, int numsubstep, float dt)
-{
+/*
+ * Physic resolver using the Position Based Dynamic method
+ * @param objects a vector of all the point in a physic object
+ * @param links a vector of the link constituing the object
+ * @param spings a vector of the spring constituing the object
+ * @param numsubstep define the quality of the simulation
+ * @param dt time since last call of this function
+ */
+void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, std::vector<Spring> springs, int numsubstep, float dt){
     float h = dt / numsubstep;
     int n = objects->size();
     std::vector<sf::Vector2f> xprev(n);
     std::vector<sf::Vector2f> fext(n);
 
     for (int k = 0; k < numsubstep; k++) {
-        
+
         for (int i = 0; i < n; i++) {
             xprev[i] = (*objects)[i].position;
             fext[i] = {0, 0};
@@ -63,7 +69,7 @@ void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, st
 
         // Manage springs here
         for (const auto& spring : springs) {
-            
+
             sf::Vector2f force = springForce((*objects)[spring.pointA], (*objects)[spring.pointB], spring.springStrength, spring.restLength);
 
             // Trouver les indexes des points
@@ -74,8 +80,6 @@ void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, st
             if (idxB != -1) fext[idxB] -= force;
         }
 
-        
-
         // Save previous positions
         // Compute new positions from speed and Euler method
         for (int i = 0; i < n; i++) {
@@ -84,14 +88,13 @@ void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, st
                 (*objects)[i].velocity.x *= 0.98;
                 (*objects)[i].velocity.y *= 0.98;
             } else {
-                (*objects)[i].velocity.x *= 0.12; 
-                (*objects)[i].velocity.y *= 0.12; 
+                (*objects)[i].velocity.x *= 0.12;
+                (*objects)[i].velocity.y *= 0.12;
             }
 
             (*objects)[i].position += (*objects)[i].velocity * h;
-
         }
-        
+
         // SolvePosition
         for (const auto& link : links) {
             Point* a = &(*objects)[link.pointA];
@@ -122,26 +125,20 @@ void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, st
         for (int i = 0; i < n; i++) {
             (*objects)[i].velocity = ((*objects)[i].position - xprev[i]) / h;
         }
-
     }
-
 }
 
-sf::Vector2f PhysicsWorker::springForce(Point a, Point b, float springConstant, float restLength)
-{
+sf::Vector2f PhysicsWorker::springForce(Point a, Point b, float springConstant, float restLength){
     // Calculates the force of a spring between two points
     // and returns the force vector from a to b (or from b to a)
-        
-    // /!\ WARNING: if there are performance issues, these checks can be removed.
 
     float l = distance(a, b);
     sf::Vector2f n;
     if (l != 0) {
         n = (b.position - a.position) / l;
     } else {
-        n = {0, 0};
+        n = {0, 0}; // If the points are in the same place, there is no normal vector
     }
-    // If the points are in the same place, there is no normal vector
 
     if (l - restLength == 0) {
         // The spring is at its unloaded length, so there is no force
