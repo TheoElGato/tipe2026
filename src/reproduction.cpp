@@ -1,3 +1,14 @@
+/*
+    reproduction.cpp
+
+    Description:
+        DESCRIPTION
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #include "reproduction.hpp"
 #include <random>
 

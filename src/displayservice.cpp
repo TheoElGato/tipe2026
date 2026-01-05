@@ -1,3 +1,14 @@
+/*
+    displayservice.cpp
+
+    Description:
+        DESCRIPTION
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #include "displayservice.hpp"
 #include "creature.hpp" // we need Creature definition for drawing
 #include <SFML/Graphics.hpp>

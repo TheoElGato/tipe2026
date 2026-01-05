@@ -1,3 +1,14 @@
+/*
+    displayservice_headless.cpp
+
+    Description:
+        DESCRIPTION
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #include "displayservice.hpp"
 #include <memory>
 #include <iostream>

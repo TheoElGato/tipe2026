@@ -1,3 +1,19 @@
+/*
+    main.cpp
+
+    Description:
+        Main file of the tipe2026 project.
+        Import the client, the server and run either 
+            - Classic mode : client mode, but with no networking
+            - Client mode : run simulations while sharing progress with a server
+            - Server mode : centralize all of the client's data and give tasks
+        The choice is made after analysing the program input.
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #include "server.hpp"
 #include "client.hpp"
 #include "filemanager.hpp"

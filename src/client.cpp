@@ -1,3 +1,14 @@
+/*
+    client.cpp
+
+    Description:
+        DESCRIPTION
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #include "client.hpp"
 #include "displayservice.hpp"
 

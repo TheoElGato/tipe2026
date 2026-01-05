@@ -1,3 +1,14 @@
+/*
+    physics.cpp
+
+    Description:
+        DESCRIPTION
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #include "physics.hpp"
 
 Point::Point(float x, float y, float mass)

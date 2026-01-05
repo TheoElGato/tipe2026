@@ -1,3 +1,14 @@
+/*
+    filemanager.cpp
+
+    Description:
+        DESCRIPTION
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #include "filemanager.hpp"
 
 // At this point, this file is responsible for storing and loading json data into files

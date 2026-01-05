@@ -1,3 +1,14 @@
+/*
+    threadsmg.cpp
+
+    Description:
+        DESCRIPTION
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #include "threadsmg.hpp"
 #include <iostream>
 

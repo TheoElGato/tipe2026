@@ -1,3 +1,14 @@
+/*
+    server.cpp
+
+    Description:
+        DESCRIPTION
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #include "server.hpp"
 
 /*

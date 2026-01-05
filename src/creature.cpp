@@ -1,3 +1,14 @@
+/*
+    creature.cpp
+
+    Description:
+        DESCRIPTION
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #include "creature.hpp"
 
 float score_distance(Creature* agent, sf::Vector2f goal) {

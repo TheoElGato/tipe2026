@@ -1,3 +1,14 @@
+/*
+    brain.cpp
+
+    Description:
+        DESCRIPTION
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #include "brain.hpp"
 
 Brain::Brain(int input_size, int output_size, std::string file, std::string device, int nb_hidden_neurones)
