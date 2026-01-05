@@ -2,7 +2,12 @@
     client.cpp
 
     Description:
-        DESCRIPTION
+        This file contain the main function 'simulate' that is used to 
+        run a simulation.
+        All the simulation parameter are taken from the SimTasker object, 
+        see filemanager.cpp
+        Along some utility functions, it also define the SimpleClient class that
+        comunicate with the server with websocketpp.
         
     Author:
         R. Benichou

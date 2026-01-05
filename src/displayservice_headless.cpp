@@ -2,7 +2,8 @@
     displayservice_headless.cpp
 
     Description:
-        DESCRIPTION
+        This is a dummy file of displayservice.cpp? It is used to declare functions
+        that actually do nothing here only to be able to run the program 
         
     Author:
         R. Benichou

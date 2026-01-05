@@ -2,7 +2,12 @@
     brain.cpp
 
     Description:
-        DESCRIPTION
+        This file is responsible for all neural networking work.
+        In particular, this uses CPP implementation of Pythorch : libtorch
+        to deal with neural network.
+        
+        A Brain class is created to hold a neural network, initialise it,
+        saving and loading it, mutate it and get data from it.
         
     Author:
         R. Benichou

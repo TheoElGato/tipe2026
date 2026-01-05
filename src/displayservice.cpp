@@ -2,7 +2,11 @@
     displayservice.cpp
 
     Description:
-        DESCRIPTION
+        This file runs all of graphical part of the project.
+        In particular creating a window and drawing in it.
+        Because the program can run headless, all of the graphical SFML is only here
+        so that this file can be replaced by a dummy file,
+        see displayservice_headless.cpp
         
     Author:
         R. Benichou
@@ -10,7 +14,7 @@
 */
 
 #include "displayservice.hpp"
-#include "creature.hpp" // we need Creature definition for drawing
+#include "creature.hpp"
 #include <SFML/Graphics.hpp>
 #include <cmath>
 #include <memory>
@@ -46,7 +50,7 @@ public:
         drawall = false;
         agent_partitions_size = agentPartitionsSize;
 
-        // Load assets (paths are relative to executable CWD)
+        // Load assets
         font.loadFromFile("assets/fonts/arial.ttf");
         backgroundTexture.loadFromFile("assets/textures/background.png");
         wifiTexture.loadFromFile("assets/textures/wifi.png");
@@ -93,7 +97,7 @@ public:
     {
         if (is_headless) return;
 
-        // process events
+        // Process events
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
@@ -101,7 +105,7 @@ public:
             }
         }
 
-        // keyboard management (rate limited)
+        // Keyboard management (rate limited)
         if (inputdelay == inputdelayBase) {
             if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
                 selected_agents = (selected_agents - 1 + agent_partitions_size) % agent_partitions_size;
