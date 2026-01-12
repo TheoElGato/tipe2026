@@ -28,7 +28,7 @@ typedef websocketpp::server<websocketpp::config::asio> server;
 class LogicServer {
 public:
     LogicServer(std::string sbf_path);
-    void run(uint16_t port, SimTasker* test);
+    void run(uint16_t port, SimTasker* mstk);
     int timeout = 60;
      
 

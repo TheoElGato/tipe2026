@@ -108,6 +108,11 @@ LogicServer::LogicServer(std::string sbf_path) {
     sbfpath = sbf_path+"/";
 }
 
+/*
+ * Send a packet object to a client websocketpp connection handler.
+ * @param pck The packet to send
+ * @param hdl The client websocketpp connection handler object
+ */
 void LogicServer::send(Packet pck, websocketpp::connection_hdl hdl) {
     websocketpp::lib::error_code ec;
     m_server.send(hdl, pck.get_string(), websocketpp::frame::opcode::text, ec);
@@ -116,19 +121,29 @@ void LogicServer::send(Packet pck, websocketpp::connection_hdl hdl) {
     }
 }
 
+/*
+ * Broadcast to all client a packet object with theirs websocketpp connection handlers.
+ * @param pck The packet to send
+ */
 void LogicServer::send_all(Packet pck) {
-	// Broadcast to all
+	// 
     for (auto &pair : connections) {
 		send(pck, pair.first);
     }
 }
 
-void LogicServer::run(uint16_t port,SimTasker* test) {
+/*
+ * Start the server websocketpp and listen on the port asked,
+ * then start the server logic thread with the mstk.
+ * @param port The port the server is listening one
+ * @param mstk The main sim tasker pointer
+ */
+void LogicServer::run(uint16_t port,SimTasker* mstk) {
     m_server.listen(port);
     m_server.start_accept();
     logm("Server listening on port "+ std::to_string(port) +"...","Server");
     
-    mstk = test;
+    this->mstk = mstk;
     // Launch the logic loop in another thread
     std::thread([this]() { this->logic_loop(); }).detach();
     
