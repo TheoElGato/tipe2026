@@ -39,17 +39,17 @@
 LogicServer::LogicServer(std::string sbf_path) {
     m_server.init_asio();
     m_server.clear_access_channels(websocketpp::log::alevel::all);
-	m_server.clear_error_channels(websocketpp::log::elevel::all);
+    m_server.clear_error_channels(websocketpp::log::elevel::all);
     m_server.set_open_handler([this](websocketpp::connection_hdl hdl) {
-    	uint64_t id = next_id++;
+        uint64_t id = next_id++;
         connections[hdl] =  id;
     });
 
     m_server.set_close_handler([this](websocketpp::connection_hdl hdl) {
         auto it = connections.find(hdl);
         if (it != connections.end()) {
-        	uint64_t from = it->second;
-        	logm("[-] Client#"+std::to_string(from)+": "+ clients_hn[from] +" disconnected","Server");
+            uint64_t from = it->second;
+            logm("[-] Client#"+std::to_string(from)+": "+ clients_hn[from] +" disconnected","Server");
             connections.erase(it);
             clients_hn.erase(from);
             nb_client -=1;
@@ -65,13 +65,13 @@ LogicServer::LogicServer(std::string sbf_path) {
         Packet r(payload);
         
         if (r.cmd == "connect") {
-        	clients_hn[from] = r.arg1;
+            clients_hn[from] = r.arg1;
             finished[from] = false;
-        	
-        	Packet resp("connected",std::to_string(from),"","");
-        	send(resp, hdl);
-        	nb_client +=1;
-        	logm("[+] Client#"+std::to_string(from)+": "+ clients_hn[from] +" connected","Server");
+            
+            Packet resp("connected",std::to_string(from),"","");
+            send(resp, hdl);
+            nb_client +=1;
+            logm("[+] Client#"+std::to_string(from)+": "+ clients_hn[from] +" connected","Server");
         }
         if (r.cmd == "genfinished") {
             std::vector<float> result = jsonstring_to_vectf(r.arg2);
@@ -126,9 +126,9 @@ void LogicServer::send(Packet pck, websocketpp::connection_hdl hdl) {
  * @param pck The packet to send
  */
 void LogicServer::send_all(Packet pck) {
-	// 
+    // 
     for (auto &pair : connections) {
-		send(pck, pair.first);
+        send(pck, pair.first);
     }
 }
 
@@ -182,51 +182,51 @@ void LogicServer::logic_loop() {
     
     SimDataStruct sds("save","",0,0,0,0,0,0,0,1,true);
 
-	int task_done = 0;
-	int started_at = 0;
-	int gen_started_at = 0;
-	int generation = 0;
+    int task_done = 0;
+    int started_at = 0;
+    int gen_started_at = 0;
+    int generation = 0;
     float seperation_time = 0;
 
     while (task_done != mstk->len) {
 
-    	if (step == 0) { // Asking client to start a sim
-    		
-    		// Load the right task
-    		mstk->loadTask(task_done);
-    		
-    		// Creating sds
-    		sds = SimDataStruct("save",mstk->sim_name,0,mstk->sous_sim,0,mstk->evolution,mstk->brain_acc,mstk->nb_brain,mstk->nb_agent,1);
+        if (step == 0) { // Asking client to start a sim
+            
+            // Load the right task
+            mstk->loadTask(task_done);
+            
+            // Creating sds
+            sds = SimDataStruct("save",mstk->sim_name,0,mstk->sous_sim,0,mstk->evolution,mstk->brain_acc,mstk->nb_brain,mstk->nb_agent,1);
             sds.save();
-    		
-    		logm("Asking clients to start sim #"+std::to_string(task_done));
-    		Packet startpacket("startsim",std::to_string(task_done),"","");
-    		send_all(startpacket);
-    		
-    		// Get a time stamp
-    		started_at = std::time(nullptr);
-    		gen_started_at = std::time(nullptr);
+            
+            logm("Asking clients to start sim #"+std::to_string(task_done));
+            Packet startpacket("startsim",std::to_string(task_done),"","");
+            send_all(startpacket);
+            
+            // Get a time stamp
+            started_at = std::time(nullptr);
+            gen_started_at = std::time(nullptr);
             timeout = mstk->sim_time*2;  // 100% more time than the sim time
 
             for (auto &pair : connections){
                 finished[pair.second] = false;
             }
-    		
-    		genresults.clear(); // We never know...
-    		generation = 0;
-    		logm("Starting new generation #"+std::to_string(generation));
-    		step = 1;
-    	}
-    	
-    	if (step==1) {
-    	    // Clients are working on a generation. We are waiting...
-    	    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    	}
-    	
-    	if (step==2) { // One client have finished.
-    	    if (cfinished==nb_client) step=3;
-    	    else if(std::time(nullptr)>(timetime+timeout)) {
-    	        logm("Some clients need to be kicked. Reason : timeout","WARNING");
+            
+            genresults.clear(); // We never know...
+            generation = 0;
+            logm("Starting new generation #"+std::to_string(generation));
+            step = 1;
+        }
+        
+        if (step==1) {
+            // Clients are working on a generation. We are waiting...
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        }
+        
+        if (step==2) { // One client have finished.
+            if (cfinished==nb_client) step=3;
+            else if(std::time(nullptr)>(timetime+timeout)) {
+                logm("Some clients need to be kicked. Reason : timeout","WARNING");
 
                 // /!\ DANGER /!\
                 // this NEED testing to ensure it works as intended and does not kick wrong clients
@@ -242,16 +242,16 @@ void LogicServer::logic_loop() {
                 }
 
                 step=3;
-    	    }
-    	}
-    	
-    	if (step==3) { // Now we analyse the results here
-    	    logm("Generation done. Processing...");
+            }
+        }
+        
+        if (step==3) { // Now we analyse the results here
+            logm("Generation done. Processing...");
 
             seperation_time = std::time(nullptr) - timetime;
             float processing_time = std::time(nullptr);
-    	    
-    	    std::vector<float> allFloats;
+            
+            std::vector<float> allFloats;
             std::vector<Brain> allBrains;
             
             // Reserve space to avoid reallocations (optional but faster)
@@ -348,31 +348,31 @@ void LogicServer::logic_loop() {
             // (I think this is not necessery but why not :/
             allFloats.clear();
             allBrains.clear();
-    	    
-    	    step=4;
-    	}
-    	
-    	if (step==4) {
-    	
-    	    if(!mstk->is_infinite &&  (std::time(nullptr) - started_at)>mstk->time_allowed) {
-    	        logm("Time limit reached. Finishing this task now.");
-    	        
-    	        // Cleaning up
-        	    cfinished = 0;
+            
+            step=4;
+        }
+        
+        if (step==4) {
+        
+            if(!mstk->is_infinite &&  (std::time(nullptr) - started_at)>mstk->time_allowed) {
+                logm("Time limit reached. Finishing this task now.");
+                
+                // Cleaning up
+                cfinished = 0;
                 genresults.clear();
-    	        
-    	        Packet stpsim("stopsim","","","");
-    	        send_all(stpsim);
-    	        step=5;
-    	        
-    	    } else {
-    	
+                
+                Packet stpsim("stopsim","","","");
+                send_all(stpsim);
+                step=5;
+                
+            } else {
+        
                 generation += 1;
                 gen_started_at = std::time(nullptr);
-        	    logm("Starting new generation #"+std::to_string(generation));
-        	    
-        	    // Cleaning up
-        	    cfinished = 0;
+                logm("Starting new generation #"+std::to_string(generation));
+                
+                // Cleaning up
+                cfinished = 0;
                 genresults.clear();
 
                 // Sending nextgen packet
@@ -390,25 +390,25 @@ void LogicServer::logic_loop() {
                 int i = 0;
                 for (auto &pair : connections) {
                     Packet pck("nextgen",packageSelectionned[i%half_clients],packageScores[i%half_clients],"");
-		            send(pck, pair.first);
+                    send(pck, pair.first);
                     i += 1;
                 }
 
     
-        	    step = 1;
-        	}
-        	
-    	}
-    	
-    	if (step==5) {
-    	    // Waiting for all clients to stop their sim
-    	    if (cfinished != nb_client) continue;
-    	    
-    	    // We are done
-    	    cfinished = 0;
-    	    task_done += 1;
-    	    step = 0;
-    	}
+                step = 1;
+            }
+            
+        }
+        
+        if (step==5) {
+            // Waiting for all clients to stop their sim
+            if (cfinished != nb_client) continue;
+            
+            // We are done
+            cfinished = 0;
+            task_done += 1;
+            step = 0;
+        }
     }
     
     logm("There was" + std::to_string(nb_client) + " clients connected", "INFO");
