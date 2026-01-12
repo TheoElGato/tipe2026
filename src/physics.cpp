@@ -108,7 +108,6 @@ void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, st
 
             // If points are fixed, we don't move them
             if (a->fixed && b->fixed) {
-                // @TheoElGato, is this a normal ?
                 a->position -= delta * diff * 0.5f;
                 b->position += delta * diff * 0.5f;
             } else if (!a->fixed && b->fixed) {
@@ -128,9 +127,16 @@ void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, st
     }
 }
 
+/*
+ * Calculates the force of a spring between two points
+ * and returns the force vector from a to b (or from b to a)
+ * @param a Point
+ * @param b Point
+ * @param springConstant The force of the spring
+ * @param restLength
+ */
 sf::Vector2f PhysicsWorker::springForce(Point a, Point b, float springConstant, float restLength){
-    // Calculates the force of a spring between two points
-    // and returns the force vector from a to b (or from b to a)
+    //
 
     float l = distance(a, b);
     sf::Vector2f n;

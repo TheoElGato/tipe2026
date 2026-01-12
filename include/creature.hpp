@@ -30,7 +30,7 @@ public:
     int bodyColorSeed;
 
     void brainUpdate(sf::Vector2f goal, Brain* brain);
-    void update(float dt);
+    void update();
     void moveTo(float x, float y);
 
 private:

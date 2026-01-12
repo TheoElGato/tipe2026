@@ -3,7 +3,7 @@
 
     Description:
         DESCRIPTION
-        
+
     Author:
         R. Benichou
         A. Spadone
@@ -19,17 +19,17 @@ float distance(sf::Vector2f a, sf::Vector2f b) {
 }
 
 
-void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Vector2f start, 
-                  std::vector<sf::Vector2f> objectif, std::vector<Brain*> brains, int* state, 
+void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Vector2f start,
+                  std::vector<sf::Vector2f> objectif, std::vector<Brain*> brains, int* state,
                   std::vector<float>* scores, float* dt, float time,float brainAcc)
 {
-    
+
     // Run the physics simulation for the specified time duration
     float acc = 0.0f;
     float accbrain = 0.0f;
 
     std::vector<int> obj;
-    int nb_goal = objectif.size(); 
+    int nb_goal = objectif.size();
 
     for (int i = 0; i < agents.size(); ++i) {
         agents[i]->moveTo(start.x, start.y);
@@ -42,6 +42,7 @@ void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Ve
             Creature* agent = agents[i];
             std::vector<Point> *vertices = &agent->vertices;
             physics->PBD(vertices, agent->links, agent->muscles, 10, *dt);
+            agents[i]->update();
         }
 
         // Brain update for all agents (when timer triggers)
@@ -50,9 +51,8 @@ void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Ve
         if (accbrain > brainAcc) {
             for (int i = 0; i < agents.size(); ++i) {
                 agents[i]->brainUpdate(objectif[obj[i]], brains[i]);
-                
+
                 // Move agent if they reached the objective
-                agents[i]->update(*dt);
                 if(distance(agents[i]->vertices[0].position, objectif[obj[i]]) < 20.0f) {
                     (*scores)[i] += 1.0f;
                     if (obj[i] == nb_goal - 1) obj[i]=0;
