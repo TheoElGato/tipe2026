@@ -3,9 +3,9 @@
 
     Description:
         This contain a implementation of the quick sort algorithm,
-        and a function to select and mutate agents in order to create 
+        and a function to select and mutate agents in order to create
         a new generation.
-        
+
     Author:
         R. Benichou
         A. Spadone
@@ -14,7 +14,7 @@
 #include "reproduction.hpp"
 #include <random>
 
-void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent, 
+void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
                int NB_BRAIN, float EVOLUTION, int bestKeep, int selectionPol) {
 
     // Validation
@@ -56,12 +56,12 @@ void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
     // Generate new brains
     std::vector<Brain> new_agents;
     new_agents.reserve(NB_BRAIN - num_best_to_keep);
-    
+
     int mode_repr = 0;
     int j = 0;
-    
+
     for (int i = num_best_to_keep; i < NB_BRAIN; i+=1) {
-        
+
         float ran = dist(gen);  // [0,1[
         if (mode_repr==0) {
             float cumul = score_agent[0];
@@ -74,7 +74,7 @@ void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
             float indx = ran*num_best_to_keep;
             j = std::floor(indx);
         }
-        
+
         // Add mutated copy of selected brain
         new_agents.emplace_back((*brain_agents)[j].copy());
         new_agents.back().mutate(EVOLUTION);
@@ -89,7 +89,13 @@ void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
 }
 
 
-
+/*
+ * Do a reverse quick sort of 2 vector using the value of the score while keeping the association
+ * @param tab Store all of the brain
+ * @param score_tab The score of the different brain
+ * @param low low bound
+ * @param high upper bound
+ */
 void reverse_sorting_brain(std::vector<Brain>* tab, std::vector<float>* score_tab, int low, int high){
 
     if (low >= high) {
