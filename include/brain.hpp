@@ -10,7 +10,7 @@ public:
     torch::Tensor forward(torch::Tensor x);
     void saveFile(const std::string& file);
     void loadFile(const std::string& file);
-    void mutate(float a);
+    void mutate(float weight);
     int bid1 = 0;
     int bid2 = 0;
     Brain copy();

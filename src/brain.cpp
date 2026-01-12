@@ -5,10 +5,10 @@
         This file is responsible for all neural networking work.
         In particular, this uses CPP implementation of Pythorch : libtorch
         to deal with neural network.
-        
+
         A Brain class is created to hold a neural network, initialise it,
         saving and loading it, mutate it and get data from it.
-        
+
     Author:
         R. Benichou
         A. Spadone
@@ -16,9 +16,9 @@
 
 #include "brain.hpp"
 
-Brain::Brain(int input_size, int output_size, std::string file, std::string device, int nb_hidden_neurones)
-{
+Brain::Brain(int input_size, int output_size, std::string file, std::string device, int nb_hidden_neurones) {
 
+    // Define useful variable
     this->input_size = input_size;
     this->output_size = output_size;
     this->nb_hidden_neurones = nb_hidden_neurones;
@@ -38,7 +38,7 @@ Brain::Brain(int input_size, int output_size, std::string file, std::string devi
         this->device = torch::kCPU;
         this->to(this->device);
     }
-    
+
     // Manuel seed and initial randomness
     auto seed = static_cast<unsigned>(
         std::chrono::high_resolution_clock::now()
@@ -62,23 +62,34 @@ Brain::Brain(int input_size, int output_size, std::string file, std::string devi
             std::cerr << "Error loading the model from " << file << ": " << e.what() << std::endl;
         }
     }
-
-    
-  
 }
 
+/*
+ * Save the weight and bias using to the designated file
+ * @param file
+ */
 void Brain::saveFile(const std::string& file) {
     torch::serialize::OutputArchive archive;
     this->save(archive);
     archive.save_to(file);
 }
 
+/*
+ * Load the weight and bias using the provided file
+ * @param file
+ */
 void Brain::loadFile(const std::string& file) {
     torch::serialize::InputArchive archive;
     archive.load_from(file);
     this->load(archive);
 }
 
+/*
+ * Calculate the ouput of the brain with the provided tensor.
+ * It use the softsing activation function
+ * @param x The tensor input
+ * @return x The ouput of the brain as a tensor
+ */
 torch::Tensor Brain::forward(torch::Tensor x) {
     x = x.to(this->device);
     x = torch::nn::functional::softsign(this->fc1->forward(x));
@@ -88,20 +99,28 @@ torch::Tensor Brain::forward(torch::Tensor x) {
     return x;
 }
 
-void Brain::mutate(float valeur) {
+/*
+ * Change randomly the weight and bias of the brain.
+ * @param weight of the modification
+ */
+void Brain::mutate(float weight) {
     torch::NoGradGuard no_grad;
-    this->fc1->weight += valeur * torch::randn_like(this->fc1->weight);
-    this->fc1->bias += valeur * torch::randn_like(this->fc1->bias);
-    this->fc2->weight += valeur * torch::randn_like(this->fc2->weight);
-    this->fc2->bias += valeur * torch::randn_like(this->fc2->bias);
-    this->fc3->weight += valeur * torch::randn_like(this->fc3->weight);
-    this->fc3->bias += valeur * torch::randn_like(this->fc3->bias);
-    this->out->weight += valeur * torch::randn_like(this->out->weight);
-    this->out->bias += valeur * torch::randn_like(this->out->bias);
+    this->fc1->weight += weight * torch::randn_like(this->fc1->weight);
+    this->fc1->bias += weight * torch::randn_like(this->fc1->bias);
+    this->fc2->weight += weight * torch::randn_like(this->fc2->weight);
+    this->fc2->bias += weight * torch::randn_like(this->fc2->bias);
+    this->fc3->weight += weight * torch::randn_like(this->fc3->weight);
+    this->fc3->bias += weight * torch::randn_like(this->fc3->bias);
+    this->out->weight += weight * torch::randn_like(this->out->weight);
+    this->out->bias += weight * torch::randn_like(this->out->bias);
 }
 
+/*
+ * This copy the associated brain.
+ * This allow to not have referencing issues
+ * @return new_brain the copy of the brain
+ */
 Brain Brain::copy() {
-    
     std::string device;
     if (this->device == torch::kCUDA){
         device = "cuda";
@@ -125,7 +144,7 @@ Brain Brain::copy() {
 void Brain::manual_init() {
     // Manual random initialization for all layers
     torch::NoGradGuard no_grad;
-    
+
     fc1->weight.copy_(torch::randn_like(fc1->weight));
     fc1->bias.copy_(torch::randn_like(fc1->bias));
 
