@@ -1,3 +1,14 @@
+/*
+    threadsmg.hpp
+
+    Description:
+        Header file for threadsmg.cpp
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #ifndef THREADSMG_H
 #define THREADSMG_H
 

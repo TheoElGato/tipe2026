@@ -1,3 +1,14 @@
+/*
+    filemanager.hpp
+
+    Description:
+        Header file for filemanager.cpp
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #ifndef FILEMANAGER_H
 #define FILEMANAGER_H
 

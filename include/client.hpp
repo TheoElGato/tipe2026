@@ -1,3 +1,14 @@
+/*
+    client.hpp
+
+    Description:
+        Header file for client.cpp
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #ifndef CLIENT_H
 #define CLIENT_H
 

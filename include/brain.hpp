@@ -1,3 +1,14 @@
+/*
+    brain.hpp
+
+    Description:
+        Header file for brain.cpp
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #ifndef BRAIN_H
 #define BRAIN_H
 

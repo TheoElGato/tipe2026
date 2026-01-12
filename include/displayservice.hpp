@@ -1,3 +1,14 @@
+/*
+    displayservice.hpp
+
+    Description:
+        Header file for displayservice.cpp
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #ifndef DISPLAYSERVICE_H
 #define DISPLAYSERVICE_H
 

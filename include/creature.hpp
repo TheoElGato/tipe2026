@@ -1,3 +1,14 @@
+/*
+    creature.hpp
+
+    Description:
+        Header file for creature.cpp
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #ifndef CREATURE_H
 #define CREATURE_H
 

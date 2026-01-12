@@ -1,3 +1,14 @@
+/*
+    reproduction.hpp
+
+    Description:
+        Header file for reproduction.cpp
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #ifndef REPRODUCTION_H
 #define REPRODUCTION_H
 

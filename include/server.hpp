@@ -1,3 +1,14 @@
+/*
+    server.hpp
+
+    Description:
+        Header file for server.cpp
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #ifndef SERVER_H
 #define SERVER_H
 

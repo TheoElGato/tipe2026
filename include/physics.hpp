@@ -1,3 +1,14 @@
+/*
+    physics.hpp
+
+    Description:
+        Header file for physics.cpp
+        
+    Author:
+        R. Benichou
+        A. Spadone
+*/
+
 #ifndef PHYSICS_H
 #define PHYSICS_H
 
