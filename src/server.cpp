@@ -2,7 +2,15 @@
     server.cpp
 
     Description:
-        DESCRIPTION
+        This file define the LogicServer class that
+        comunicate with clients with websocketpp.
+        In Server mode, this asks clients to launch a task,
+        to stop the current one and to exit. It also collects data 
+        from clients, save them on disk, and calls reproduction.cpp in
+        order to send the next unifed generation to clients
+        
+        Contains a list of the packets used in the protocol created
+        for comunicating between a server and a client.
         
     Author:
         R. Benichou
@@ -12,7 +20,7 @@
 #include "server.hpp"
 
 /*
-    I will list all of the packets here :
+    List all of the packets here :
     
     From the Client : 
     - connect; hostname, null, null : register the client with hostname to the server

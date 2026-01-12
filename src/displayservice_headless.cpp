@@ -3,8 +3,8 @@
 
     Description:
         This is a dummy file of displayservice.cpp 
-        It is used to declare functions that actually do nothing here 
-        only to be able to run the program 
+        It is used to declare functions that actually do nothing and are 
+        only here to be able to build the project 
         
     Author:
         R. Benichou

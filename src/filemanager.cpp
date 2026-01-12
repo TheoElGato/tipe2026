@@ -2,7 +2,10 @@
     filemanager.cpp
 
     Description:
-        DESCRIPTION
+        this file is responsible for storing and loading json data into files
+        Serialising data for the websocket, logging, convertion, and os stuff.
+        This is so much more that a filemanager, this is the project backbone.
+
         
     Author:
         R. Benichou
@@ -10,12 +13,6 @@
 */
 
 #include "filemanager.hpp"
-
-// At this point, this file is responsible for storing and loading json data into files
-// Serialising data for the websocket, logging, convertion, and os stuff.
-// So much more that a filemanager, this is the backbone for our project.
-
-// TODO: implement saving log message to files (with a option in task.json)
 
 void logm(const std::string& message, const std::string& level) {   
     // Standardized logging function

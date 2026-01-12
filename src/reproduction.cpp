@@ -2,7 +2,9 @@
     reproduction.cpp
 
     Description:
-        DESCRIPTION
+        This contain a implementation of the quick sort algorithm,
+        and a function to select and mutate agents in order to create 
+        a new generation.
         
     Author:
         R. Benichou
