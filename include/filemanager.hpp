@@ -23,6 +23,8 @@ using namespace csv;
 using namespace nlohmann::literals;
 
 void logm(const std::string& message, const std::string& level = "INFO");
+void error(const std::string& message);
+std::string remove_zero_ts(float value);
 std::string getHostName();
 std::string vectf_to_jsonstring(std::vector<float> v);
 std::string vects_to_jsonstring(std::vector<std::string> v);

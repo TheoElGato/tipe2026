@@ -19,6 +19,18 @@ void logm(const std::string& message, const std::string& level) {
     std::cout << "[" << level << "] " << message << std::endl;
 }
 
+void error(const std::string& message) {
+    // Standardized error function
+    logm(message, "ERROR");
+    assert(false);
+}
+
+std::string remove_zero_ts(float value) {
+    std::ostringstream oss;
+    oss << std::setprecision(8) << std::noshowpoint << value;
+    return oss.str();
+}
+
 std::string generate_name(const std::string& name) {
     std::time_t now = std::time(nullptr); // Get current time
     std::tm local_time{};

@@ -16,6 +16,13 @@
 
 #include "brain.hpp"
 
+/*
+ * Constructor for the Brain class
+ * @param input_size The size of the input layer
+ * @param output_size The size of the output layer
+ * @param file If not a empty string, the brain file to load
+ * @param nb_hidden_layer The number of hidden layer for a brain
+ */
 Brain::Brain(int input_size, int output_size, std::string file, std::string device, int nb_hidden_neurones) {
 
     // Define useful variable
@@ -141,8 +148,10 @@ Brain Brain::copy() {
     return new_brain;
 }
 
+/*
+ * Do a manual random initialization for all layers
+ */
 void Brain::manual_init() {
-    // Manual random initialization for all layers
     torch::NoGradGuard no_grad;
 
     fc1->weight.copy_(torch::randn_like(fc1->weight));

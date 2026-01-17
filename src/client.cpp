@@ -17,20 +17,20 @@
 #include "client.hpp"
 #include "displayservice.hpp"
 
-void error(const std::string& message) {
-    // Standardized error function
-    logm(message, "ERROR");
-    assert(false);
-}
-
-std::string remove_zero_ts(float value) {
-    std::ostringstream oss;
-    oss << std::setprecision(8) << std::noshowpoint << value;
-    return oss.str();
-}
-
+/*
+ * Initialise agents and brains related objects
+ * @param countAgents The number of agents to create
+ * @param countBrains The number of brains to create
+ * @param x The spawnpoint x coordinate
+ * @param y The spawnpoint y coordinate
+ * @param agents The pointer to the agents vector
+ * @param brains The pointer to the brains vector
+ * @param device Where to run the AI model : "cpu" or "cuda"
+ * @param nb_hidden_layer The number of hidden layer for a brain
+ * @param brainFile If not a empty string, the brain file to load. 
+ */
 void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::vector<Creature>* agents, std::vector<Brain>* brains, std::string device, int nb_hidden_layer, std::string brainFile="") {
-    // initialise agent and brain related objects
+    // Initialise agent and brain related objects
 
     for(int i=0; i<countAgents; i+=1) {
         agents->emplace_back(x, y, i);
@@ -51,8 +51,16 @@ void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::
     }
 }
 
-
-void init_goals(std::vector<std::vector<sf::Vector2f>> *goals, sf::Vector2f start, int MINDIST, int MAXDIST, int NB_GOAL, int sous_sim_total){
+/*
+ * Initialise goals
+ * @param goals The pointer to the vector of vector of goals
+ * @param start A float vector of the spawnpoint
+ * @param mindist The minimum distance to start where we can create a goal
+ * @param maxdist The maximum distance to start where we can create a goal
+ * @param nb_goal The number of goal we need to create
+ * @param sous_sim_total The number of sub simulate there is
+ */
+void init_goals(std::vector<std::vector<sf::Vector2f>>* goals, sf::Vector2f start, int mindist, int maxdist, int nb_goal, int sous_sim_total){
     // Random number setup
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -68,17 +76,15 @@ void init_goals(std::vector<std::vector<sf::Vector2f>> *goals, sf::Vector2f star
 
     for(int i=0; i<sous_sim_total; i++) {
         std::vector<sf::Vector2f> temp;
-    
-
         angle = (2 * M_PI / sous_sim_total) * i;
-        radius = (MAXDIST-MINDIST)*dist(gen) + MINDIST;
+        radius = (maxdist-mindist)*dist(gen) + mindist;
         x = start.x + radius * cos(angle);
         y = start.y + radius * sin(angle);
         temp.emplace_back(sf::Vector2f(x, y));
 
-        for(int j=1; j<NB_GOAL; j+=1){
+        for(int j=1; j<nb_goal; j+=1){
             ran = dist(gen)*2*M_PI;  // [0,2*pi[
-            radius = (MAXDIST-MINDIST)*dist(gen) + MINDIST;
+            radius = (maxdist-mindist)*dist(gen) + mindist;
             x += start.x + radius * cos(ran);
             y += start.y + radius * sin(ran);
             temp.emplace_back(sf::Vector2f(x, y));   
@@ -88,12 +94,18 @@ void init_goals(std::vector<std::vector<sf::Vector2f>> *goals, sf::Vector2f star
     }
 }
 
-
-int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
+/*
+ * Main function for the simulation
+ * @param stk The sim tasker use of the simulation 
+ * @param start If true : run in client mode, else in classic mode
+ * @param cl The pointer to the instance of the SimpleClient class
+ * @return int 0 for a successfull simulation
+ */
+int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
     
     logm("Welcome to the URSAF Sim");
     
-    /// SETTINGS FROM THE SIMTASKER///
+    /// SETTINGS FROM THE SIMTASKER ///
     std::string DEVICE = stk.device;
     int THREADS = stk.threads;
     bool LOAD_FROM_FILE = stk.load_from_file;
@@ -123,7 +135,7 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
     float curve_d = stk.curve_d;
     ///////////////////
 
-    /// Temp
+    /// Time related variables
     float ss_dt = 1/60.f;
     float dt = 0.016f;
     
@@ -259,7 +271,7 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
         if (dt < 1e-6f) dt = 1e-6f;
         fps = 1.0f / dt;
         
-        // stop program if it take to much time and in client mode
+        // Stop program if it take to much time and in client mode
         if (!is_infinite && !mc) {
             if (acc > time_allowed) {
             clean_exit = true;
@@ -471,7 +483,7 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
                 // Avoid starting sous-sim that don't exist
                 if(sous_sim_started >= sous_sim_total) break;
 
-                // find on of the available thread
+                // Find an available thread
                 int group_index = -1;
                 for (int i = 0; i < groups_avail.size(); i++) {
                     if (groups_avail[i] == -1) { // Group is available
@@ -500,7 +512,7 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
             }
         }
         
-        //// Window drawing block here
+        //// Window drawing block
         if (!headless) {
             dpl_srvc->render(&groups_avail, &agentPartitions, fps, agents.size(), generation, sous_sim_started, acu, simu_time, evolution, start, goals[0], mc);
         }
@@ -516,8 +528,12 @@ int simulate(SimTasker stk, bool mc, bool headless,SimpleClient* cl) {
     return 0;
 }
 
+/*
+ * Constructor for the SimpleClient class
+ * @param uri The address of the websocket
+ * @param path The path as a std::string of Server Brain Files Folder Path
+ */
 SimpleClient::SimpleClient(const std::string &uri, const std::string path) {
-
     sbfpath = path+"/";
     m_client.init_asio();
     m_client.clear_access_channels(websocketpp::log::alevel::all);
@@ -528,31 +544,31 @@ SimpleClient::SimpleClient(const std::string &uri, const std::string path) {
         Packet r(payload);
         
         if (r.cmd == "connected") {
-        	srvid = r.arg1;
+            srvid = r.arg1;
         }
         
         if (r.cmd == "startsim") {
-        	logm("Server requested the start of sim #" + r.arg1,"Client");
-        	mstk->loadTask(std::stoi(r.arg1));
-        	mstk->sim_name = mstk->sim_name + srvid;
-        	state = 1;
+            logm("Server requested the start of sim #" + r.arg1,"Client");
+            mstk->loadTask(std::stoi(r.arg1));
+            mstk->sim_name = mstk->sim_name + srvid;
+            state = 1;
         }
         
         if (r.cmd == "nextgen") {
-        	logm("Server requested the next gen","Client");
-        	selectioned = jsonstring_to_vects(r.arg1);
-        	scores = jsonstring_to_vectf(r.arg2);
-        	state = 3;
+            logm("Server requested the next gen","Client");
+            selectioned = jsonstring_to_vects(r.arg1);
+            scores = jsonstring_to_vectf(r.arg2);
+            state = 3;
         }
         
         if (r.cmd == "stopsim") {
-        	logm("Server requested the end of sim","Client");
-        	state = 4;
+            logm("Server requested the end of sim","Client");
+            state = 4;
         }
         
         if (r.cmd == "exit") {
-        	logm("Server requested exiting...","Client");
-        	state = -1;
+            logm("Server requested exiting...","Client");
+            state = -1;
         }
     });
 
@@ -569,12 +585,19 @@ SimpleClient::SimpleClient(const std::string &uri, const std::string path) {
     m_thread = std::thread([this]() { m_client.run(); });
 }
 
+/*
+ * Destructor for the SimpleClient class
+ */
 SimpleClient::~SimpleClient() {
     m_client.stop_perpetual();
     if (m_thread.joinable())
         m_thread.join();
 }
 
+/*
+ * Send a packet object to the server websocket
+ * @param pck The packet to send
+ */
 void SimpleClient::send(Packet pck) {
     websocketpp::lib::error_code ec;
     m_client.send(m_hdl, pck.get_string(), websocketpp::frame::opcode::text, ec);
@@ -583,8 +606,12 @@ void SimpleClient::send(Packet pck) {
     }
 }
 
+/*
+ * Start the client websocketpp and connect to the server address,
+ * @param stk The sim tasker use of the simulation 
+ * @param hl If true run in headless mode
+ */
 void SimpleClient::run(SimTasker* stk, bool hl) {
-
     headless = hl;
     mstk = stk;
     
@@ -616,8 +643,7 @@ void SimpleClient::run(SimTasker* stk, bool hl) {
         logm("Close failed: " + ec.message(), "ERROR");
     }
     
-    // Stop the ASIO event loop and wait for the thread to end
-    // For once...
+    // Stop the ASIO event loop and wait for the thread to end.
     m_client.stop();
     if (m_thread.joinable()){
         m_thread.join();
