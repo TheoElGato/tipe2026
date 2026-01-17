@@ -24,29 +24,28 @@ int main(int argc, char* argv[]) {
     int mode = 0;
     std::string ip = "localhost";
     uint16_t port = 9002;
-    std::string sbf_path = "sbf"; // Stand for Server Brain File Path
+    std::string sbf_path = "sbf"; // Stand for Server Brain Files Path
 
-    // allow to run without UI
-    bool headless = false;
+    bool headless = false; // Allow to run without a window
     if (argc==1) mode = 0;
     else {
         while (next_arg != argc) {
             std::string arg = argv[next_arg];
-            if (arg=="-c") {    // client mode
+            if (arg=="-c") {    // Client mode
                 mode = 1;
                 ip = argv[next_arg+1];
                 str_to_uint16(argv[next_arg+2], &port);
                 sbf_path = argv[next_arg+3];
                 next_arg = next_arg+4;
 
-            } else if (arg=="-s") { // serveur mode
+            } else if (arg=="-s") { // Server mode
                 mode = 2;
                 ip = argv[next_arg+1];
                 str_to_uint16(argv[next_arg+2], &port);
                 sbf_path = argv[next_arg+3];
                 next_arg = next_arg+4;
 
-            } else if (arg=="-x") { // headless mode
+            } else if (arg=="-x") { // Headless mode
                 headless = true;
                 next_arg = next_arg+1;
 
