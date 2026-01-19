@@ -1,12 +1,12 @@
 /*
-    creature.hpp
+	creature.hpp
 
-    Description:
-        Header file for creature.cpp
-        
-    Author:
-        R. Benichou
-        A. Spadone
+	Description:
+		Header file for creature.cpp
+
+	Author:
+		R. Benichou
+		A. Spadone
 */
 
 #ifndef CREATURE_H
@@ -23,26 +23,26 @@
 
 class Creature {
 public:
-    Creature(float sx, float sy, int bodyColorSeed=0, std::string brainFile="");
+	Creature(float sx, float sy, int bodyColorSeed=0, std::string brainFile="");
 
-    float body_mass;
-    float paw_mass;
-    float muscle_strength;
-    std::vector<float> muscle_con;
-    std::vector<float> muscle_len;
-    std::vector<float> leg_len;
-    float struc_len;
+	float body_mass;
+	float paw_mass;
+	float muscle_strength;
+	std::vector<float> muscle_con;
+	std::vector<float> muscle_len;
+	std::vector<float> leg_len;
+	float struc_len;
 
-    std::vector<Point> vertices;
-    std::vector<Link> links;
-    std::vector<Spring> muscles;
-    float dir;
-    std::vector<float> leg_up;
-    int bodyColorSeed;
+	std::vector<Point> vertices;
+	std::vector<Link> links;
+	std::vector<Spring> muscles;
+	float dir;
+	std::vector<float> leg_up;
+	int bodyColorSeed;
 
-    void brainUpdate(sf::Vector2f goal, Brain* brain);
-    void update();
-    void moveTo(float x, float y);
+	void brainUpdate(sf::Vector2f goal, Brain* brain);
+	void update();
+	void moveTo(float x, float y);
 
 private:
 

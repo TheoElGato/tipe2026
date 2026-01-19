@@ -1,12 +1,12 @@
 /*
-    filemanager.hpp
+	filemanager.hpp
 
-    Description:
-        Header file for filemanager.cpp
-        
-    Author:
-        R. Benichou
-        A. Spadone
+	Description:
+		Header file for filemanager.cpp
+
+	Author:
+		R. Benichou
+		A. Spadone
 */
 
 #ifndef FILEMANAGER_H
@@ -35,69 +35,69 @@ float average(std::vector<float> v);
 
 class Packet {
    public:
-      Packet(std::string c,std::string a1,std::string a2,std::string a3);
-      Packet(std::string loads);
-      std::string get_string();
-      std::string cmd = "";
-      std::string arg1 = "";
-      std::string arg2 = "";
-      std::string arg3 = "";
-      void update();
+	  Packet(std::string c,std::string a1,std::string a2,std::string a3);
+	  Packet(std::string loads);
+	  std::string get_string();
+	  std::string cmd = "";
+	  std::string arg1 = "";
+	  std::string arg2 = "";
+	  std::string arg3 = "";
+	  void update();
    private:
-      nlohmann::json data;
+	  nlohmann::json data;
 };
 
 class SimTasker {
    public:
-      SimTasker(std::string tastPath);
-      void loadTask(int id);
-      
-      int len=0;
-      
-      std::string sim_name;
-      std::string device;
-      int threads;
-      
-      bool load_from_file;
-      std::string load_name;
-      
-      // SIM //
-      int sim_time;
-      float evolution;
-      float brain_acc;
-      int nb_brain;
-      int nb_agent;
-      int nb_hidden_layer;
-      int sous_sim;
-      int best_keep;
-      int selection_pol;
-      
-      // AUTOSAVE //
-      bool autosave;
-      int autosave_freq;
-      
-      // GOAL //
-      int maxdist;
-      int mindist;
-      int nb_goal;
-      
-      // START POS//
-      int startx;
-      int starty;
-      
-      // OTHERS //
-      bool use_evolution_curve;
-      float curve_a;
-      float curve_b;
-      float curve_c;
-      float curve_d;
-      
-      bool is_infinite;
-      int time_allowed;
-   
+	  SimTasker(std::string tastPath);
+	  void loadTask(int id);
+
+	  int len=0;
+
+	  std::string sim_name;
+	  std::string device;
+	  int threads;
+
+	  bool load_from_file;
+	  std::string load_name;
+
+	  // SIM //
+	  int sim_time;
+	  float evolution;
+	  float brain_acc;
+	  int nb_brain;
+	  int nb_agent;
+	  int nb_hidden_layer;
+	  int sous_sim;
+	  int best_keep;
+	  int selection_pol;
+
+	  // AUTOSAVE //
+	  bool autosave;
+	  int autosave_freq;
+
+	  // GOAL //
+	  int maxdist;
+	  int mindist;
+	  int nb_goal;
+
+	  // START POS//
+	  int startx;
+	  int starty;
+
+	  // OTHERS //
+	  bool use_evolution_curve;
+	  float curve_a;
+	  float curve_b;
+	  float curve_c;
+	  float curve_d;
+
+	  bool is_infinite;
+	  int time_allowed;
+
    private:
-      nlohmann::json allData;
-   
+	  nlohmann::json allData;
+
 };
 
 class SimDataStruct {
@@ -106,13 +106,13 @@ public:
    void save();
    void loadFromFile(std::string load_name);
    std::string getFullPath();
-   
-   void addStatRow(float generation, float agent0score, float agent1score, float agent2score, 
-                   float agent3score, float agent4score, float agent5score, float agent6score,
-                   float agent7score, float agent8score, float agent9score, float mean, float median,
-                   float bestAgentScore,float timeForOneGen, float timeWaitingClients,
-                   float timeForProcessing, float localTime, int nb_clients);
-                   
+
+   void addStatRow(float generation, float agent0score, float agent1score, float agent2score,
+				   float agent3score, float agent4score, float agent5score, float agent6score,
+				   float agent7score, float agent8score, float agent9score, float mean, float median,
+				   float bestAgentScore,float timeForOneGen, float timeWaitingClients,
+				   float timeForProcessing, float localTime, int nb_clients);
+
    nlohmann::json data;
    std::vector<float> generationV;
    std::vector<float> agent0scoreV;
@@ -132,8 +132,8 @@ public:
    std::vector<float> timeWaitingClientsV;
    std::vector<float> timeForProcessingV;
    std::vector<float> localTimeV;
-   
-   
+
+
 private:
    std::string name;
    std::filesystem::path fullpath;

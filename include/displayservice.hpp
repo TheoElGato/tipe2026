@@ -1,12 +1,12 @@
 /*
-    displayservice.hpp
+	displayservice.hpp
 
-    Description:
-        Header file for displayservice.cpp
-        
-    Author:
-        R. Benichou
-        A. Spadone
+	Description:
+		Header file for displayservice.cpp
+
+	Author:
+		R. Benichou
+		A. Spadone
 */
 
 #ifndef DISPLAYSERVICE_H
@@ -25,13 +25,13 @@ class Creature; // forward
 
 class DisplayService {
 public:
-    virtual ~DisplayService() = default;
-    virtual void init(bool headless, bool* runningptr, bool* clean_exitptr, int agentPartitionsSize, bool mc) = 0;
-    virtual void draw_creature(Creature* creature) = 0;
-    virtual void render(std::vector<int>* groups_avail,
-                        std::vector<std::vector<Creature*>>* agentPartitions,
-                        float fps, int agent_size, int generation, int sous_sim_started, float acu,
-                        float simu_time, float evolution, sf::Vector2f start, const std::vector<sf::Vector2f>& goals, bool mc) = 0;
+	virtual ~DisplayService() = default;
+	virtual void init(bool headless, bool* runningptr, bool* clean_exitptr, int agentPartitionsSize, bool mc) = 0;
+	virtual void draw_creature(Creature* creature) = 0;
+	virtual void render(std::vector<int>* groups_avail,
+						std::vector<std::vector<Creature*>>* agentPartitions,
+						float fps, int agent_size, int generation, int sous_sim_started, float acu,
+						float simu_time, float evolution, sf::Vector2f start, const std::vector<sf::Vector2f>& goals, bool mc) = 0;
 };
 
 // Each implementation file (graphical / headless) will provide its own CreateDisplayService()

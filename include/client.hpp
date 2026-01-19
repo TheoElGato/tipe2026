@@ -1,12 +1,12 @@
 /*
-    client.hpp
+	client.hpp
 
-    Description:
-        Header file for client.cpp
-        
-    Author:
-        R. Benichou
-        A. Spadone
+	Description:
+		Header file for client.cpp
+
+	Author:
+		R. Benichou
+		A. Spadone
 */
 
 #ifndef CLIENT_H
@@ -32,22 +32,22 @@ typedef websocketpp::client<websocketpp::config::asio_client> client;
 
 class SimpleClient {
 public:
-    SimpleClient(const std::string &uri, const std::string path);
-    ~SimpleClient();
-    void send(Packet pck);
-    void run(SimTasker* stk,bool hl);
-    bool headless = false;
-    int state = 0;
-    std::string sbfpath = "";
-    std::string srvid = "";
-    std::vector<std::string> selectioned;
-    std::vector<float> scores;
+	SimpleClient(const std::string &uri, const std::string path);
+	~SimpleClient();
+	void send(Packet pck);
+	void run(SimTasker* stk,bool hl);
+	bool headless = false;
+	int state = 0;
+	std::string sbfpath = "";
+	std::string srvid = "";
+	std::vector<std::string> selectioned;
+	std::vector<float> scores;
 
 private:
-    client m_client;
-    websocketpp::connection_hdl m_hdl;
-    std::thread m_thread;
-    SimTasker* mstk;
+	client m_client;
+	websocketpp::connection_hdl m_hdl;
+	std::thread m_thread;
+	SimTasker* mstk;
 };
 
 int simulate(SimTasker stk, bool mc = false, bool headless = false, SimpleClient* cl = nullptr);
