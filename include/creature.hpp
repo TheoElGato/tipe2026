@@ -23,7 +23,7 @@
 
 class Creature {
 public:
-	Creature(float sx, float sy, int bodyColorSeed=0, std::string brainFile="");
+	Creature(float sx, float sy, int bodyColorSeed=0);
 
 	float body_mass;
 	float paw_mass;

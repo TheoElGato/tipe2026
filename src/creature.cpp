@@ -2,7 +2,8 @@
 	creature.cpp
 
 	Description:
-		DESCRIPTION
+		This file handle every thing related to the creature a.k.a. agents
+		It define the creature shape, mass. And handle physic and the associated brain
 
 	Author:
 		R. Benichou
@@ -11,11 +12,25 @@
 
 #include "creature.hpp"
 
+
+/*
+ * Calculate the score of a creature relative to an objective
+ * @param agent the agent used
+ * @param goal a vector to the goal
+ * @return the score bounded by ]0;1]
+ */
 float score_distance(Creature* agent, sf::Vector2f goal) {
 	return (std::sqrt(std::pow(agent->vertices[0].position.x - goal.x, 2) + std::pow(agent->vertices[0].position.y - goal.y, 2)));
 }
 
-Creature::Creature(float sx, float sy, int bodyColorSeed, std::string brainFile)
+
+/*
+ * Constructor of Creature class used to define the agent
+ * @param sx Spawn x position
+ * @param sy Spawn y position
+ * @param bodyColorSeed use to give predefined color
+ */
+Creature::Creature(float sx, float sy, int bodyColorSeed)
 {
 	/// Initialization of creature parameters
 

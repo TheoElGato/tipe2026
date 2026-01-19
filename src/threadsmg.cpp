@@ -2,7 +2,8 @@
 	threadsmg.cpp
 
 	Description:
-		DESCRIPTION
+		This file handle the task that are launch as thread.
+		This allow an easyer gestion of the different thread.
 
 	Author:
 		R. Benichou
