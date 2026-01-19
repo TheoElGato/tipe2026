@@ -41,6 +41,7 @@
 .ecode
 build/*
 .vscode/
+.zed
 buildrun.sh
 task.json
 save/*
