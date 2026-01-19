@@ -25,7 +25,7 @@ float distance(sf::Vector2f a, sf::Vector2f b) {
 }
 
 /*
- * @brief Manage a given task. Wich is givent by the agent, brain, start, objectives, time.
+ * Manage a given task. Wich is givent by the agent, brain, start, objectives, time.
  * the brainAcc and dt define the quality
  * And update the scores and state
  * @param physics the physicwotker that the thread can use
