@@ -2,10 +2,10 @@
 	displayservice_headless.cpp
 
 	Description:
-		This is a dummy file of displayservice.cpp 
-		It is used to declare functions that actually do nothing and are 
-		only here to be able to build the project 
-		
+		This is a dummy file of displayservice.cpp
+		It is used to declare functions that actually do nothing and are
+		only here to be able to build the project
+
 	Author:
 		R. Benichou
 		A. Spadone
@@ -39,17 +39,17 @@ public:
 
 		logm("DisplayServiceHeadless initialized (no graphics).");
 	}
-	
+
 	/*
 	 * Render a frame to the window
 	 * Because this is headless, it will do nothing
 	 * @param groups_avail The pointer to a vector of int representing which groups are available (see client.cpp)
-	 * @param agentPartitions The pointer to the vector of the partitioning of agents 
+	 * @param agentPartitions The pointer to the vector of the partitioning of agents
 	 * @param fps A float of the current Frame Per Second
 	 * @param agent_size The number of agents in total
 	 * @param generation The current generation number
-	 * @param sous_sim_started The number of sous_sim_started
-	 * @param acu Used for the time for a generation 
+	 * @param sub_sim_started The number of sub_sim_started
+	 * @param acu Used for the time for a generation
 	 * @param simu_time The time for one generation
 	 * @param evolution The current simulation parameter evolution
 	 * @param start A vector2f for the spawnpoint
@@ -58,18 +58,18 @@ public:
 	 */
 	void render(std::vector<int>* groups_avail,
 				std::vector<std::vector<Creature*>>* agentPartitions,
-				float fps, int agent_size, int generation, int sous_sim_started, float acu,
+				float fps, int agent_size, int generation, int sub_sim_started, float acu,
 				float simu_time, float evolution, sf::Vector2f start, const std::vector<sf::Vector2f>& goals, bool mc) override {
 		// Nothing to do here
 	}
-	
+
 	/*
 	 * Draw a creature to the screen
 	 * Because this is headless, it will do nothing
 	 * @param creature The pointer to the creature to draw
 	 */
 	void draw_creature(Creature* creature) override {
-	
+
 	}
 
 private:

@@ -7,7 +7,7 @@
 		Because the program can run headless, all of the graphical SFML is only here
 		so that this file can be replaced by a dummy file,
 		see displayservice_headless.cpp
-		
+
 	Author:
 		R. Benichou
 		A. Spadone
@@ -28,7 +28,7 @@ class DisplayServiceSFML : public DisplayService {//
 public:
 	DisplayServiceSFML() = default;
 	~DisplayServiceSFML() override = default;
-	
+
 	/*
 	 * Initialize the DisplayServiceSFML class
 	 * @param headless If true run in headless mode
@@ -81,15 +81,15 @@ public:
 
 		wifiSprite.setPosition({0, 0});
 		wifiSprite.scale({0.1f, 0.1f});
-		
+
 		// Create objects for the body, legs and eyes
 		pawUp = sf::CircleShape(5);
 		pawDown = sf::CircleShape(10);
 		body = sf::CircleShape(20);
 		eyeWhite = sf::CircleShape(8);
 		eyeBlack = sf::CircleShape(2);
-		
-		
+
+
 		pawUp.setOrigin({5, 5});
 		pawDown.setOrigin({10, 10});
 		body.setOrigin({20, 20});
@@ -101,12 +101,12 @@ public:
 	/*
 	 * Render a frame to the window
 	 * @param groups_avail The pointer to a vector of int representing which groups are available (see client.cpp)
-	 * @param agentPartitions The pointer to the vector of the partitioning of agents 
+	 * @param agentPartitions The pointer to the vector of the partitioning of agents
 	 * @param fps A float of the current Frame Per Second
 	 * @param agent_size The number of agents in total
 	 * @param generation The current generation number
-	 * @param sous_sim_started The number of sous_sim_started
-	 * @param acu Used for the time for a generation 
+	 * @param sub_sim_started The number of sub_sim_started
+	 * @param acu Used for the time for a generation
 	 * @param simu_time The time for one generation
 	 * @param evolution The current simulation parameter evolution
 	 * @param start A vector2f for the spawnpoint
@@ -115,7 +115,7 @@ public:
 	 */
 	void render(std::vector<int>* groups_avail,
 				std::vector<std::vector<Creature*>>* agentPartitions,
-				float fps, int agent_size, int generation, int sous_sim_started, float acu,
+				float fps, int agent_size, int generation, int sub_sim_started, float acu,
 				float simu_time, float evolution, sf::Vector2f start, const std::vector<sf::Vector2f>& goals, bool mc) override {
 		if (is_headless) return;
 
@@ -167,7 +167,7 @@ public:
 			}
 		}
 
-		drawStats(window, font, {{"FPS", std::round(fps)}, {"Nb agents", agent_size}, {"SGen Selected", (*groups_avail)[selected_agents]}, {"Current Gen", generation}, {"SGen started", sous_sim_started}});
+		drawStats(window, font, {{"FPS", std::round(fps)}, {"Nb agents", agent_size}, {"SGen Selected", (*groups_avail)[selected_agents]}, {"Current Gen", generation}, {"SGen started", sub_sim_started}});
 		if (mc) window.draw(wifiSprite);
 
 		window.display();
@@ -178,7 +178,7 @@ public:
 	 * @param creature The pointer to the creature to draw
 	 */
 	void draw_creature(Creature* creature) override {
-		
+
 		std::vector<sf::Color> colors = {
 			sf::Color(0, 0, 255),
 			sf::Color(0, 255, 255),
@@ -193,7 +193,7 @@ public:
 			paw->setFillColor(colors[i]);
 			paw->setPosition(creature->vertices[i+1].position);
 			window.draw(*paw);
-	
+
 			// Line between the body and the leg
 			std::array line =
 			{
@@ -202,7 +202,7 @@ public:
 			};
 			window.draw(line.data(), line.size(), sf::PrimitiveType::Lines);
 		}
-	
+
 		// Drawing of muscles (simple lines)
 		for (int i = 0; i < 2; ++i) {
 			std::array line =
@@ -212,25 +212,25 @@ public:
 			};
 			window.draw(line.data(), line.size(), sf::PrimitiveType::Lines);
 		}
-	
+
 		// Body drawing
 		body.setPosition(creature->vertices[0].position);
 		window.draw(body);
-	
+
 		// Drawing eyes
 		float eye_offset1 = creature->dir - 0.3f;
 		float eye_offset2 = creature->dir + 0.3f;
 		sf::Vector2f center = creature->vertices[0].position;
 		sf::Vector2f eye1 = center + sf::Vector2f(20 * std::cos(eye_offset1), 20 * std::sin(eye_offset1));
 		sf::Vector2f eye2 = center + sf::Vector2f(20 * std::cos(eye_offset2), 20 * std::sin(eye_offset2));
-	
-		
+
+
 		eyeWhite.setPosition(eye1);
 		window.draw(eyeWhite);
 		eyeWhite.setPosition(eye2);
 		window.draw(eyeWhite);
-	
-		
+
+
 		eyeBlack.setPosition(eye1);
 		window.draw(eyeBlack);
 		eyeBlack.setPosition(eye2);
@@ -271,7 +271,7 @@ private:
 			window.draw(text);
 		}
 	}
-	
+
 	/*
 	 * Draw all items to the screen
 	 * @param window The window object
@@ -306,7 +306,7 @@ private:
 	sf::CircleShape body;
 	sf::CircleShape eyeWhite;
 	sf::CircleShape eyeBlack;
-	
+
 	// State
 	bool mc = false;
 	bool is_headless = false;

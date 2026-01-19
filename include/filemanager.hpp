@@ -68,7 +68,7 @@ class SimTasker {
 	  int nb_brain;
 	  int nb_agent;
 	  int nb_hidden_layer;
-	  int sous_sim;
+	  int sub_sim;
 	  int best_keep;
 	  int selection_pol;
 
