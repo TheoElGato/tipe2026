@@ -14,23 +14,40 @@
 
 #include "filemanager.hpp"
 
+/*
+ * Standardized logging function for the project
+ * @param message The message to print
+ * @param level The level of the message, by default INFO
+ */
 void logm(const std::string& message, const std::string& level) {   
-	// Standardized logging function
 	std::cout << "[" << level << "] " << message << std::endl;
 }
 
+/*
+ * Standardized error function for the project
+ * @param message The message to print will exiting
+ */
 void error(const std::string& message) {
-	// Standardized error function
-	logm(message, "ERROR");
+	logm(message, "FATAL");
 	assert(false);
 }
 
+/*
+ * Remove useless zero when converting float to string
+ * @param value The float to convert and trim zeros
+ * @return A string with the zeros removed
+ */
 std::string remove_zero_ts(float value) {
 	std::ostringstream oss;
 	oss << std::setprecision(8) << std::noshowpoint << value;
 	return oss.str();
 }
 
+/*
+ * Generate a name for a simulation with the current date
+ * @param name The start of the name that will be generated
+ * @return A concacenated string with name and date
+ */
 std::string generate_name(const std::string& name) {
 	std::time_t now = std::time(nullptr); // Get current time
 	std::tm local_time{};
@@ -42,44 +59,76 @@ std::string generate_name(const std::string& name) {
 	return name + "_" + oss.str();
 }
 
+/*
+ * Make the average of a vector of float
+ * @param v The vector to average
+ * @return The average of v
+ */
 float average(std::vector<float> v){
 	if(v.empty()){
 		return 0;
 	}
-
 	auto const count = static_cast<float>(v.size());
 	return std::reduce(v.begin(), v.end()) / count;
 }
 
+/*
+ * Get the host name of the machine
+ * This bloc has been made with no intention for Windows. 
+ * @return The host name
+ */
 std::string getHostName() {
-	// This bloc has been made with no intention for Windows. 
 	char hostname[HOST_NAME_MAX];
 	gethostname(hostname, HOST_NAME_MAX);
-	// Cry about it.
 	return hostname;
 }
 
+/*
+ * Serialise a float vector to a json string
+ * @param v The vector to convert
+ * @return The json string
+ */
 std::string vectf_to_jsonstring(std::vector<float> v) {
 	nlohmann::json j(v);
 	return j.dump();
 }
 
+/*
+ * Serialise a string vector to a json string
+ * @param v The vector to convert
+ * @return The json string
+ */
 std::string vects_to_jsonstring(std::vector<std::string> v) {
 	nlohmann::json j(v);
 	return j.dump();
 }
 
-
+/*
+ * Convert a json string to float vector
+ * @param s The json to convert
+ * @return The float vector
+ */
 std::vector<float> jsonstring_to_vectf(std::string s) {
 	nlohmann::json j = nlohmann::json::parse(s);
 	return j;
 }
 
+/*
+ * Convert a json string to string vector
+ * @param s The json to convert
+ * @return The string vector
+ */
 std::vector<std::string> jsonstring_to_vects(std::string s) {
 	nlohmann::json j = nlohmann::json::parse(s);
 	return j;
 }
 
+/*
+ * Convert a string to a uint16
+ * @param str The pointer to the string to convert
+ * @param res The pointer where to store the result
+ * @return A bool of the operation success
+ */
 bool str_to_uint16(const char *str, uint16_t *res) {
 	char *end;
 	errno = 0;
@@ -91,6 +140,20 @@ bool str_to_uint16(const char *str, uint16_t *res) {
 	return true;
 }
 
+/*
+ * Constructor for the SimDataStruct class
+ * @param path The path as a std::string of where to store the simulation data
+ * @param name The name of the simulation
+ * @param generation The current generation
+ * @param sgeneration The current sub simulation
+ * @param simu_time The time for one generation
+ * @param evolution The current evolution 
+ * @param brain_acc The number of step skipped until brain are ticked
+ * @param brains_number The total number of brains
+ * @param agents_number The total number of agents
+ * @param train_sessions The number of sessions where the AI was trained
+ * @param empty If empty is true then skip this function at start
+ */
 SimDataStruct::SimDataStruct(std::string path, std::string name, int generation, int sgeneration, int simu_time, int evolution, float brain_acc, int brains_number,int agents_number,int train_sessions,bool empty) {
 	if (empty) return;
 	std::string host_name = getHostName();
@@ -130,7 +193,7 @@ void SimDataStruct::addStatRow(float generation, float agent0score, float agent1
 				   float timeForProcessing, float localTime, int nb_clients) {
 	generationV.push_back(generation);
 	agent0scoreV.push_back(agent0score);
-	agent1scoreV.push_back(agent1score);
+	agent1scoreV.push_back(agent1score);SimDataStruct
 	agent2scoreV.push_back(agent2score);
 	agent3scoreV.push_back(agent3score);
 	agent4scoreV.push_back(agent4score);
@@ -257,7 +320,7 @@ void SimTasker::loadTask(int id) {
 	this->nb_brain = data["NB_BRAIN"];
 	this->nb_agent = nb_brain*threads;
 	this->nb_hidden_layer = data["NB_HIDDEN_LAYER"];
-	this->sous_sim = data["SOUS_SIM"];
+	this->sub_sim = data["SOUS_SIM"];
 	this->best_keep = data["BEST_KEEP"];
 	this->selection_pol = data["SELECTION_POL"];
 	this->autosave = data["AUTOSAVE"];
