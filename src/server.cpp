@@ -134,7 +134,6 @@ void LogicServer::send(Packet pck, websocketpp::connection_hdl hdl) {
  * @param pck The packet to send
  */
 void LogicServer::send_all(Packet pck) {
-	//
 	for (auto &pair : connections) {
 		send(pck, pair.first);
 	}
@@ -164,7 +163,6 @@ void LogicServer::run(uint16_t port,SimTasker* mstk) {
  * server get from command line by the user
  */
 void LogicServer::handle_input() {
-
 	while (true) {
 
 		char input[25];
@@ -220,7 +218,7 @@ void LogicServer::logic_loop() {
 			sds.save();
 
 			logm("Asking clients to start sim #"+std::to_string(task_done));
-			Packet startpacket("startsim",std::to_string(task_done),"","");
+			Packet startpacket("startsim", std::to_string(task_done),"","");
 			send_all(startpacket);
 
 			// Get a time stamp
