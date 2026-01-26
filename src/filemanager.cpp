@@ -186,6 +186,28 @@ SimDataStruct::SimDataStruct(std::string path, std::string name, int generation,
 	
 }
 
+/*
+ * Add a line of stats in vectors for a generation, to later
+ * push them into a CSV file
+ * @param generation The current generation
+ * @param agent0score The score for the generation for agent 0
+ * @param agent1score The score for the generation for agent 1
+ * @param agent2score The score for the generation for agent 2
+ * @param agent3score The score for the generation for agent 3
+ * @param agent4score The score for the generation for agent 4
+ * @param agent5score The score for the generation for agent 5
+ * @param agent6score The score for the generation for agent 6
+ * @param agent7score The score for the generation for agent 7
+ * @param agent8score The score for the generation for agent 8
+ * @param agent9score The score for the generation for agent 9
+ * @param mean The mean for the generation
+ * @param median The median for the generation
+ * @param bestAgentScore The score for the generation for the best agent
+ * @param timeForOneGen The total number of brains
+ * @param agents_number The total number of agents
+ * @param train_sessions The number of sessions where the AI was trained
+ * @param empty If empty is true then skip this function at start
+ */
 void SimDataStruct::addStatRow(float generation, float agent0score, float agent1score, float agent2score, 
 				   float agent3score, float agent4score, float agent5score, float agent6score,
 				   float agent7score, float agent8score, float agent9score, float mean, float median,
@@ -193,7 +215,7 @@ void SimDataStruct::addStatRow(float generation, float agent0score, float agent1
 				   float timeForProcessing, float localTime, int nb_clients) {
 	generationV.push_back(generation);
 	agent0scoreV.push_back(agent0score);
-	agent1scoreV.push_back(agent1score);SimDataStruct
+	agent1scoreV.push_back(agent1score);
 	agent2scoreV.push_back(agent2score);
 	agent3scoreV.push_back(agent3score);
 	agent4scoreV.push_back(agent4score);
@@ -213,14 +235,14 @@ void SimDataStruct::addStatRow(float generation, float agent0score, float agent1
 }
 
 void SimDataStruct::save() {
-	// write a really pretty~~ JSON file :)
+	// Write a really JSON file
 	std::ofstream o(fullpath / (name+".json"));
 	o << std::setw(4) << data << std::endl;
 	o.close();
 	
-	// write a cool CSV for the stats :
+	// Write a CSV for the stats
 	std::ofstream ss(fullpath / (name+".csv"));
-	auto writer = make_csv_writer(ss); // Fix auto I don't like this
+	auto writer = make_csv_writer(ss);
 	
 	
 	writer << std::vector<std::string>({"Generation","Agent0Score", "Agent1Score", "Agent2Score", "Agent3Score", 
@@ -250,8 +272,6 @@ void SimDataStruct::save() {
 	
 	o.close();
 }
-
-
 
 void SimDataStruct::loadFromFile(std::string load_name) {
 	// Read the JSON file from the load_name sim 
