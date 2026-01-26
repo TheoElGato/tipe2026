@@ -49,7 +49,7 @@ class Packet {
 
 class SimTasker {
    public:
-	  SimTasker(std::string tastPath);
+	  SimTasker(std::string taskPath);
 	  void loadTask(int id);
 
 	  int len=0;

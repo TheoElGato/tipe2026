@@ -203,10 +203,11 @@ SimDataStruct::SimDataStruct(std::string path, std::string name, int generation,
  * @param mean The mean for the generation
  * @param median The median for the generation
  * @param bestAgentScore The score for the generation for the best agent
- * @param timeForOneGen The total number of brains
- * @param agents_number The total number of agents
- * @param train_sessions The number of sessions where the AI was trained
- * @param empty If empty is true then skip this function at start
+ * @param timeForOneGen The time to train this generation
+ * @param timeWaitingClients The time use to wait all the clients
+ * @param timeForProcessing The time use to process and save data
+ * @param localTime The local time of the device
+ * @param nb_clients The number of client connected as this data is save.
  */
 void SimDataStruct::addStatRow(float generation, float agent0score, float agent1score, float agent2score, 
 				   float agent3score, float agent4score, float agent5score, float agent6score,
@@ -234,6 +235,9 @@ void SimDataStruct::addStatRow(float generation, float agent0score, float agent1
 	data["nb_clients"] = nb_clients;
 }
 
+/*
+ * Push data saved in vectors into a JSON and a CSV file
+ */
 void SimDataStruct::save() {
 	// Write a really JSON file
 	std::ofstream o(fullpath / (name+".json"));
@@ -273,6 +277,9 @@ void SimDataStruct::save() {
 	o.close();
 }
 
+/*
+ * Push data saved in vectors into a JSON and a CSV file
+ */
 void SimDataStruct::loadFromFile(std::string load_name) {
 	// Read the JSON file from the load_name sim 
 	std::string filename = folder / load_name / (load_name+".json");
@@ -310,17 +317,22 @@ void SimDataStruct::loadFromFile(std::string load_name) {
 	}
 }
 
+/*
+ * Get a the full path of the Sim Data Struct folder
+ * @return A string of the path
+ */
 std::string SimDataStruct::getFullPath() {
 	std::string fp = this->fullpath;
 	return fp+"/";
 }
 
-
-// SimTasker
-
-SimTasker::SimTasker(std::string tastPath) {
-	// Read the JSON file from tastPath (tastPath ??? why not taskPath)
-	std::ifstream f(tastPath);
+/*
+ * Constructor for the SimDataStruct class
+ * @param taskPath The path as a std::string of the task list
+ */
+SimTasker::SimTasker(std::string taskPath) {
+	// Read the JSON file from taskPath
+	std::ifstream f(taskPath);
 	allData = nlohmann::json::parse(f);
 	
 	len = allData.size();
