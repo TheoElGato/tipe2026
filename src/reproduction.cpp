@@ -14,6 +14,16 @@
 #include "reproduction.hpp"
 #include <random>
 
+
+/*
+ * Do a reverse quick sort of 2 vector using the value of the score while keeping the association
+ * @param brain_agents a vector of all the brain
+ * @param score_agent a vector of the score that each brain got
+ * @param NB_BRAIN the number of brain
+ * @param EVOLUTION the evolution factor determining the force of the mutation
+ * @param besKeep the purcentage of kept agent
+ * @param selectionPol the purcentage of the population to use for the next gen
+ */
 void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
 			   int NB_BRAIN, float EVOLUTION, int bestKeep, int selectionPol) {
 
