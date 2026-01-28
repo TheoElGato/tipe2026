@@ -423,7 +423,7 @@ std::string Packet::get_string()
 }
 
 /*
- * Update the jsob object data with the current variables
+ * Update the json object data with the current variables
  */
 void Packet::update()
 {
