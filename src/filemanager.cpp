@@ -14,6 +14,8 @@
 
 #include "filemanager.hpp"
 
+//// Utility functions
+
 /*
  * Standardized logging function for the project
  * @param message The message to print
@@ -139,6 +141,8 @@ bool str_to_uint16(const char *str, uint16_t *res) {
 	*res = (uint16_t)val;
 	return true;
 }
+
+//// SimDataStruct
 
 /*
  * Constructor for the SimDataStruct class
@@ -291,8 +295,7 @@ void SimDataStruct::loadFromFile(std::string load_name) {
 	j["host_name"] = host_name;
 	
 	data = j;
-	// Load the STATS 
-	
+	// Load the STATS
 	std::string filenameCsv = folder / load_name / (load_name+".csv");
 	CSVReader reader(filenameCsv);
 	for (CSVRow& row: reader) { // Input iterator
@@ -326,8 +329,10 @@ std::string SimDataStruct::getFullPath() {
 	return fp+"/";
 }
 
+//// SimTasker
+
 /*
- * Constructor for the SimDataStruct class
+ * Constructor for the SimTasker class
  * @param taskPath The path as a std::string of the task list
  */
 SimTasker::SimTasker(std::string taskPath) {
@@ -336,9 +341,12 @@ SimTasker::SimTasker(std::string taskPath) {
 	allData = nlohmann::json::parse(f);
 	
 	len = allData.size();
-	
 }
 
+/*
+ * Load the task parameters into the object variables
+ * @param id The id of the task to load from the json file
+ */
 void SimTasker::loadTask(int id) {
 	nlohmann::json data = this->allData[id];
 	this->sim_name = data["SIM_NAME"];
@@ -371,8 +379,16 @@ void SimTasker::loadTask(int id) {
 	this->time_allowed = data["TIME_ALLOWED"];
 }
 
-// Packets for the websocket
+//// Packet
 
+/*
+ * Constructor for the Packet class
+ * Create a Packet object from scratch
+ * @param c The command/packet identifier (see filemanager.cpp for a list)
+ * @param a1 The first argument
+ * @param a2 The second argument
+ * @param a3 The third argument
+ */
 Packet::Packet(std::string c,std::string a1,std::string a2,std::string a3)
 {
 	cmd = c;
@@ -382,6 +398,11 @@ Packet::Packet(std::string c,std::string a1,std::string a2,std::string a3)
 	update();
 }
 
+/*
+ * Constructor for the Packet class
+ * Unpack a Packet object from a json string
+ * @param loads The json string we parse and load into variables
+ */
 Packet::Packet(std::string loads)
 {
 	data = nlohmann::json::parse(loads);
@@ -389,14 +410,21 @@ Packet::Packet(std::string loads)
 	arg1 = data["arg1"];
 	arg2 = data["arg2"];
 	arg3 = data["arg3"];
-	update(); // Not needed I think, but why not.
+	update();
 }
 
+/*
+ * Create a json string to pack the object
+ * @return A json string
+ */
 std::string Packet::get_string()
 {
 	return data.dump();
 }
 
+/*
+ * Update the jsob object data with the current variables
+ */
 void Packet::update()
 {
 	data = {
