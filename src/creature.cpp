@@ -12,7 +12,6 @@
 
 #include "creature.hpp"
 
-
 /*
  * Calculate the score of a creature relative to an objective
  * @param agent the agent used
@@ -22,7 +21,6 @@
 float score_distance(Creature* agent, sf::Vector2f goal) {
 	return (std::sqrt(std::pow(agent->vertices[0].position.x - goal.x, 2) + std::pow(agent->vertices[0].position.y - goal.y, 2)));
 }
-
 
 /*
  * Constructor of Creature class used to define the agent

@@ -14,6 +14,8 @@
 
 #include "filemanager.hpp"
 
+//// Utility functions
+
 /*
  * Standardized logging function for the project
  * @param message The message to print
@@ -140,6 +142,8 @@ bool str_to_uint16(const char *str, uint16_t *res) {
 	return true;
 }
 
+//// SimDataStruct
+
 /*
  * Constructor for the SimDataStruct class
  * @param path The path as a std::string of where to store the simulation data
@@ -203,10 +207,11 @@ SimDataStruct::SimDataStruct(std::string path, std::string name, int generation,
  * @param mean The mean for the generation
  * @param median The median for the generation
  * @param bestAgentScore The score for the generation for the best agent
- * @param timeForOneGen The total number of brains
- * @param agents_number The total number of agents
- * @param train_sessions The number of sessions where the AI was trained
- * @param empty If empty is true then skip this function at start
+ * @param timeForOneGen The time to train this generation
+ * @param timeWaitingClients The time use to wait all the clients
+ * @param timeForProcessing The time use to process and save data
+ * @param localTime The local time of the device
+ * @param nb_clients The number of client connected as this data is save.
  */
 void SimDataStruct::addStatRow(float generation, float agent0score, float agent1score, float agent2score, 
 				   float agent3score, float agent4score, float agent5score, float agent6score,
@@ -234,6 +239,9 @@ void SimDataStruct::addStatRow(float generation, float agent0score, float agent1
 	data["nb_clients"] = nb_clients;
 }
 
+/*
+ * Push data saved in vectors into a JSON and a CSV file
+ */
 void SimDataStruct::save() {
 	// Write a really JSON file
 	std::ofstream o(fullpath / (name+".json"));
@@ -273,6 +281,9 @@ void SimDataStruct::save() {
 	o.close();
 }
 
+/*
+ * Push data saved in vectors into a JSON and a CSV file
+ */
 void SimDataStruct::loadFromFile(std::string load_name) {
 	// Read the JSON file from the load_name sim 
 	std::string filename = folder / load_name / (load_name+".json");
@@ -284,8 +295,7 @@ void SimDataStruct::loadFromFile(std::string load_name) {
 	j["host_name"] = host_name;
 	
 	data = j;
-	// Load the STATS 
-	
+	// Load the STATS
 	std::string filenameCsv = folder / load_name / (load_name+".csv");
 	CSVReader reader(filenameCsv);
 	for (CSVRow& row: reader) { // Input iterator
@@ -310,23 +320,33 @@ void SimDataStruct::loadFromFile(std::string load_name) {
 	}
 }
 
+/*
+ * Get a the full path of the Sim Data Struct folder
+ * @return A string of the path
+ */
 std::string SimDataStruct::getFullPath() {
 	std::string fp = this->fullpath;
 	return fp+"/";
 }
 
+//// SimTasker
 
-// SimTasker
-
-SimTasker::SimTasker(std::string tastPath) {
-	// Read the JSON file from tastPath (tastPath ??? why not taskPath)
-	std::ifstream f(tastPath);
+/*
+ * Constructor for the SimTasker class
+ * @param taskPath The path as a std::string of the task list
+ */
+SimTasker::SimTasker(std::string taskPath) {
+	// Read the JSON file from taskPath
+	std::ifstream f(taskPath);
 	allData = nlohmann::json::parse(f);
 	
 	len = allData.size();
-	
 }
 
+/*
+ * Load the task parameters into the object variables
+ * @param id The id of the task to load from the json file
+ */
 void SimTasker::loadTask(int id) {
 	nlohmann::json data = this->allData[id];
 	this->sim_name = data["SIM_NAME"];
@@ -359,8 +379,16 @@ void SimTasker::loadTask(int id) {
 	this->time_allowed = data["TIME_ALLOWED"];
 }
 
-// Packets for the websocket
+//// Packet
 
+/*
+ * Constructor for the Packet class
+ * Create a Packet object from scratch
+ * @param c The command/packet identifier (see filemanager.cpp for a list)
+ * @param a1 The first argument
+ * @param a2 The second argument
+ * @param a3 The third argument
+ */
 Packet::Packet(std::string c,std::string a1,std::string a2,std::string a3)
 {
 	cmd = c;
@@ -370,6 +398,11 @@ Packet::Packet(std::string c,std::string a1,std::string a2,std::string a3)
 	update();
 }
 
+/*
+ * Constructor for the Packet class
+ * Unpack a Packet object from a json string
+ * @param loads The json string we parse and load into variables
+ */
 Packet::Packet(std::string loads)
 {
 	data = nlohmann::json::parse(loads);
@@ -377,14 +410,21 @@ Packet::Packet(std::string loads)
 	arg1 = data["arg1"];
 	arg2 = data["arg2"];
 	arg3 = data["arg3"];
-	update(); // Not needed I think, but why not.
+	update();
 }
 
+/*
+ * Create a json string to pack the object
+ * @return A json string
+ */
 std::string Packet::get_string()
 {
 	return data.dump();
 }
 
+/*
+ * Update the json object data with the current variables
+ */
 void Packet::update()
 {
 	data = {
