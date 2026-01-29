@@ -251,11 +251,11 @@ void LogicServer::logic_loop() {
 			else if(std::time(nullptr)>(timetime+timeout)) {
 				logm("Some clients need to be kicked. Reason : timeout","WARNING");
 				// Send "exit" to any connected clients that are not finished
-				Packet exitpck("exit","","","");
+				Packet stoppck("stopsim","","","");
 				for (auto &pair : connections) {
 					logm(std::to_string(finished[pair.second]));
 					if (finished[pair.second] == 0) {
-						send(exitpck, pair.first);
+						send(stoppck, pair.first);
 						finished[pair.second] = -1;
 						active_client -= 1;
 					}
