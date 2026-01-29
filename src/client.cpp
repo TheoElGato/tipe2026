@@ -556,7 +556,7 @@ SimpleClient::SimpleClient(const std::string &uri, const std::string path) {
 		}
 
 		if (r.cmd == "standby") {
-			logm("Server requested to stop computing and go on standy.");
+			logm("Server requested to stop computing and go on standy.","Client");
 			state = 2;
 		}
 

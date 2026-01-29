@@ -229,7 +229,7 @@ void LogicServer::logic_loop() {
 			gen_started_at = std::time(nullptr);
 			timeout = mstk->sim_time*2;  // 100% more time than the sim time
 
-			// unkick the client that got timed out
+			// Unkick the client that got timed out
 			active_client = nb_client;
 			for (auto &pair : connections){
 				finished[pair.second] = 0;
@@ -247,7 +247,7 @@ void LogicServer::logic_loop() {
 		}
 
 		if (step==2) { // One client have finished.
-			// look if all active client (not kicked) have finished
+			// Look if all active client (not kicked) have finished
 			if (cfinished==active_client) step=3;
 			else if(std::time(nullptr)>(timetime+timeout)) {
 				logm("Some clients need to be kicked. Reason : timeout","WARNING");
