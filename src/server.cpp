@@ -22,6 +22,7 @@
 		- startsim; task_id, null, null : ask clients to start task #task_id
 		- nextgen; json_selectioned_files, json_scores, null : send to clients the files and scores to load to start a new gen
 		- stopsim; null, null, null : ask the clients to stop their current task
+		- stanby; null, null, null : ask the clients to wait for further information
 		- exit; null, null, null : shutdown the client
 
 	Author:
@@ -250,12 +251,12 @@ void LogicServer::logic_loop() {
 			if (cfinished==active_client) step=3;
 			else if(std::time(nullptr)>(timetime+timeout)) {
 				logm("Some clients need to be kicked. Reason : timeout","WARNING");
-				// Send "exit" to any connected clients that are not finished
-				Packet stoppck("stopsim","","","");
+				// Send "standby" to any connected clients that are not finished
+				Packet stbpck("standby","","","");
 				for (auto &pair : connections) {
 					logm(std::to_string(finished[pair.second]));
 					if (finished[pair.second] == 0) {
-						send(stoppck, pair.first);
+						send(stbpck, pair.first);
 						finished[pair.second] = -1;
 						active_client -= 1;
 					}
