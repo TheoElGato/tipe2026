@@ -22,7 +22,7 @@
 		- startsim; task_id, null, null : ask clients to start task #task_id
 		- nextgen; json_selectioned_files, json_scores, null : send to clients the files and scores to load to start a new gen
 		- stopsim; null, null, null : ask the clients to stop their current task
-		- stanby; null, null, null : ask the clients to wait for further information
+		- standby; null, null, null : ask the clients to wait for further information
 		- exit; null, null, null : shutdown the client
 
 	Author:
@@ -174,7 +174,7 @@ void LogicServer::handle_input() {
 		std::string sinput = input;	//Convert to std::string
 
 		if (sinput.find("kill") != std::string::npos) {	// Kill all clients
-			logm("Recive kill command");
+			logm("Receive kill command");
 			Packet exitpck("exit","","","");
 			send_all(exitpck);
 		}
