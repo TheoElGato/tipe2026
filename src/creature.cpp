@@ -88,9 +88,6 @@ Creature::Creature(float sx, float sy, int bodyColorSeed)
  * @param brain The crature brain
  */
 void Creature::brainUpdate(sf::Vector2f target, Brain * brain) {
-	// Get the input for the brain
-
-
 	// Get the distance to the target
 	sf::Vector2f to_target = target - this->vertices[0].position;
 	float to_target_length = std::sqrt(to_target.x * to_target.x + to_target.y * to_target.y);

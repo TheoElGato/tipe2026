@@ -555,6 +555,11 @@ SimpleClient::SimpleClient(const std::string &uri, const std::string path) {
 			state = 1;
 		}
 
+		if (r.cmd == "standby") {
+			logm("Server requested to stop computing and go on standby.","Client");
+			state = 2;
+		}
+
 		if (r.cmd == "nextgen") {
 			logm("Server requested the next gen","Client");
 			selectioned = jsonstring_to_vects(r.arg1);

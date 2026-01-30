@@ -22,6 +22,7 @@
 		- startsim; task_id, null, null : ask clients to start task #task_id
 		- nextgen; json_selectioned_files, json_scores, null : send to clients the files and scores to load to start a new gen
 		- stopsim; null, null, null : ask the clients to stop their current task
+		- standby; null, null, null : ask the clients to wait for further information
 		- exit; null, null, null : shutdown the client
 
 	Author:
@@ -57,6 +58,7 @@ LogicServer::LogicServer(std::string sbf_path) {
 			connections.erase(it);
 			clients_hn.erase(from);
 			nb_client -=1;
+			if(finished[from] != -1) active_client -= 1;
 		}
 	});
 
@@ -72,17 +74,21 @@ LogicServer::LogicServer(std::string sbf_path) {
 
 		if (r.cmd == "connect") {
 			clients_hn[from] = r.arg1;
-			finished[from] = false;
+			finished[from] = 0;
 
 			Packet resp("connected",std::to_string(from),"","");
 			send(resp, hdl);
 			nb_client +=1;
+			active_client += 1;
 			logm("[+] Client#"+std::to_string(from)+": "+ clients_hn[from] +" connected","Server");
 		}
 		if (r.cmd == "genfinished") {
+			
+			if (finished[from]==-1) return;
+
 			std::vector<float> result = jsonstring_to_vectf(r.arg2);
 			logm("Client#"+std::to_string(from)+": "+ clients_hn[from] +" finished gen #"+r.arg1,"Server");
-			finished[from] = true;
+			finished[from] = 1;
 
 			if (result.size() == 0) {
 				logm("Client#"+std::to_string(from)+": "+clients_hn[from]+" send a result of 0 on a generation","ERROR");
@@ -171,7 +177,7 @@ void LogicServer::handle_input() {
 		std::string sinput = input;	//Convert to std::string
 
 		if (sinput.find("kill") != std::string::npos) {	// Kill all clients
-			logm("Recive kill command");
+			logm("Receive kill command");
 			Packet exitpck("exit","","","");
 			send_all(exitpck);
 		}
@@ -226,8 +232,10 @@ void LogicServer::logic_loop() {
 			gen_started_at = std::time(nullptr);
 			timeout = mstk->sim_time*2;  // 100% more time than the sim time
 
+			// Re-enable the client that got timed out
+			active_client = nb_client;
 			for (auto &pair : connections){
-				finished[pair.second] = false;
+				finished[pair.second] = 0;
 			}
 
 			genresults.clear();
@@ -242,15 +250,18 @@ void LogicServer::logic_loop() {
 		}
 
 		if (step==2) { // One client have finished.
-			if (cfinished==nb_client) step=3;
+			// Look if all active client (not kicked) have finished
+			if (cfinished==active_client) step=3;
 			else if(std::time(nullptr)>(timetime+timeout)) {
 				logm("Some clients need to be kicked. Reason : timeout","WARNING");
-				// Send "exit" to any connected clients that are not finished
-				Packet exitpck("exit","","","");
+				// Send "standby" to any connected clients that are not finished
+				Packet stbpck("standby","","","");
 				for (auto &pair : connections) {
 					logm(std::to_string(finished[pair.second]));
-					if (! finished[pair.second]) {
-					   send(exitpck, pair.first);
+					if (finished[pair.second] == 0) {
+						send(stbpck, pair.first);
+						finished[pair.second] = -1;
+						active_client -= 1;
 					}
 				}
 
@@ -312,19 +323,21 @@ void LogicServer::logic_loop() {
 
 			packageSelectionned.clear();
 			packageScores.clear();
-
-			for(int j = 0; j < 1+nb_client/2; j+=1){
-				std::vector<std::string> selectioned;
-				std::vector<float> scores;
-				for(int i=0; i<(mstk->nb_brain); i+=1) {
-					std::string idstr = std::to_string(allBrains[i+j*(mstk->nb_brain)].bid1)+"s"+std::to_string(allBrains[i+j*(mstk->nb_brain)].bid2)+".pt";
-					selectioned.push_back(idstr);
-					scores.push_back(allFloats[i]);
+			
+			if (active_client!=0) { // If active_client is 0 then no package will be created
+				for(int j = 0; j < 1+active_client/2; j+=1){			
+					std::vector<std::string> selectioned;
+					std::vector<float> scores;
+					for(int i=0; i<(mstk->nb_brain); i+=1) {
+						std::string idstr = std::to_string(allBrains[i+j*(mstk->nb_brain)].bid1)+"s"+std::to_string(allBrains[i+j*(mstk->nb_brain)].bid2)+".pt";
+						selectioned.push_back(idstr);
+						scores.push_back(allFloats[i]);
+					}
+	
+					// Packaging it in json to send it
+					packageSelectionned.push_back(vects_to_jsonstring(selectioned));
+					packageScores.push_back(vectf_to_jsonstring(scores));
 				}
-
-				// Packaging it in json to send it
-				packageSelectionned.push_back(vects_to_jsonstring(selectioned));
-				packageScores.push_back(vectf_to_jsonstring(scores));
 			}
 
 			// Making a copy of the best brains
@@ -342,7 +355,7 @@ void LogicServer::logic_loop() {
 			sds.addStatRow(generationTemp, agent0scoreTemp, agent1scoreTemp, agent2scoreTemp,
 			   agent3scoreTemp, agent4scoreTemp, agent5scoreTemp, agent6scoreTemp,
 			   agent7scoreTemp, agent8scoreTemp, agent9scoreTemp, meanTemp, median,
-			   bestAgentScoreTemp,timeForOneGenTemp,seperation_time,processing_time,std::time(nullptr), nb_client);
+			   bestAgentScoreTemp,timeForOneGenTemp,seperation_time,processing_time,std::time(nullptr), active_client);
 
 			sds.data["generation"] = generation;
 			sds.data["simu_time"] = mstk->sim_time;
@@ -380,19 +393,26 @@ void LogicServer::logic_loop() {
 				logm("Starting new generation #"+std::to_string(generation));
 
 				int half_clients = 1;
-				if(nb_client == 1){
+				if(active_client == 1){
 					half_clients = 1;
 				} else {
-					half_clients = nb_client/2;
+					half_clients = active_client/2;
 				}
 
 				// Sending nextgen packet
-				logm("Sending nextgen to Clients");
-				int i = 0;
-				for (auto &pair : connections) {
-					Packet pck("nextgen",packageSelectionned[i%half_clients],packageScores[i%half_clients],"");
-					send(pck, pair.first);
-					i += 1;
+				// Only if there are active clients
+				if (active_client == 0) {
+					logm("No active client, skipping the nextgen packet");
+				}
+				else {
+					logm("Sending nextgen to Clients");
+					int i = 0;
+					for (auto &pair : connections) {
+						if (finished[pair.second] == -1) continue;
+						Packet pck("nextgen",packageSelectionned[i%half_clients],packageScores[i%half_clients],"");
+						send(pck, pair.first);
+						i += 1;
+					}
 				}
 				step = 1;
 			}
@@ -401,7 +421,7 @@ void LogicServer::logic_loop() {
 
 		if (step==5) {
 			// Waiting for all clients to stop their sim
-			if (cfinished != nb_client) continue;
+			if (cfinished != active_client) continue;
 
 			// We are done
 			cfinished = 0;
