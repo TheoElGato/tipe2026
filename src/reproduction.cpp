@@ -25,7 +25,7 @@
  * @param NB_BRAIN the number of brain
  * @param EVOLUTION the evolution factor determining the force of the mutation
  * @param bestKeep the percentage of kept agent
- * @param selectionPol the purcentage of the population to use for the next gen
+ * @param selectionPol the percentage of the population to use for the next gen
  */
 void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
 			   int NB_BRAIN, float EVOLUTION, int bestKeep, int selectionPol) {

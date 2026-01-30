@@ -232,7 +232,7 @@ void LogicServer::logic_loop() {
 			gen_started_at = std::time(nullptr);
 			timeout = mstk->sim_time*2;  // 100% more time than the sim time
 
-			// Unkick the client that got timed out
+			// Re-enable the client that got timed out
 			active_client = nb_client;
 			for (auto &pair : connections){
 				finished[pair.second] = 0;
@@ -324,20 +324,20 @@ void LogicServer::logic_loop() {
 			packageSelectionned.clear();
 			packageScores.clear();
 			
-			
-			for(int j = 0; j < 1+active_client/2; j+=1){
-				if (active_client==0) continue; // If active_client is 0 then a package will be created
-				std::vector<std::string> selectioned;
-				std::vector<float> scores;
-				for(int i=0; i<(mstk->nb_brain); i+=1) {
-					std::string idstr = std::to_string(allBrains[i+j*(mstk->nb_brain)].bid1)+"s"+std::to_string(allBrains[i+j*(mstk->nb_brain)].bid2)+".pt";
-					selectioned.push_back(idstr);
-					scores.push_back(allFloats[i]);
+			if (active_client!=0) { // If active_client is 0 then no package will be created
+				for(int j = 0; j < 1+active_client/2; j+=1){			
+					std::vector<std::string> selectioned;
+					std::vector<float> scores;
+					for(int i=0; i<(mstk->nb_brain); i+=1) {
+						std::string idstr = std::to_string(allBrains[i+j*(mstk->nb_brain)].bid1)+"s"+std::to_string(allBrains[i+j*(mstk->nb_brain)].bid2)+".pt";
+						selectioned.push_back(idstr);
+						scores.push_back(allFloats[i]);
+					}
+	
+					// Packaging it in json to send it
+					packageSelectionned.push_back(vects_to_jsonstring(selectioned));
+					packageScores.push_back(vectf_to_jsonstring(scores));
 				}
-
-				// Packaging it in json to send it
-				packageSelectionned.push_back(vects_to_jsonstring(selectioned));
-				packageScores.push_back(vectf_to_jsonstring(scores));
 			}
 
 			// Making a copy of the best brains
@@ -402,7 +402,7 @@ void LogicServer::logic_loop() {
 				// Sending nextgen packet
 				// Only if there are active clients
 				if (active_client == 0) {
-					logm("No active client, skipping the nextgen packet);
+					logm("No active client, skipping the nextgen packet");
 				}
 				else {
 					logm("Sending nextgen to Clients");
