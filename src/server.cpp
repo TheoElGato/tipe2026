@@ -230,7 +230,7 @@ void LogicServer::logic_loop() {
 			// Get a time stamp
 			started_at = std::time(nullptr);
 			gen_started_at = std::time(nullptr);
-			timeout = mstk->sim_time*2;  // 100% more time than the sim time
+			timeout = mstk->sim_time;  // 100% more time than the sim time
 
 			// Re-enable the client that got timed out
 			active_client = nb_client;
@@ -402,7 +402,8 @@ void LogicServer::logic_loop() {
 				// Sending nextgen packet
 				// Only if there are active clients
 				if (active_client == 0) {
-					logm("No active client, skipping the nextgen packet");
+					logm("No active client, skipping the task");
+					step = 5;
 				}
 				else {
 					logm("Sending nextgen to Clients");
