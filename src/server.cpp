@@ -58,7 +58,7 @@ LogicServer::LogicServer(std::string sbf_path) {
 			connections.erase(it);
 			clients_hn.erase(from);
 			nb_client -=1;
-			active_client -= 1;
+			if(finished[from] != -1) active_client -= 1;
 		}
 	});
 
@@ -83,6 +83,9 @@ LogicServer::LogicServer(std::string sbf_path) {
 			logm("[+] Client#"+std::to_string(from)+": "+ clients_hn[from] +" connected","Server");
 		}
 		if (r.cmd == "genfinished") {
+			
+			if (finished[from]==-1) return;
+
 			std::vector<float> result = jsonstring_to_vectf(r.arg2);
 			logm("Client#"+std::to_string(from)+": "+ clients_hn[from] +" finished gen #"+r.arg1,"Server");
 			finished[from] = 1;
@@ -320,8 +323,10 @@ void LogicServer::logic_loop() {
 
 			packageSelectionned.clear();
 			packageScores.clear();
-
+			
+			
 			for(int j = 0; j < 1+active_client/2; j+=1){
+				if (active_client==0) continue; // If active_client is 0 then a package will be created
 				std::vector<std::string> selectioned;
 				std::vector<float> scores;
 				for(int i=0; i<(mstk->nb_brain); i+=1) {
@@ -395,13 +400,19 @@ void LogicServer::logic_loop() {
 				}
 
 				// Sending nextgen packet
-				logm("Sending nextgen to Clients");
-				int i = 0;
-				for (auto &pair : connections) {
-					if (finished[pair.second] == -1) continue;
-					Packet pck("nextgen",packageSelectionned[i%half_clients],packageScores[i%half_clients],"");
-					send(pck, pair.first);
-					i += 1;
+				// Only if there are active clients
+				if (active_client == 0) {
+					logm("No active client, skipping the nextgen packet);
+				}
+				else {
+					logm("Sending nextgen to Clients");
+					int i = 0;
+					for (auto &pair : connections) {
+						if (finished[pair.second] == -1) continue;
+						Packet pck("nextgen",packageSelectionned[i%half_clients],packageScores[i%half_clients],"");
+						send(pck, pair.first);
+						i += 1;
+					}
 				}
 				step = 1;
 			}
