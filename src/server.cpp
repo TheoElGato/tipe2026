@@ -83,7 +83,7 @@ LogicServer::LogicServer(std::string sbf_path) {
 			logm("[+] Client#"+std::to_string(from)+": "+ clients_hn[from] +" connected","Server");
 		}
 		if (r.cmd == "genfinished") {
-			
+
 			if (finished[from]==-1) return;
 
 			std::vector<float> result = jsonstring_to_vectf(r.arg2);
@@ -232,11 +232,18 @@ void LogicServer::logic_loop() {
 			gen_started_at = std::time(nullptr);
 			timeout = mstk->sim_time;  // 100% more time than the sim time
 
+
+			logm("There is" + std::to_string(nb_client) + " clients connected", "DEBUG");
+			logm("There is" + std::to_string(active_client) + " active clients", "DEBUG");
+
 			// Re-enable the client that got timed out
 			active_client = nb_client;
 			for (auto &pair : connections){
 				finished[pair.second] = 0;
 			}
+
+			logm("There is" + std::to_string(nb_client) + " clients connected", "DEBUG");
+			logm("There is" + std::to_string(active_client) + " active clients", "DEBUG");
 
 			genresults.clear();
 			generation = 0;
@@ -251,7 +258,10 @@ void LogicServer::logic_loop() {
 
 		if (step==2) { // One client have finished.
 			// Look if all active client (not kicked) have finished
-			if (cfinished==active_client) step=3;
+			if (cfinished==active_client){
+				step=3;
+				logm("finished in time", "DEBUG")
+			}
 			else if(std::time(nullptr)>(timetime+timeout)) {
 				logm("Some clients need to be kicked. Reason : timeout","WARNING");
 				// Send "standby" to any connected clients that are not finished
@@ -323,9 +333,9 @@ void LogicServer::logic_loop() {
 
 			packageSelectionned.clear();
 			packageScores.clear();
-			
+
 			if (active_client!=0) { // If active_client is 0 then no package will be created
-				for(int j = 0; j < 1+active_client/2; j+=1){			
+				for(int j = 0; j < 1+active_client/2; j+=1){
 					std::vector<std::string> selectioned;
 					std::vector<float> scores;
 					for(int i=0; i<(mstk->nb_brain); i+=1) {
@@ -333,7 +343,7 @@ void LogicServer::logic_loop() {
 						selectioned.push_back(idstr);
 						scores.push_back(allFloats[i]);
 					}
-	
+
 					// Packaging it in json to send it
 					packageSelectionned.push_back(vects_to_jsonstring(selectioned));
 					packageScores.push_back(vectf_to_jsonstring(scores));
