@@ -414,10 +414,9 @@ void LogicServer::logic_loop() {
 						send(pck, pair.first);
 						i += 1;
 					}
+					step = 1;
 				}
-				step = 1;
 			}
-
 		}
 
 		if (step==5) {
