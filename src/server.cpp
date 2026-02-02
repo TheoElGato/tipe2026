@@ -260,7 +260,7 @@ void LogicServer::logic_loop() {
 			// Look if all active client (not kicked) have finished
 			if (cfinished==active_client){
 				step=3;
-				logm("finished in time", "DEBUG")
+				logm("finished in time", "DEBUG");
 			}
 			else if(std::time(nullptr)>(timetime+timeout)) {
 				logm("Some clients need to be kicked. Reason : timeout","WARNING");
