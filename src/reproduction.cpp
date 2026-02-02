@@ -22,17 +22,17 @@
  * copies of selected parents.
  * @param brain_agents a vector of all the brain
  * @param score_agent a vector of the score that each brain got
- * @param NB_BRAIN the number of brain
- * @param EVOLUTION the evolution factor determining the force of the mutation
+ * @param nb_brain the number of brain
+ * @param evolution the evolution factor determining the force of the mutation
  * @param bestKeep the percentage of kept agent
  * @param selectionPol the percentage of the population to use for the next gen
  */
 void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
-			   int NB_BRAIN, float EVOLUTION, int bestKeep, int selectionPol) {
+			   int nb_brain, float evolution, int bestKeep, int selectionPol) {
 
 	// Validation
-	if (brain_agents->size() != NB_BRAIN || score_agent.size() != NB_BRAIN) {
-		std::cerr << "Error: brain_agents and score_agent must have size NB_BRAIN.\n";
+	if (brain_agents->size() != nb_brain || score_agent.size() != nb_brain) {
+		std::cerr << "Error: brain_agents and score_agent must have size nb_brain.\n";
 		exit(EXIT_FAILURE);
 	}
 	if (bestKeep < 0 || bestKeep > 100 || selectionPol < 0 || selectionPol > 100) {
@@ -41,11 +41,11 @@ void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
 	}
 
 	// Sort by score descending
-	reverse_sorting_brain(brain_agents, &score_agent, 0, NB_BRAIN - 1);
+	reverse_sorting_brain(brain_agents, &score_agent, 0, nb_brain - 1);
 
 	// Compute how many to keep and to select
-	int num_best_to_keep = (bestKeep * NB_BRAIN) / 100;
-	int num_selectable = (selectionPol * NB_BRAIN) / 100;
+	int num_best_to_keep = (bestKeep * nb_brain) / 100;
+	int num_selectable = (selectionPol * nb_brain) / 100;
 	if (num_selectable == 0) num_selectable = 1; // Avoid divide by zero
 
 	// Normalize scores
@@ -68,12 +68,12 @@ void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
 
 	// Generate new brains
 	std::vector<Brain> new_agents;
-	new_agents.reserve(NB_BRAIN - num_best_to_keep);
+	new_agents.reserve(nb_brain - num_best_to_keep);
 
 	int mode_repr = 0;
 	int j = 0;
 
-	for (int i = num_best_to_keep; i < NB_BRAIN; i+=1) {
+	for (int i = num_best_to_keep; i < nb_brain; i+=1) {
 
 		float ran = dist(gen);  // [0,1[
 		if (mode_repr==0) {
@@ -90,11 +90,11 @@ void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
 
 		// Add mutated copy of selected brain
 		new_agents.emplace_back((*brain_agents)[j].copy());
-		new_agents.back().mutate(EVOLUTION);
+		new_agents.back().mutate(evolution);
 	}
 
 	// Replace worst brains
-	for (int i = num_best_to_keep; i < NB_BRAIN; i+=1){
+	for (int i = num_best_to_keep; i < nb_brain; i+=1){
 		(*brain_agents)[i] = new_agents[i - num_best_to_keep];
 	}
 	// Cleanup

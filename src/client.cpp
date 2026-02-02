@@ -39,14 +39,14 @@ void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::
 	if (brainFile == ""){
 		// Initialize agents with default brain
 		for (int i=0; i<countBrains; i+=1) {
-			brains->emplace_back(9,6,"",device,nb_hidden_layer);
+			brains->emplace_back(9, 6, "", device, nb_hidden_layer);
 		}
 	} else {
 		// Initialize agents with brain from file
 		for (int i=0; i<countBrains; i+=1) {
 			std::string istring = std::to_string(i);
-			logm("Loading brain"+istring+" from file.");
-			brains->emplace_back(9,6,brainFile+istring+".pt",device,nb_hidden_layer);
+			logm("Loading brain" + istring + " from file.");
+			brains->emplace_back(9, 6, brainFile+istring+".pt", device, nb_hidden_layer);
 		}
 	}
 }
@@ -58,9 +58,9 @@ void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::
  * @param mindist The minimum distance to start where we can create a goal
  * @param maxdist The maximum distance to start where we can create a goal
  * @param nb_goal The number of goal we need to create
- * @param sub_sim_total The number of sub simulate there is
+ * @param sub_gen_total The number of sub generation there is
  */
-void init_goals(std::vector<std::vector<sf::Vector2f>>* goals, sf::Vector2f start, int mindist, int maxdist, int nb_goal, int sub_sim_total){
+void init_goals(std::vector<std::vector<sf::Vector2f>>* goals, sf::Vector2f start, int mindist, int maxdist, int nb_goal, int sub_gen_total){
 	// Random number setup
 	std::random_device rd;
 	std::mt19937 gen(rd());
@@ -76,7 +76,7 @@ void init_goals(std::vector<std::vector<sf::Vector2f>>* goals, sf::Vector2f star
 
 	for(int i=0; i<sub_sim_total; i++) {
 		std::vector<sf::Vector2f> temp;
-		angle = (2 * M_PI / sub_sim_total) * i;
+		angle = (2 * M_PI / sub_gen_total) * i;
 		radius = (maxdist-mindist)*dist(gen) + mindist;
 		x = start.x + radius * cos(angle);
 		y = start.y + radius * sin(angle);
@@ -107,25 +107,25 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 	logm("Welcome to the URSAF Sim");
 
 	/// SETTINGS FROM THE SIMTASKER ///
-	std::string DEVICE = stk.device;
-	int THREADS = stk.threads;
-	bool LOAD_FROM_FILE = stk.load_from_file;
-	std::string LOAD_NAME = stk.load_name;
-	std::string SIM_NAME = stk.sim_name;
-	int SIM_TIME = stk.sim_time;
-	float EVOLUTION = stk.evolution;
-	float BRAIN_ACC = stk.brain_acc;
-	int NB_BRAIN = stk.nb_brain;
-	int NB_AGENT = stk.nb_agent;
-	int NB_HIDDEN_LAYER = stk.nb_hidden_layer;
-	int SUB_SIM = stk.sub_sim;
-	int BEST_KEEP = stk.best_keep;
-	int SELECTION_POL = stk.selection_pol;
-	bool AUTOSAVE = stk.autosave;
-	int AUTOSAVE_FREQ = stk.autosave_freq;
-	int MAXDIST = stk.maxdist;
-	int MINDIST = stk.mindist;
-	int NB_GOAL = stk.nb_goal;
+	std::string device = stk.device;
+	int threads = stk.threads;
+	bool load_from_file = stk.load_from_file;
+	std::string load_name = stk.load_name;
+	std::string sim_name = stk.sim_name;
+	int sim_time = stk.sim_time;
+	float evolution = stk.evolution;
+	float brain_acc = stk.brain_acc;
+	int nb_brain = stk.nb_brain;
+	int nb_agent = stk.nb_agent;
+	int nb_hidden_layer = stk.nb_hidden_layer;
+	int sub_sim = stk.sub_sim;
+	int best_keep = stk.best_keep;
+	int selection_pol = stk.selection_pol;
+	bool autosave = stk.autosave;
+	int autosave_freq = stk.autosave_freq;
+	int maxdist = stk.maxdist;
+	int mindist = stk.mindist;
+	int nb_goal = stk.nb_goal;
 	sf::Vector2f start = sf::Vector2f(stk.startx, stk.starty);
 	bool is_infinite = stk.is_infinite;
 	int time_allowed = stk.time_allowed;
@@ -143,10 +143,6 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 	////// Variable related to the state of simulation ///////
 
 	// Var simulation gestion
-	int nb_agent = NB_AGENT;
-	int nb_brain = NB_BRAIN;
-	int simu_time = SIM_TIME;
-	float evolution = EVOLUTION;
 	int generation = 0;
 	bool clean_exit = false;
 
@@ -160,32 +156,31 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 	std::vector<Creature> agents;
 
 	// Init the SimDataStruct
-	std::string sim_name = SIM_NAME;
-	if (LOAD_FROM_FILE) sim_name=LOAD_NAME;
-	SimDataStruct sds("save", sim_name, 0, SUB_SIM, 0, evolution, BRAIN_ACC, nb_brain, nb_agent, 1, mc);
+	if (load_from_file) sim_name=load_name;
+	SimDataStruct sds("save", sim_name, 0, sub_sim, 0, evolution, brain_acc, nb_brain, nb_agent, 1, mc);
 
 	// If needed, load the sim
-	if (LOAD_FROM_FILE) {
+	if (load_from_file) {
 		if(mc) logm("Loading in client mode not supported.", "WARNING");
 		// Load simulation state from file
 		logm("Loading the sim","WARNING");
-		sds.loadFromFile(LOAD_NAME);
+		sds.loadFromFile(load_name);
 
 		nb_agent = sds.data["agents-number"];
 		nb_brain = sds.data["brains-number"];
 		generation = sds.data["generation"];
 		generation += 1;
-		simu_time = sds.data["simu_time"];
+		sim_time = sds.data["simu_time"];
 		evolution = sds.data["evolution"];
 		acc = sds.data["total_trained_time"];
 		int temp = sds.data["train_sessions"];
 		sds.data["train_sessions"] = temp + 1;
 
-		init_agents_and_brain(nb_agent, nb_brain, start.x, start.y, &agents, &brain_agent, DEVICE,NB_HIDDEN_LAYER,"save/"+LOAD_NAME+"/");
+		init_agents_and_brain(nb_agent, nb_brain, start.x, start.y, &agents, &brain_agent, device, nb_hidden_layer, "save/"+load_name+"/");
 
 	} else {
 		// Initialize simulation state
-		init_agents_and_brain(nb_agent, nb_brain, start.x, start.y, &agents, &brain_agent, DEVICE,NB_HIDDEN_LAYER);
+		init_agents_and_brain(nb_agent, nb_brain, start.x, start.y, &agents, &brain_agent, device, nb_hidden_layer);
 	}
 
 	if (!mc) sds.save();
@@ -195,40 +190,40 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 	std::vector<float> agents_objectif(nb_agent, 0);
 
 	// Data for sub sim
-	std::vector<std::thread> sub_sim_threads(SUB_SIM);
-	std::vector<std::vector<float>> sub_sim_scores(SUB_SIM);
+	std::vector<std::thread> sub_sim_threads(sub_sim);
+	std::vector<std::vector<float>> sub_sim_scores(sub_sim);
 
-	// State of each sous-sim:
+	// State of each sub-gen:
 	// 0 = not started
 	// 1 = running, the thread is doing its job
 	//	 (the main thread will check if it's finished)
 	//	 (the thread will change its state to 2 when finished)
 	// 2 = finished, the thread marked itself as finished
 	// 3 = collected, the main thread collected the results and processed them
-	std::vector<int> sub_sim_state(SUB_SIM, 0);
+	std::vector<int> sub_sim_state(sub_sim, 0);
 
 	// -1 means available
-	// else it contains the index of the sous-sim using it
-	std::vector<int> groups_avail(THREADS, -1);
+	// else it contains the index of the sub-sim using it
+	std::vector<int> groups_avail(threads, -1);
 
 	// Variable to track the threads and their state
 	int threads_used = 0;
 	int sub_sim_next_index = 0;
-	int sub_sim_total = SUB_SIM;
+	int sub_sim_total = sub_sim;
 	int sub_sim_started = 0;
 	int sub_sim_completed = 0;
 
 	// Distribute agents among PhysicsWorkers
 	std::vector<PhysicsWorker> physicsWorkers;
-	for(int i = 0; i < THREADS; i++) {
+	for(int i = 0; i < threads; i++) {
 		physicsWorkers.emplace_back();
 	}
 
 	// Partition agents for each thread
-	std::vector<std::vector<Creature*>> agentPartitions(THREADS);
-	for(int i = 0; i < THREADS; i++) {
-		auto start = agents.begin() + i * (agents.size() / THREADS);
-		auto end = (i == THREADS - 1) ? agents.end() : agents.begin() + (i + 1) * (agents.size() / THREADS);
+	std::vector<std::vector<Creature*>> agentPartitions(threads);
+	for(int i = 0; i < threads; i++) {
+		auto start = agents.begin() + i * (agents.size() / threads);
+		auto end = (i == threads - 1) ? agents.end() : agents.begin() + (i + 1) * (agents.size() / threads);
 
 		for (auto it = start; it != end; ++it) {
 			agentPartitions[i].push_back(&(*it));
@@ -252,10 +247,10 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 
 	// Generate goals
 	std::vector<std::vector<sf::Vector2f>> goals;
-	init_goals(&goals, start, MINDIST, MAXDIST, NB_GOAL, sub_sim_total);
+	init_goals(&goals, start, mindist, maxdist, nb_goal, sub_sim_total);
 
 	// Initialisation of score variables
-	for(int i = 0; i < SUB_SIM; i++) {
+	for(int i = 0; i < sub_sim; i++) {
 		sub_sim_scores[i] = std::vector<float>(nb_brain, 0.0f);
 	}
 
@@ -297,10 +292,10 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 
 					// Initialize agents with brain from file
 					for (int i=0; i<nb_brain; i++) {
-						brain_agent.emplace_back(9,6,cl->sbfpath+cl->selectioned[i],DEVICE,NB_HIDDEN_LAYER);
+						brain_agent.emplace_back(9, 6, cl->sbfpath+cl->selectioned[i], device, nb_hidden_layer);
 					}
 
-					reproduce(&brain_agent, score_agent,  nb_brain, evolution, BEST_KEEP, SELECTION_POL);
+					reproduce(&brain_agent, score_agent, nb_brain, evolution, best_keep, selection_pol);
 
 					for(int j=0;j<nb_brain;j++) score_agent[j] = 0;
 					sub_sim_next_index = 0;
@@ -331,7 +326,7 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 			}
 		}
 
-		// Check if any sous-sim thread has finished
+		// Check if any sub-gen thread has finished
 		for(int i = 0; i < sub_sim_total; i++) {
 			if(sub_sim_state[i] == 2) {
 				// Thread has finished
@@ -360,7 +355,7 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 						brain_agent[i].saveFile(sds.getFullPath()+istring+".pt");
 					}
 					sds.data["generation"] = generation;
-					sds.data["simu_time"] = simu_time;
+					sds.data["simu_time"] = sim_time;
 					sds.data["evolution"] = evolution;
 					sds.data["total_trained_time"] = acc;
 					sds.save();
@@ -395,7 +390,7 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 
 				int best_score_index = std::distance(score_agent.begin(), std::max_element(score_agent.begin(), score_agent.end()));
 
-				init_goals(&goals, start, MINDIST, MAXDIST, NB_GOAL, sub_sim_total);
+				init_goals(&goals, start, mindist, maxdist, nb_goal, sub_sim_total);
 
 
 				if (!mc) { // We only want to save brain in classic mode here.
@@ -416,7 +411,7 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 					float timeForOneGenTemp = acu;
 
 					// Initialization the variables for the next generation
-					reproduce(&brain_agent, score_agent,  nb_brain, evolution, BEST_KEEP, SELECTION_POL);
+					reproduce(&brain_agent, score_agent,  nb_brain, evolution, best_keep, selection_pol);
 
 					// Saving data
 					int midid = score_agent.size()/2;
@@ -425,17 +420,17 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 					sds.addStatRow(generationTemp, agent0scoreTemp, agent1scoreTemp, agent2scoreTemp,
 					   agent3scoreTemp, agent4scoreTemp, agent5scoreTemp, agent6scoreTemp,
 					   agent7scoreTemp, agent8scoreTemp, agent9scoreTemp, meanTemp, median,
-					   bestAgentScoreTemp,timeForOneGenTemp,0,0,std::time(nullptr),0);
+					   bestAgentScoreTemp, timeForOneGenTemp, 0, 0, std::time(nullptr), 0);
 
 					// Autosave check
-					if (AUTOSAVE && generation % AUTOSAVE_FREQ == 0) {
+					if (autosave && generation % autosave_freq == 0) {
 						// Time to autosave !
 						for (int i=0; i<nb_brain; i++) {
 							std::string istring = std::to_string(i);
 							brain_agent[i].saveFile(sds.getFullPath()+istring+".pt");
 						}
 						sds.data["generation"] = generation;
-						sds.data["simu_time"] = simu_time;
+						sds.data["simu_time"] = sim_time;
 						sds.data["evolution"] = evolution;
 						sds.data["total_trained_time"] = acc;
 						sds.save();
@@ -444,7 +439,8 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 					}
 
 
-					for(int j=0;j<nb_brain;j++) score_agent[j] = 0;
+					for(int j=0; j<nb_brain; j++) score_agent[j] = 0;
+
 					sub_sim_next_index = 0;
 					sub_sim_started = 0;
 					sub_sim_completed = 0;
@@ -477,11 +473,11 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 			}
 		} else {
 
-			// Not all sous-sim started yet
-			while(threads_used < THREADS) {
+			// Not all sub-sim started yet
+			while(threads_used < threads) {
 				// There is one or more free thread
 
-				// Avoid starting sous-sim that don't exist
+				// Avoid starting sub-sim that don't exist
 				if(sub_sim_started >= sub_sim_total) break;
 
 				// Find an available thread
@@ -503,9 +499,9 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 				for (auto& b : brain_agent) brain_agent_ptrs.push_back(&b);
 
 				sub_sim_started+=1;
-				logm("Starting sous-sim " + std::to_string(sub_sim_next_index) + " on group " + std::to_string(group_index) + " with " + std::to_string(agentPartitions[group_index].size()) + " agents.", "THREAD");
+				logm("Starting sub-sim " + std::to_string(sub_sim_next_index) + " on group " + std::to_string(group_index) + " with " + std::to_string(agentPartitions[group_index].size()) + " agents.", "THREAD");
 
-				sub_sim_threads[sub_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goals[sub_sim_next_index], brain_agent_ptrs, &sub_sim_state[sub_sim_next_index], &sub_sim_scores[sub_sim_next_index], &ss_dt, simu_time, ss_dt*BRAIN_ACC);
+				sub_sim_threads[sub_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goals[sub_sim_next_index], brain_agent_ptrs, &sub_sim_state[sub_sim_next_index], &sub_sim_scores[sub_sim_next_index], &ss_dt, sim_time, ss_dt*brain_acc);
 				sub_sim_threads[sub_sim_next_index].detach(); // Detach the thread to make it run on is own
 				sub_sim_state[sub_sim_next_index] = 1; // Mark it as running
 				threads_used += 1;
@@ -515,7 +511,7 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 
 		//// Window drawing block
 		if (!headless) {
-			dpl_srvc->render(&groups_avail, &agentPartitions, fps, agents.size(), generation, sub_sim_started, acu, simu_time, evolution, start, goals[0], mc);
+			dpl_srvc->render(&groups_avail, &agentPartitions, fps, agents.size(), generation, sub_sim_started, acu, sim_time, evolution, start, goals[0], mc);
 		}
 		////
 
@@ -608,7 +604,7 @@ void SimpleClient::send(Packet pck) {
 	websocketpp::lib::error_code ec;
 	m_client.send(m_hdl, pck.get_string(), websocketpp::frame::opcode::text, ec);
 	if (ec) {
-		logm("Send failed: " + ec.message(),"ERROR");
+		logm("Send failed: " + ec.message(), "ERROR");
 	}
 }
 
@@ -623,7 +619,7 @@ void SimpleClient::run(SimTasker* stk, bool hl) {
 
 	// Connecting...
 	std::this_thread::sleep_for(std::chrono::seconds(1));
-	Packet conn("connect",getHostName(),"","");
+	Packet conn("connect", getHostName(), "", "");
 	send(conn);
 
 	while (srvid == "") continue;
@@ -635,12 +631,12 @@ void SimpleClient::run(SimTasker* stk, bool hl) {
 			simulate(*mstk, true, headless, this);
 			if (state == -1) break;
 			state=0;
-			Packet simfnsh("simfinished","","","");
+			Packet simfnsh("simfinished", "", "", "");
 			send(simfnsh);
 		}
 	}
 
-	logm("Shuting down...","Client");
+	logm("Shuting down...", "Client");
 
 	// Close connection with the server
 	websocketpp::lib::error_code ec;
@@ -654,5 +650,5 @@ void SimpleClient::run(SimTasker* stk, bool hl) {
 	if (m_thread.joinable()){
 		m_thread.join();
 	}
-	logm("Shutdown.","Client");
+	logm("Shutdown.", "Client");
 }

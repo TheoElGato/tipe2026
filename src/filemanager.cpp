@@ -6,7 +6,7 @@
 		serialising data for the websocket, logging, convertion, and os stuff.
 		This is so much more that a filemanager, this is the project backbone.
 
-		
+
 	Author:
 		R. Benichou
 		A. Spadone
@@ -21,7 +21,7 @@
  * @param message The message to print
  * @param level The level of the message, by default INFO
  */
-void logm(const std::string& message, const std::string& level) {   
+void logm(const std::string& message, const std::string& level) {
 	std::cout << "[" << level << "] " << message << std::endl;
 }
 
@@ -76,7 +76,7 @@ float average(std::vector<float> v){
 
 /*
  * Get the host name of the machine
- * This bloc has been made with no intention for Windows. 
+ * This bloc has been made with no intention for Windows.
  * @return The host name
  */
 std::string getHostName() {
@@ -151,28 +151,28 @@ bool str_to_uint16(const char *str, uint16_t *res) {
  * @param generation The current generation
  * @param sgeneration The current sub simulation
  * @param simu_time The time for one generation
- * @param evolution The current evolution 
+ * @param evolution The current evolution
  * @param brain_acc The number of step skipped until brain are ticked
  * @param brains_number The total number of brains
  * @param agents_number The total number of agents
  * @param train_sessions The number of sessions where the AI was trained
  * @param empty If empty is true then skip this function at start
  */
-SimDataStruct::SimDataStruct(std::string path, std::string name, int generation, int sgeneration, int simu_time, int evolution, float brain_acc, int brains_number,int agents_number,int train_sessions,bool empty) {
+SimDataStruct::SimDataStruct(std::string path, std::string name, int generation, int sgeneration, int simu_time, int evolution, float brain_acc, int brains_number, int agents_number, int train_sessions, bool empty) {
 	if (empty) return;
 	std::string host_name = getHostName();
 
 	this->name = generate_name(name);
-	
+
 	folder = path;
 	std::filesystem::path part2 = this->name;
 	this->fullpath = folder / part2;
-	
+
 	if (!std::filesystem::exists(fullpath))
 	{
 		 std::filesystem::create_directory(fullpath);
 	}
-	
+
 	data = {
 		{"name", name},
 		{"host_name", host_name},
@@ -187,7 +187,7 @@ SimDataStruct::SimDataStruct(std::string path, std::string name, int generation,
 		{"train_sessions",train_sessions},
 		{"nb_clients",0}
 	};
-	
+
 }
 
 /*
@@ -213,7 +213,7 @@ SimDataStruct::SimDataStruct(std::string path, std::string name, int generation,
  * @param localTime The local time of the device
  * @param nb_clients The number of client connected as this data is save.
  */
-void SimDataStruct::addStatRow(float generation, float agent0score, float agent1score, float agent2score, 
+void SimDataStruct::addStatRow(float generation, float agent0score, float agent1score, float agent2score,
 				   float agent3score, float agent4score, float agent5score, float agent6score,
 				   float agent7score, float agent8score, float agent9score, float mean, float median,
 				   float bestAgentScore, float timeForOneGen, float timeWaitingClients,
@@ -247,15 +247,15 @@ void SimDataStruct::save() {
 	std::ofstream o(fullpath / (name+".json"));
 	o << std::setw(4) << data << std::endl;
 	o.close();
-	
+
 	// Write a CSV for the stats
 	std::ofstream ss(fullpath / (name+".csv"));
 	auto writer = make_csv_writer(ss);
-	
-	
-	writer << std::vector<std::string>({"Generation","Agent0Score", "Agent1Score", "Agent2Score", "Agent3Score", 
-						 "Agent4Score", "Agent5Score", "Agent6Score", "Agent7Score", "Agent8Score", 
-						 "Agent9Score", "Mean", "Median", "BestAgentScore", "TimeForOneGen","TimeWaitingClients","TimeForProcessing","LocalTime"});
+
+
+	writer << std::vector<std::string>({"Generation","Agent0Score", "Agent1Score", "Agent2Score", "Agent3Score",
+						 "Agent4Score", "Agent5Score", "Agent6Score", "Agent7Score", "Agent8Score",
+						 "Agent9Score", "Mean", "Median", "BestAgentScore", "TimeForOneGen", "TimeWaitingClients", "TimeForProcessing", "LocalTime"});
 	for(int i=0;i<this->generationV.size();i+=1) {
 		writer << std::vector<float>({ generationV[i],
 									   agent0scoreV[i],
@@ -276,8 +276,8 @@ void SimDataStruct::save() {
 									   timeForProcessingV[i],
 									   localTimeV[i]});
 	}
-	
-	
+
+
 	o.close();
 }
 
@@ -285,15 +285,15 @@ void SimDataStruct::save() {
  * Push data saved in vectors into a JSON and a CSV file
  */
 void SimDataStruct::loadFromFile(std::string load_name) {
-	// Read the JSON file from the load_name sim 
+	// Read the JSON file from the load_name sim
 	std::string filename = folder / load_name / (load_name+".json");
-	
+
 	std::ifstream f(filename);
 	nlohmann::json j = nlohmann::json::parse(f);
-	
+
 	std::string host_name = getHostName();
 	j["host_name"] = host_name;
-	
+
 	data = j;
 	// Load the STATS
 	std::string filenameCsv = folder / load_name / (load_name+".csv");
@@ -339,7 +339,7 @@ SimTasker::SimTasker(std::string taskPath) {
 	// Read the JSON file from taskPath
 	std::ifstream f(taskPath);
 	allData = nlohmann::json::parse(f);
-	
+
 	len = allData.size();
 }
 
@@ -389,8 +389,7 @@ void SimTasker::loadTask(int id) {
  * @param a2 The second argument
  * @param a3 The third argument
  */
-Packet::Packet(std::string c,std::string a1,std::string a2,std::string a3)
-{
+Packet::Packet(std::string c, std::string a1, std::string a2, std::string a3) {
 	cmd = c;
 	arg1 = a1;
 	arg2 = a2;
@@ -403,8 +402,7 @@ Packet::Packet(std::string c,std::string a1,std::string a2,std::string a3)
  * Unpack a Packet object from a json string
  * @param loads The json string we parse and load into variables
  */
-Packet::Packet(std::string loads)
-{
+Packet::Packet(std::string loads) {
 	data = nlohmann::json::parse(loads);
 	cmd = data["cmd"];
 	arg1 = data["arg1"];
@@ -417,16 +415,14 @@ Packet::Packet(std::string loads)
  * Create a json string to pack the object
  * @return A json string
  */
-std::string Packet::get_string()
-{
+std::string Packet::get_string() {
 	return data.dump();
 }
 
 /*
  * Update the json object data with the current variables
  */
-void Packet::update()
-{
+void Packet::update() {
 	data = {
 		{"cmd", cmd},
 		{"arg1", arg1},

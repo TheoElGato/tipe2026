@@ -356,7 +356,7 @@ void LogicServer::logic_loop() {
 
 				std::ifstream  src(sbfpath+idstr,std::ios::binary);
 				std::string istring = std::to_string(i);
-				std::ofstream  dst(sds.getFullPath()+istring+".pt",std::ios::binary);
+				std::ofstream  dst(sds.getFullPath()+istring+".pt", std::ios::binary);
 				dst << src.rdbuf();
 			}
 
@@ -365,7 +365,7 @@ void LogicServer::logic_loop() {
 			sds.addStatRow(generationTemp, agent0scoreTemp, agent1scoreTemp, agent2scoreTemp,
 			   agent3scoreTemp, agent4scoreTemp, agent5scoreTemp, agent6scoreTemp,
 			   agent7scoreTemp, agent8scoreTemp, agent9scoreTemp, meanTemp, median,
-			   bestAgentScoreTemp,timeForOneGenTemp,seperation_time,processing_time,std::time(nullptr), active_client);
+			   bestAgentScoreTemp, timeForOneGenTemp, seperation_time, processing_time, std::time(nullptr), active_client);
 
 			sds.data["generation"] = generation;
 			sds.data["simu_time"] = mstk->sim_time;
@@ -392,7 +392,7 @@ void LogicServer::logic_loop() {
 				logm("Time limit reached. Finishing the task now.");
 
 				// Sending stopsim packet
-				Packet stpsim("stopsim","","","");
+				Packet stpsim("stopsim", "", "", "");
 				send_all(stpsim);
 				step=5;
 
@@ -421,7 +421,7 @@ void LogicServer::logic_loop() {
 					for (auto &pair : connections) {
 						if (finished[pair.second] == -1) continue;
 						if (finished[pair.second] == 1) finished[pair.second] = 0;
-						Packet pck("nextgen",packageSelectionned[i%half_clients],packageScores[i%half_clients],"");
+						Packet pck("nextgen", packageSelectionned[i%half_clients], packageScores[i%half_clients], "");
 						send(pck, pair.first);
 						i += 1;
 					}
@@ -445,7 +445,7 @@ void LogicServer::logic_loop() {
 	this->running = false;
 
 	logm("Asking all clients to shutdown...");
-	Packet exitpck("exit","","","");
+	Packet exitpck("exit", "", "", "");
 	send_all(exitpck);
 
 	while(nb_client > 0) continue;
