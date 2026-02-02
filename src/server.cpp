@@ -420,6 +420,7 @@ void LogicServer::logic_loop() {
 					int i = 0;
 					for (auto &pair : connections) {
 						if (finished[pair.second] == -1) continue;
+						if (finished[pair.second] == 1) finished[pair.second] = 0;
 						Packet pck("nextgen",packageSelectionned[i%half_clients],packageScores[i%half_clients],"");
 						send(pck, pair.first);
 						i += 1;
