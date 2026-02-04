@@ -161,7 +161,7 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 
 	// If needed, load the sim
 	if (load_from_file) {
-		if(mc) logm("Loading in client mode not supported.", "WARNING");
+		if(mc) logm("Loading in client mode is not supported.", "WARNING");
 		// Load simulation state from file
 		logm("Loading the sim","WARNING");
 		sds.loadFromFile(load_name);
