@@ -84,7 +84,7 @@ LogicServer::LogicServer(std::string sbf_path) {
 		}
 		if (r.cmd == "genfinished") {
 
-			if (finished[from]==-1) return;
+			if (finished[from]==-1) return; // even if the client hadd a warning we count the result
 
 			std::vector<float> result = jsonstring_to_vectf(r.arg2);
 			logm("Client#"+std::to_string(from)+": "+ clients_hn[from] +" finished gen #"+r.arg1,"Server");
@@ -261,13 +261,15 @@ void LogicServer::logic_loop() {
 				Packet stbpck("standby","","","");
 				for (auto &pair : connections) {
 					// kick only the client that where still connected
-					if (finished[pair.second] == 0) {
+					if (finished[pair.second] == -2) { // if they had a warning then kick it and remove from active
 						send(stbpck, pair.first);
 						finished[pair.second] = -1;
 						active_client -= 1;
+					} else if (finished[pair.second] == 0) { // if they haven't finished in time then put a warning
+						send(stbpck, pair.first);
+						finished[pair.second] = -2;
 					}
 				}
-
 				step=3;
 			}
 		}
