@@ -74,7 +74,7 @@ void init_goals(std::vector<std::vector<sf::Vector2f>>* goals, sf::Vector2f star
 	float x = 0;
 	float y = 0;
 
-	for(int i=0; i<sub_sim_total; i++) {
+	for(int i=0; i<sub_gen_total; i++) {
 		std::vector<sf::Vector2f> temp;
 		angle = (2 * M_PI / sub_gen_total) * i;
 		radius = (maxdist-mindist)*dist(gen) + mindist;
