@@ -37,7 +37,7 @@ private:
 	std::atomic<uint64_t> next_id = 0;
 	std::map<websocketpp::connection_hdl, uint64_t, std::owner_less<websocketpp::connection_hdl>> connections;
 	std::map<uint64_t, std::string> clients_hn;
-	std::map<uint64_t, int> finished; // 0 standby; 1 finished; -1 kicked out; -2 warning
+	std::map<uint64_t, int> finished; // 0 standby; 1 finished; -1 kicked out
 	SimTasker* mstk;
 	int timetime = 0;
 	int cfinished = 0;
