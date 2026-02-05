@@ -232,10 +232,6 @@ void LogicServer::logic_loop() {
 			gen_started_at = std::time(nullptr);
 			timeout = mstk->sim_time;  // 100% more time than the sim time
 
-
-			logm("There is" + std::to_string(nb_client) + " clients connected", "DEBUG");
-			logm("There is" + std::to_string(active_client) + " active clients", "DEBUG");
-
 			// Re-enable the client that got timed out
 			active_client = nb_client;
 			cfinished = 0;
@@ -257,18 +253,14 @@ void LogicServer::logic_loop() {
 		if (step==2) { // One client have finished.
 			// Look if all active client (not kicked) have finished
 			if (cfinished==active_client){
-				logm("There is" + std::to_string(active_client) + " active clients", "DEBUG");
 				step=3;
-				logm("finished in time", "DEBUG");
 			}
 			else if(std::time(nullptr)>(timetime+timeout)) {
-				logm("There is" + std::to_string(active_client) + " active clients", "DEBUG");
-				logm("There is" + std::to_string(cfinished) + " finished clients", "DEBUG");
 				logm("Some clients need to be kicked. Reason : timeout","WARNING");
 				// Send "standby" to any connected clients that are not finished
 				Packet stbpck("standby","","","");
 				for (auto &pair : connections) {
-					logm(std::to_string(finished[pair.second]));
+					// kick only the client that where still connected
 					if (finished[pair.second] == 0) {
 						send(stbpck, pair.first);
 						finished[pair.second] = -1;
