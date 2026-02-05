@@ -238,6 +238,7 @@ void LogicServer::logic_loop() {
 
 			// Re-enable the client that got timed out
 			active_client = nb_client;
+			cfinished = 0;
 			for (auto &pair : connections){
 				finished[pair.second] = 0;
 			}
@@ -385,7 +386,6 @@ void LogicServer::logic_loop() {
 		if (step==4) {
 
 			// Cleaning up
-			cfinished = 0;
 			genresults.clear();
 
 			if(!mstk->is_infinite &&  (std::time(nullptr) - started_at)>mstk->time_allowed) {
@@ -411,6 +411,7 @@ void LogicServer::logic_loop() {
 
 				// Sending nextgen packet
 				// Only if there are active clients
+				cfinished = 0;
 				if (active_client == 0) {
 					logm("No active client, skipping the task");
 					step = 5;
