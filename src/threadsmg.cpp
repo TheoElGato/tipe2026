@@ -90,7 +90,7 @@ void handleThread(PhysicsWorker* physics, std::vector<Creature *> agents, sf::Ve
 		Creature* agent = agents[i];
 		float dst = distance(agent->vertices[0].position, objectives[obj[i]]);
 		float scr = 1/(1+dst);
-		(*scores)[i] = scr;
+		(*scores)[i] += scr;
 	}
 
 	obj.clear();
