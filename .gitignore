@@ -54,3 +54,5 @@ tools/__pycache__/
 # debug information files
 *.dwo
 task.json
+.nvim.lua
+compile_commands.json
