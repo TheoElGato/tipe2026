@@ -5,8 +5,9 @@ project(TIPE2026 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-profile-arcs -fno-test-coverage") # Disable coverage
 
-set(PcLycee FALSE)
+option(PCSCHOOL "" OFF)
 
 include(FetchContent)
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz)
@@ -38,7 +39,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(asio)
 
-if(PcLycee)
+if(PCSCHOOL)
     set(SFML_DIR "/nfs/home/rbenichou/Documents/TIPE/SFML-2.5.1/lib/cmake/SFML/")
     set(SFML_FIND_COMPONENTS system window graphics audio network)
     find_package(SFML 2 REQUIRED COMPONENTS graphics window system audio network)
@@ -56,6 +57,12 @@ endif()
 
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+
+# Disable coverage for csv
+set_target_properties(csv PROPERTIES 
+    COMPILE_FLAGS "-fno-profile-arcs -fno-test-coverage"
+    INTERFACE_COMPILE_OPTIONS ""
+)
 
 # To test for memory leaks, uncomment the line below :
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g")
@@ -101,17 +108,6 @@ add_executable(ursafsim_headless
 
 target_compile_definitions(ursafsim_headless PRIVATE ASIO_STANDALONE)
 target_include_directories(ursafsim_headless PRIVATE include ${asio_SOURCE_DIR}/asio/include)
-target_link_libraries(ursafsim_headless PRIVATE nlohmann_json::nlohmann_json sfml-system sfml-audio sfml-network csv websocketpp "${TORCH_LIBRARIES}" )
+target_link_libraries(ursafsim_headless PRIVATE nlohmann_json::nlohmann_json sfml-system sfml-audio sfml-network gcov csv websocketpp "${TORCH_LIBRARIES}" )
 
-# The following code block is suggested to be used on Windows.
-# However our code is not compatible for it.
-# According to https://github.com/pytorch/pytorch/issues/25457,
-# the DLLs need to be copied to avoid memory errors.
-if (MSVC)
-  file(GLOB TORCH_DLLS "${TORCH_INSTALL_PREFIX}/lib/*.dll")
-  add_custom_command(TARGET example-app
-                     POST_BUILD
-                     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                     ${TORCH_DLLS}
-                     $<TARGET_FILE_DIR:example-app>)
-endif (MSVC)
+
