@@ -79,6 +79,22 @@ public:
 		netherite_ingotSprite.setTexture(netherite_ingotTexture);
 		music_disc_othersideSprite.setTexture(music_disc_othersideTexture);
 
+		startSprite.scale({0.6f, 0.6f});
+		diamondSprite.scale({0.6f, 0.6f});
+		emeraldSprite.scale({0.6f, 0.6f});
+		nether_starSprite.scale({0.6f, 0.6f});
+		netherite_ingotSprite.scale({0.6f, 0.6f});
+		music_disc_othersideSprite.scale({0.6f, 0.6f});
+
+		sf::FloatRect spb = startSprite.getLocalBounds();
+
+		startSprite.setOrigin(spb.width/2, spb.height/2);
+		diamondSprite.setOrigin(spb.width/2, spb.height/2);
+		emeraldSprite.setOrigin(spb.width/2, spb.height/2);
+		nether_starSprite.setOrigin(spb.width/2, spb.height/2);
+		netherite_ingotSprite.setOrigin(spb.width/2, spb.height/2);
+		music_disc_othersideSprite.setOrigin(spb.width/2, spb.height/2);
+
 		wifiSprite.setPosition({0, 0});
 		wifiSprite.scale({0.1f, 0.1f});
 
@@ -158,7 +174,7 @@ public:
 		window.draw(backgroundSprite);
 
 		// Draw start and item sprites
-		draw_items(window, startSprite, diamondSprite, start, goals[0], (*groups_avail)[selected_agents]);
+		draw_items(window, startSprite, diamondSprite, start, goals[selected_agents], (*groups_avail)[selected_agents]);
 
 		if (drawall) {
 			//logm(std::to_string( (*agentPartitions)[0].size()),"DEBUG");
@@ -279,16 +295,11 @@ private:
 	 * @param ob The sprite for the goal
 	 * @param start The Vector2f for the coordinate for the spawnpoint
 	 * @param goal The Vector2f for the coordinate for the goal
-	 * @param stats An identifier of the current sub sim
+	 * @param idssim An identifier of the current sub sim
 	 */
 	void draw_items(sf::RenderWindow& window, sf::Sprite sp, sf::Sprite ob, sf::Vector2f start, sf::Vector2f goal, int idsssim) {
 		if (idsssim < 0) idsssim = 0;
-		sp.scale({0.6f, 0.6f});
-		ob.scale({0.6f, 0.6f});
-		sf::FloatRect spb = sp.getLocalBounds();
-		sf::FloatRect obb = ob.getLocalBounds();
-		sp.setOrigin(spb.width/2, spb.height/2);
-		ob.setOrigin(obb.width/2, obb.height/2);
+		
 		sp.setPosition(start);
 		ob.setPosition(goal);
 		window.draw(sp);
