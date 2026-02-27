@@ -35,4 +35,5 @@
 	
 	"IS_INFINITE": true,
 	"TIME_ALLOWED": 126000
+	"KICK_FACTOR": 1
 }]

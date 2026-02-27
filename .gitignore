@@ -49,7 +49,8 @@ tools/myenv/
 tools/rapports/*
 tools/saves/*
 tools/__pycache__/
-
+docs
+Doxyfile
 
 # debug information files
 *.dwo

@@ -94,6 +94,7 @@ class SimTasker {
 
 	  bool is_infinite;
 	  int time_allowed;
+	  int kick_factor;
 
    private:
 	  nlohmann::json allData;

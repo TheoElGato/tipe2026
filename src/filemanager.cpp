@@ -377,6 +377,7 @@ void SimTasker::loadTask(int id) {
 	this->curve_d = data["CURVE_D"];
 	this->is_infinite = data["IS_INFINITE"];
 	this->time_allowed = data["TIME_ALLOWED"];
+	this->kick_factor = data["KICK_FACTOR"];
 }
 
 //// Packet
