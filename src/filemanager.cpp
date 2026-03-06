@@ -17,21 +17,20 @@
 //// Utility functions
 
 /*
- * Standardized logging function for the project
- * @param message The message to print
- * @param level The level of the message, by default INFO
+ * Get the current timestamp as a string in the format [HH:MM:SS]
+ * @return A string with the current timestamp
  */
-void logm(const std::string& message, const std::string& level) {
-	std::cout << "[" << level << "] " << message << std::endl;
-}
+std::string get_timestamp() {
+    std::time_t now = std::time(nullptr);
+    std::tm* lt = std::localtime(&now);
 
-/*
- * Standardized error function for the project
- * @param message The message to print will exiting
- */
-void error(const std::string& message) {
-	logm(message, "FATAL");
-	assert(false);
+    // Fixed-size buffer on the stack (no heap allocation)
+    char buffer[12]; 
+    // %H:%M:%S is exactly 8 chars + 2 brackets + null terminator = 11 chars
+    std::snprintf(buffer, sizeof(buffer), "[%02d:%02d:%02d]", 
+                  lt->tm_hour, lt->tm_min, lt->tm_sec);
+    
+    return std::string(buffer);
 }
 
 /*
@@ -140,6 +139,38 @@ bool str_to_uint16(const char *str, uint16_t *res) {
 	}
 	*res = (uint16_t)val;
 	return true;
+}
+
+//// Logger
+
+/*
+ * Standardized logging function for the project.
+ * Also save the message to a cache to be saved to disk.
+ * @param message The message to print
+ * @param level The level of the message, by default INFO
+ * @param thread The thread that print the message, by default Main
+ */
+void Logger::logm(const std::string& message ,const std::string& level, const std::string& thread) {
+	std::string line = get_timestamp() + " [" + thread + "] [" + level + "] " + message;
+	std::cout << line << std::endl;
+	cache.emplace_back(line);
+}
+
+/*
+ * Standardized fatal error function for the project
+ * @param message The message to print will exiting
+ */
+void Logger::fatal(const std::string& message, const std::string& thread) {
+	logm(message, "FATAL", thread);
+	assert(false);
+}
+
+/*
+ * Save the logger cache to disk
+ * @param filename The filename to write the cache
+ */
+void Logger::saveToDisk(std::string filename) {
+    return;
 }
 
 //// SimDataStruct

@@ -22,8 +22,7 @@
 using namespace csv;
 using namespace nlohmann::literals;
 
-void logm(const std::string& message, const std::string& level = "INFO");
-void error(const std::string& message);
+
 std::string remove_zero_ts(float value);
 std::string getHostName();
 std::string vectf_to_jsonstring(std::vector<float> v);
@@ -32,6 +31,16 @@ std::vector<float> jsonstring_to_vectf(std::string s);
 std::vector<std::string> jsonstring_to_vects(std::string s);
 bool str_to_uint16(const char *str, uint16_t *res);
 float average(std::vector<float> v);
+std::string get_timestamp();
+
+class Logger {
+  public:
+	  void logm(const std::string& message, const std::string& level = "INFO", const std::string& thread = "Main");
+	  void fatal(const std::string& message, const std::string& thread = "Main");
+	  void saveToDisk(std::string filename);
+  private:
+	  std::vector<std::string> cache;
+};
 
 class Packet {
    public:

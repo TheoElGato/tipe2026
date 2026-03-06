@@ -26,7 +26,7 @@ class Creature; // forward
 class DisplayService {
 public:
 	virtual ~DisplayService() = default;
-	virtual void init(bool headless, bool* runningptr, bool* clean_exitptr, int agentPartitionsSize, bool mc) = 0;
+	virtual void init(bool headless, bool* runningptr, bool* clean_exitptr, int agentPartitionsSize, bool mc, Logger* loggerptr) = 0;
 	virtual void draw_creature(Creature* creature) = 0;
 	virtual void render(std::vector<int>* groups_avail,
 						std::vector<std::vector<Creature*>>* agentPartitions,

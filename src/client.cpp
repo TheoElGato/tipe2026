@@ -45,7 +45,7 @@ void init_agents_and_brain(int countAgents, int countBrains, int x, int y, std::
 		// Initialize agents with brain from file
 		for (int i=0; i<countBrains; i+=1) {
 			std::string istring = std::to_string(i);
-			logm("Loading brain" + istring + " from file.");
+			//logger->logm("Loading brain" + istring + " from file.");
 			brains->emplace_back(9, 6, brainFile+istring+".pt", device, nb_hidden_layer);
 		}
 	}
@@ -99,12 +99,13 @@ void init_goals(std::vector<std::vector<sf::Vector2f>>* goals, sf::Vector2f star
  * @param stk The sim tasker use of the simulation
  * @param mc If true : run in client mode, else in classic mode
  * @param headless If true run in headless mode
+ * @param logger The main logger
  * @param cl The pointer to the instance of the SimpleClient class
  * @return int 0 for a successfull simulation
  */
-int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
+int simulate(SimTasker stk, Logger* logger, bool mc, bool headless,SimpleClient* cl) {
 
-	logm("Welcome to the URSAF Sim");
+	logger->logm("Welcome to the URSAF Sim");
 
 	/// SETTINGS FROM THE SIMTASKER ///
 	std::string device = stk.device;
@@ -161,9 +162,9 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 
 	// If needed, load the sim
 	if (load_from_file) {
-		if(mc) logm("Loading in client mode is not supported.", "WARNING");
+		if(mc) logger->logm("Loading in client mode is not supported.", "WARNING");
 		// Load simulation state from file
-		logm("Loading the sim","WARNING");
+		logger->logm("Loading the sim","WARNING");
 		sds.loadFromFile(load_name);
 
 		nb_agent = sds.data["agents-number"];
@@ -229,7 +230,7 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 			agentPartitions[i].push_back(&(*it));
 		}
 
-		logm("Created partition " + std::to_string(i) + " with " + std::to_string(agentPartitions[i].size()) + " agents.");
+		logger->logm("Created partition " + std::to_string(i) + " with " + std::to_string(agentPartitions[i].size()) + " agents.");
 	}
 
 	for(int i=0; i<sub_sim_total; i++) {
@@ -239,7 +240,7 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 	// DisplayService init
 	bool running = true;
 	std::unique_ptr<DisplayService> dpl_srvc = CreateDisplayService();
-	dpl_srvc->init(headless, &running, &clean_exit, agentPartitions.size(), mc);
+	dpl_srvc->init(headless, &running, &clean_exit, agentPartitions.size(), mc, logger);
 
 	// Manage Clock
 	sf::Clock clock;
@@ -259,7 +260,7 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 		evolution = curve_a*std::exp(curve_b*generation+curve_c)+curve_d;
 	}
 
-	logm("All variable initialized. Starting main loop.", "INFO");
+	logger->logm("All variable initialized. Starting main loop.", "INFO");
 
 	// Main loop
 	while (running) {
@@ -360,10 +361,10 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 					sds.data["total_trained_time"] = acc;
 					sds.save();
 
-					logm("Saved.", "INFO");
+					logger->logm("Saved.", "INFO");
 				}
 
-				logm("Exiting simulation.", "INFO");
+				logger->logm("Exiting simulation.", "INFO");
 				return 0;
 			}
 		}
@@ -375,7 +376,7 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 			if (sub_sim_completed >= sub_sim_total) {
 				// All of it is finished
 				// Change of sim :
-				logm("Generation finished. Processing...", "INFO");
+				logger->logm("Generation finished. Processing...", "INFO");
 
 				for(int i=0;i<sub_sim_scores.size();i++) {
 					for(int j=0;j<nb_brain;j++) {
@@ -435,7 +436,7 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 						sds.data["total_trained_time"] = acc;
 						sds.save();
 
-						logm("Autosaved.", "INFO");
+						logger->logm("Autosaved.", "INFO");
 					}
 
 
@@ -491,7 +492,7 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 				}
 
 				if (group_index == -1){
-					error("No group available. Have you made a mistake ???"); // No free group to work with
+					logger->fatal("No group available. Have you made a mistake ???"); // No free group to work with
 				}
 
 				// Making a Vector of Brain pointers for the group
@@ -499,7 +500,7 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 				for (auto& b : brain_agent) brain_agent_ptrs.push_back(&b);
 
 				sub_sim_started+=1;
-				logm("Starting sub-sim " + std::to_string(sub_sim_next_index) + " on group " + std::to_string(group_index) + " with " + std::to_string(agentPartitions[group_index].size()) + " agents.", "THREAD");
+				logger->logm("Starting sub-sim " + std::to_string(sub_sim_next_index) + " on group " + std::to_string(group_index) + " with " + std::to_string(agentPartitions[group_index].size()) + " agents.", "THREAD");
 
 				sub_sim_threads[sub_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goals[sub_sim_next_index], brain_agent_ptrs, &sub_sim_state[sub_sim_next_index], &sub_sim_scores[sub_sim_next_index], &ss_dt, sim_time, ss_dt*brain_acc);
 				sub_sim_threads[sub_sim_next_index].detach(); // Detach the thread to make it run on is own
@@ -521,7 +522,7 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
 
 	}
 
-	logm("Exiting simulation.", "INFO");
+	logger->logm("Exiting simulation.", "INFO");
 	return 0;
 }
 
@@ -530,8 +531,9 @@ int simulate(SimTasker stk, bool mc, bool headless, SimpleClient* cl) {
  * @param uri The address of the websocket
  * @param path The path as a std::string of Server Brain Files Folder Path
  */
-SimpleClient::SimpleClient(const std::string &uri, const std::string path) {
+SimpleClient::SimpleClient(const std::string &uri, const std::string path, Logger* loggerptr) {
 	sbfpath = path+"/";
+	this->logger = loggerptr;
 	m_client.init_asio();
 	m_client.clear_access_channels(websocketpp::log::alevel::all);
 	m_client.clear_error_channels(websocketpp::log::elevel::all);
@@ -545,31 +547,31 @@ SimpleClient::SimpleClient(const std::string &uri, const std::string path) {
 		}
 
 		if (r.cmd == "startsim") {
-			logm("Server requested the start of sim #" + r.arg1,"Client");
+			logger->logm("Server requested the start of sim #" + r.arg1, "INFO", "Client");
 			mstk->loadTask(std::stoi(r.arg1));
 			mstk->sim_name = mstk->sim_name + srvid;
 			state = 1;
 		}
 
 		if (r.cmd == "standby") {
-			logm("Server requested to stop computing and go on standby.","Client");
+			logger->logm("Server requested to stop computing and go on standby.","INFO", "Client");
 			state = 2;
 		}
 
 		if (r.cmd == "nextgen") {
-			logm("Server requested the next gen","Client");
+			logger->logm("Server requested the next gen", "INFO", "Client");
 			selectioned = jsonstring_to_vects(r.arg1);
 			scores = jsonstring_to_vectf(r.arg2);
 			state = 3;
 		}
 
 		if (r.cmd == "stopsim") {
-			logm("Server requested the end of sim","Client");
+			logger->logm("Server requested the end of sim", "INFO","Client");
 			state = 4;
 		}
 
 		if (r.cmd == "exit") {
-			logm("Server requested exiting...","Client");
+			logger->logm("Server requested exiting...", "INFO","Client");
 			state = -1;
 		}
 	});
@@ -577,7 +579,7 @@ SimpleClient::SimpleClient(const std::string &uri, const std::string path) {
 	websocketpp::lib::error_code ec;
 	client::connection_ptr con = m_client.get_connection(uri, ec);
 	if (ec) {
-		logm("Could not create connection: ", "ERROR");
+		logger->logm("Could not create connection: ", "ERROR","Client");
 		return;
 	}
 
@@ -604,7 +606,7 @@ void SimpleClient::send(Packet pck) {
 	websocketpp::lib::error_code ec;
 	m_client.send(m_hdl, pck.get_string(), websocketpp::frame::opcode::text, ec);
 	if (ec) {
-		logm("Send failed: " + ec.message(), "ERROR");
+		logger->logm("Send failed: " + ec.message(), "ERROR", "Client");
 	}
 }
 
@@ -623,12 +625,12 @@ void SimpleClient::run(SimTasker* stk, bool hl) {
 	send(conn);
 
 	while (srvid == "") continue;
-	logm("Connected to server with id #" + srvid,"Client");
+	logger->logm("Connected to server with id #" + srvid, "INFO","Client");
 
 	while (state != -1) {
 		if (state==0) {std::this_thread::sleep_for(std::chrono::milliseconds(200));}
 		if (state==1) {
-			simulate(*mstk, true, headless, this);
+			simulate(*mstk, this->logger, true, headless, this);
 			if (state == -1) break;
 			state=0;
 			Packet simfnsh("simfinished", "", "", "");
@@ -636,19 +638,19 @@ void SimpleClient::run(SimTasker* stk, bool hl) {
 		}
 	}
 
-	logm("Shuting down...", "Client");
+	logger->logm("Shuting down...", "INFO", "Client");
 
 	// Close connection with the server
 	websocketpp::lib::error_code ec;
 	m_client.close(m_hdl, websocketpp::close::status::normal, "Client shutting down", ec);
 	if (ec) {
-		logm("Close failed: " + ec.message(), "ERROR");
-	}
+		logger->logm("Close failed: " + ec.message(), "ERROR", "Client");
+    }
 
 	// Stop the ASIO event loop and wait for the thread to end.
 	m_client.stop();
 	if (m_thread.joinable()){
 		m_thread.join();
 	}
-	logm("Shutdown.", "Client");
+	logger->logm("Shutdown.", "INFO", "Client");
 }

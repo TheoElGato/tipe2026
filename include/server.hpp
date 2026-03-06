@@ -27,11 +27,12 @@ typedef websocketpp::server<websocketpp::config::asio> server;
 
 class LogicServer {
 public:
-	LogicServer(std::string sbf_path);
+	LogicServer(std::string sbf_path, Logger* loggerptr);
 	void run(uint16_t port, SimTasker* mstk);
 	int timeout = 60;
 
 private:
+	Logger* logger;
 	server m_server;
 	std::string sbfpath = "";
 	std::atomic<uint64_t> next_id = 0;

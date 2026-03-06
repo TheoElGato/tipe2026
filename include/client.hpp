@@ -29,10 +29,9 @@
 
 typedef websocketpp::client<websocketpp::config::asio_client> client;
 
-
 class SimpleClient {
 public:
-	SimpleClient(const std::string &uri, const std::string path);
+	SimpleClient(const std::string &uri, const std::string path, Logger* loggerptr);
 	~SimpleClient();
 	void send(Packet pck);
 	void run(SimTasker* stk,bool hl);
@@ -48,8 +47,9 @@ private:
 	websocketpp::connection_hdl m_hdl;
 	std::thread m_thread;
 	SimTasker* mstk;
+	Logger* logger;
 };
 
-int simulate(SimTasker stk, bool mc = false, bool headless = false, SimpleClient* cl = nullptr);
+int simulate(SimTasker stk, Logger* logger, bool mc = false, bool headless = false, SimpleClient* cl = nullptr);
 
 #endif // CLIENT_H

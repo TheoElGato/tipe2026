@@ -26,6 +26,9 @@ int main(int argc, char* argv[]) {
 	uint16_t port = 9002;
 	std::string sbf_path = "sbf"; // Stand for Server Brain Files Path
 
+	// Create the main logger
+    Logger* logger = new Logger();
+
 	bool headless = false; // Allow to run without a window
 	if (argc==1) mode = 0;
 	else {
@@ -50,7 +53,7 @@ int main(int argc, char* argv[]) {
 				next_arg = next_arg+1;
 
 			} else {
-				assert(false  && "Unkown argument passed.");
+				logger->fatal("Unkown argument passed.");
 			}
 		}
 	}
@@ -60,20 +63,20 @@ int main(int argc, char* argv[]) {
 	
 	if (mode==0) {
 		// Execute all the sims : 
-		logm("Starting Classic mode for "+std::to_string(mainSimTasker.len)+" simulations");
+		logger->logm("Starting Classic mode for "+std::to_string(mainSimTasker.len)+" simulations");
 		for(int i=0;i<mainSimTasker.len;i+=1) {
 			mainSimTasker.loadTask(i);
-			simulate(mainSimTasker,false,headless);
+			simulate(mainSimTasker,logger,false,headless);
 		}
 	} else if (mode==1) {
 		// Start client on ip and port
-		logm("Starting Client mode for "+std::to_string(mainSimTasker.len)+" simulations today.");
-		SimpleClient cl("ws://"+ip+":"+std::to_string(port),sbf_path);
+		logger->logm("Starting Client mode for "+std::to_string(mainSimTasker.len)+" simulations today.");
+		SimpleClient cl("ws://"+ip+":"+std::to_string(port),sbf_path,logger);
 		cl.run(&mainSimTasker,headless);
 	} else if (mode==2) {
 		// Start server on localhost and listening on port
-		logm("Server mode for "+std::to_string(mainSimTasker.len)+" simulations today.");
-		LogicServer sv(sbf_path);
+		logger->logm("Server mode for "+std::to_string(mainSimTasker.len)+" simulations today.");
+		LogicServer sv(sbf_path, logger);
 		sv.run(port,&mainSimTasker);
 	} 
 	

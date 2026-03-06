@@ -36,7 +36,9 @@
  * Constructor for the LogicServer class
  * @param sbf_path The path as a std::string of Server Brain Files Folder Path
  */
-LogicServer::LogicServer(std::string sbf_path) {
+LogicServer::LogicServer(std::string sbf_path, Logger* loggerptr) {
+	this->logger = loggerptr;
+
 	m_server.init_asio();
 
 	// Hide debug websocketpp logs messages
@@ -54,7 +56,7 @@ LogicServer::LogicServer(std::string sbf_path) {
 		auto it = connections.find(hdl);
 		if (it != connections.end()) {
 			uint64_t from = it->second;
-			logm("[-] Client#"+std::to_string(from)+": "+ clients_hn[from] +" disconnected","Server");
+			logger->logm("(-) Client#"+std::to_string(from)+": "+ clients_hn[from] +" disconnected","WARNING","Server");
 			connections.erase(it);
 			clients_hn.erase(from);
 			nb_client -=1;
@@ -80,18 +82,18 @@ LogicServer::LogicServer(std::string sbf_path) {
 			send(resp, hdl);
 			nb_client +=1;
 			active_client += 1;
-			logm("[+] Client#"+std::to_string(from)+": "+ clients_hn[from] +" connected","Server");
+			logger->logm("(+) Client#"+std::to_string(from)+": "+ clients_hn[from] +" connected","INFO","Server");
 		}
 		if (r.cmd == "genfinished") {
 
 			if (finished[from]==-1) return; // we only count the results from active clients
 
 			std::vector<float> result = jsonstring_to_vectf(r.arg2);
-			logm("Client#"+std::to_string(from)+": "+ clients_hn[from] +" finished gen #"+r.arg1,"Server");
+			logger->logm("Client#"+std::to_string(from)+": "+ clients_hn[from] +" finished gen #"+r.arg1,"INFO","Server");
 			finished[from] = 1;
 
 			if (result.size() == 0) {
-				logm("Client#"+std::to_string(from)+": "+clients_hn[from]+" send a result of 0 on a generation","ERROR");
+				logger->logm("Client#"+std::to_string(from)+": "+clients_hn[from]+" send a result of 0 on a generation","ERROR","Server");
 				genresults.emplace_back(std::vector<float>{}, std::vector<Brain>{});
 			} else {
 				std::vector<Brain> vb;
@@ -112,7 +114,7 @@ LogicServer::LogicServer(std::string sbf_path) {
 		}
 
 		if (r.cmd == "simfinished") {
-			logm("Client#"+std::to_string(from)+": "+ clients_hn[from] +" finished task","Server");
+			logger->logm("Client#"+std::to_string(from)+": "+ clients_hn[from] +" finished task","INFO","Server");
 			cfinished += 1;
 		}
 
@@ -131,7 +133,7 @@ void LogicServer::send(Packet pck, websocketpp::connection_hdl hdl) {
 	websocketpp::lib::error_code ec;
 	m_server.send(hdl, pck.get_string(), websocketpp::frame::opcode::text, ec);
 	if (ec) {
-		logm("Send failed: " + ec.message(),"ERROR");
+		logger->logm("Send failed: " + ec.message(),"ERROR","Server");
 	}
 }
 
@@ -154,7 +156,7 @@ void LogicServer::send_all(Packet pck) {
 void LogicServer::run(uint16_t port,SimTasker* mstk) {
 	m_server.listen(port);
 	m_server.start_accept();
-	logm("Server listening on port "+ std::to_string(port) +"...","Server");
+	logger->logm("Server listening on port "+ std::to_string(port) +"...","INFO","Server");
 
 	this->mstk = mstk;
 	// Launch the logic loop in another thread
@@ -177,7 +179,7 @@ void LogicServer::handle_input() {
 		std::string sinput = input;	//Convert to std::string
 
 		if (sinput.find("kill") != std::string::npos) {	// Kill all clients
-			logm("Receive kill command");
+			logger->logm("Sending kill command","WARNING");
 			Packet exitpck("exit","","","");
 			send_all(exitpck);
 		}
@@ -197,13 +199,13 @@ void LogicServer::handle_input() {
  */
 void LogicServer::logic_loop() {
 	// We are waiting for clients to connect
-	logm("Press ENTER when all clients are connected sucessfully");
+	logger->logm("Press ENTER when all clients are connected sucessfully","INFO");
 	std::getc(stdin);
 
 	// Launching input thread in background
 	std::thread([this]() { this->handle_input(); }).detach();
 
-	logm("All clients are connected. Starting Logic Loop...");
+	logger->logm("All clients are connected. Starting Logic Loop...","INFO");
 
 	SimDataStruct sds("save","",0,0,0,0,0,0,0,1,true);
 	int task_done = 0;
@@ -223,7 +225,7 @@ void LogicServer::logic_loop() {
 			sds = SimDataStruct("save",mstk->sim_name,0,mstk->sub_sim,0,mstk->evolution,mstk->brain_acc,mstk->nb_brain,mstk->nb_agent,1);
 			sds.save();
 
-			logm("Asking clients to start sim #"+std::to_string(task_done));
+			logger->logm("Asking clients to start sim #"+std::to_string(task_done),"INFO");
 			Packet startpacket("startsim", std::to_string(task_done),"","");
 			send_all(startpacket);
 
@@ -241,7 +243,7 @@ void LogicServer::logic_loop() {
 
 			genresults.clear();
 			generation = 0;
-			logm("Starting new generation #"+std::to_string(generation));
+			logger->logm("Starting new generation #"+std::to_string(generation));
 			step = 1;
 		}
 
@@ -256,7 +258,7 @@ void LogicServer::logic_loop() {
 				step=3;
 			}
 			else if(std::time(nullptr)>(timetime+timeout)) {
-				logm("Some clients need to be kicked. Reason : timeout","WARNING");
+				logger->logm("Some clients need to be kicked. Reason : timeout","WARNING");
 				// Send "standby" to any connected clients that are not finished
 				Packet stbpck("standby","","","");
 				for (auto &pair : connections) {
@@ -273,7 +275,7 @@ void LogicServer::logic_loop() {
 
 		if (step==3) {
 			// Now we analyse the results here
-			logm("Generation done. Processing...");
+			logger->logm("Generation done. Processing...");
 
 			seperation_time = std::time(nullptr) - timetime;
 			float processing_time = std::time(nullptr);
@@ -365,7 +367,7 @@ void LogicServer::logic_loop() {
 			sds.data["total_trained_time"] = (std::time(nullptr) - started_at);
 			sds.save();
 
-			logm("Autosaved.", "SAVE");
+			logger->logm("Autosaved.", "SAVE");
 
 			// Clearing memory
 			allFloats.clear();
@@ -380,7 +382,7 @@ void LogicServer::logic_loop() {
 			genresults.clear();
 
 			if(!mstk->is_infinite &&  (std::time(nullptr) - started_at)>mstk->time_allowed) {
-				logm("Time limit reached. Finishing the task now.");
+				logger->logm("Time limit reached. Finishing the task now.");
 
 				// Sending stopsim packet
 				Packet stpsim("stopsim", "", "", "");
@@ -391,7 +393,7 @@ void LogicServer::logic_loop() {
 
 				generation += 1;
 				gen_started_at = std::time(nullptr);
-				logm("Starting new generation #"+std::to_string(generation));
+				logger->logm("Starting new generation #"+std::to_string(generation));
 
 				int half_clients = 1;
 				if(active_client == 1){
@@ -404,15 +406,15 @@ void LogicServer::logic_loop() {
 				// Only if there are active clients
 				cfinished = 0;
 				if (active_client == 0) {
-					logm("No active client, skipping the task");
+					logger->logm("No active client, skipping the task");
 					step = 5;
 				}
 				else {
-					logm("Sending nextgen to Clients");
+					logger->logm("Sending nextgen to Clients");
 					int i = 0;
 					for (auto &pair : connections) {
 						if (finished[pair.second] == -1) continue;
-						if (finished[pair.second] == 0) logm("Something went wrong", "WARNING");
+						if (finished[pair.second] == 0) logger->logm("Something went wrong", "WARNING");
 						if (finished[pair.second] == 1) finished[pair.second] = 0; // if the client is not kicked then we marked as ready and send the packet
 						Packet pck("nextgen", packageSelectionned[i%half_clients], packageScores[i%half_clients], "");
 						send(pck, pair.first);
@@ -434,14 +436,14 @@ void LogicServer::logic_loop() {
 		}
 	}
 
-	logm("There was" + std::to_string(nb_client) + " clients connected", "INFO");
+	logger->logm("There was" + std::to_string(nb_client) + " clients connected", "INFO");
 	this->running = false;
 
-	logm("Asking all clients to shutdown...");
+	logger->logm("Asking all clients to shutdown...");
 	Packet exitpck("exit", "", "", "");
 	send_all(exitpck);
 
 	while(nb_client > 0) continue;
-	logm("Server Logic Loop finished. WS Server will stop now.");
+	logger->logm("Server Logic Loop finished. WS Server will stop now.");
 	m_server.stop();
 }

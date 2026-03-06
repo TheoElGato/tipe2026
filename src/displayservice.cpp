@@ -37,11 +37,13 @@ public:
 	 * @param agentPartitionsSize The size of one agent partition
 	 * @param mc If true : run in client mode, else in classic mode
 	 */
-	void init(bool headless, bool* runningptr, bool* clean_exitptr, int agentPartitionsSize, bool mc) override {
+	void init(bool headless, bool* runningptr, bool* clean_exitptr, int agentPartitionsSize, bool mc, Logger* loggerptr) override {
+		this->logger = loggerptr;
+
 		// If headless was requested at runtime, we can early-return.
 		if (headless) {
 			// No window created
-			logm("Headless mode was selected");
+			logger->logm("Headless mode was selected");
 			this->is_headless = true;
 			return;
 		}
@@ -159,10 +161,10 @@ public:
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::K)) {
 				if (mc) {
-					logm("You should not do that !","WARNING");
+					logger->logm("You should not do that !","WARNING");
 				} else {
 					*clean_exitptr = true;
-					logm("Waiting for threads to finish before exiting...");
+					logger->logm("Waiting for threads to finish before exiting...");
 				}
 				inputdelay = 0;
 			}
@@ -177,7 +179,7 @@ public:
 		draw_items(window, startSprite, diamondSprite, start, goals[selected_agents], (*groups_avail)[selected_agents]);
 
 		if (drawall) {
-			//logm(std::to_string( (*agentPartitions)[0].size()),"DEBUG");
+			//logger->logm(std::to_string( (*agentPartitions)[0].size()),"DEBUG");
 			for (Creature* agent : (*agentPartitions)[selected_agents]) {
 				draw_creature(agent);
 			}
@@ -305,6 +307,9 @@ private:
 		window.draw(sp);
 		window.draw(ob);
 	}
+
+	// Logging
+	Logger* logger;
 
 	// SFML objects
 	sf::RenderWindow window;

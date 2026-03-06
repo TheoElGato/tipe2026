@@ -28,7 +28,7 @@ public:
 	 * @param agentPartitionsSize The size of one agent partition
 	 * @param mc If true : run in client mode, else in classic mode
 	 */
-	void init(bool headless, bool* runningptr, bool* clean_exitptr, int agentPartitionsSize, bool mc) override {
+	void init(bool headless, bool* runningptr, bool* clean_exitptr, int agentPartitionsSize, bool mc, Logger* loggerptr) override {
 		// headless mode: do nothing, but we can set runningptr to true
 		if (runningptr_local_owned) {
 			// nothing
@@ -37,7 +37,7 @@ public:
 		this->clean_exitptr = clean_exitptr;
 		if (runningptr) *runningptr = true;
 
-		logm("DisplayServiceHeadless initialized (no graphics).");
+		loggerptr->logm("DisplayServiceHeadless initialized (no graphics).");
 	}
 
 	/*
