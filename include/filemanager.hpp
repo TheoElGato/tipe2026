@@ -40,7 +40,7 @@ class Logger {
 	  void saveToDisk(std::string filename, bool append = false);
   private:
 	  std::vector<std::string> cache;
-	  std::string LastPath = "crash_no_name.log";
+	  std::string lastPath = "crash_no_name.log";
 };
 
 class Packet {
