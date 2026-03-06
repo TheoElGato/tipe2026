@@ -315,6 +315,9 @@ int simulate(SimTasker stk, Logger* logger, bool mc, bool headless,SimpleClient*
 					if (use_evolution_curve) {
 						evolution = curve_a*std::exp(curve_b*generation+curve_c)+curve_d;
 					}
+					
+					if (mc) logger->saveToDisk(sds.getFullPath()+cl->srvid+"Log.log",false);
+					else logger->saveToDisk(sds.getFullPath()+"localLog.log",false);
 
 					acu = 0;
 					cl->state = 1;
@@ -500,7 +503,7 @@ int simulate(SimTasker stk, Logger* logger, bool mc, bool headless,SimpleClient*
 				for (auto& b : brain_agent) brain_agent_ptrs.push_back(&b);
 
 				sub_sim_started+=1;
-				logger->logm("Starting sub-sim " + std::to_string(sub_sim_next_index) + " on group " + std::to_string(group_index) + " with " + std::to_string(agentPartitions[group_index].size()) + " agents.", "THREAD");
+				logger->logm("Starting sub-sim " + std::to_string(sub_sim_next_index) + " on group " + std::to_string(group_index) + " with " + std::to_string(agentPartitions[group_index].size()) + " agents.", "INFO","Thread");
 
 				sub_sim_threads[sub_sim_next_index] = std::thread(handleThread, &physicsWorkers[group_index], agentPartitions[group_index], start, goals[sub_sim_next_index], brain_agent_ptrs, &sub_sim_state[sub_sim_next_index], &sub_sim_scores[sub_sim_next_index], &ss_dt, sim_time, ss_dt*brain_acc);
 				sub_sim_threads[sub_sim_next_index].detach(); // Detach the thread to make it run on is own

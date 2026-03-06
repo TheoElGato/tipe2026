@@ -17,6 +17,24 @@
 #include "server.hpp"
 #include "client.hpp"
 #include "filemanager.hpp"
+#include <csignal>
+#include <atomic>
+
+// Logger pointer to use in crash handler
+Logger* globalLogger = nullptr;;
+
+/*
+ *  Crash handler for the program, to catch SIGSERV and save logs.
+ *  @param signal The signal received.
+ */
+void crashHandler(int signal) {
+	if (globalLogger != nullptr) {
+		globalLogger->logm("Segmentation fault detected. Saving logs before exiting.","CRASH");
+		globalLogger->saveToFile(globalLogger->lastPath,true);
+	}
+	std::exit(signal);
+}
+
 
 int main(int argc, char* argv[]) {
 	// Read args
@@ -27,7 +45,8 @@ int main(int argc, char* argv[]) {
 	std::string sbf_path = "sbf"; // Stand for Server Brain Files Path
 
 	// Create the main logger
-    Logger* logger = new Logger();
+    	Logger* logger = new Logger();
+	globalLogger = logger;
 
 	bool headless = false; // Allow to run without a window
 	if (argc==1) mode = 0;

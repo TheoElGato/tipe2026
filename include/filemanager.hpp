@@ -37,9 +37,10 @@ class Logger {
   public:
 	  void logm(const std::string& message, const std::string& level = "INFO", const std::string& thread = "Main");
 	  void fatal(const std::string& message, const std::string& thread = "Main");
-	  void saveToDisk(std::string filename);
+	  void saveToDisk(std::string filename, bool append = false);
   private:
 	  std::vector<std::string> cache;
+	  std::string LastPath = "crash_no_name.log";
 };
 
 class Packet {

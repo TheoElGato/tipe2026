@@ -169,8 +169,26 @@ void Logger::fatal(const std::string& message, const std::string& thread) {
  * Save the logger cache to disk
  * @param filename The filename to write the cache
  */
-void Logger::saveToDisk(std::string filename) {
-    return;
+void Logger::saveToDisk(std::string filename, bool append) {
+    	std::ofstream file;
+	if (append) {
+		file.open(filename, std::ios_base::app); // Open in append mode
+	} else {
+		file.open(filename); // Open in overwrite mode
+	}
+
+	if (!file.is_open()) {
+		logm("Failed to open log file: " + filename, "ERROR", "Logger");
+		return;
+	}
+
+	lastPath = filename;
+
+	for (const auto& line : cache) {
+		file << line << std::endl;
+	}
+
+	cache.clear();
 }
 
 //// SimDataStruct
