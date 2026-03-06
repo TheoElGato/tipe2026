@@ -30,7 +30,7 @@ Logger* globalLogger = nullptr;;
 void crashHandler(int signal) {
 	if (globalLogger != nullptr) {
 		globalLogger->logm("Segmentation fault detected. Saving logs before exiting.","CRASH");
-		globalLogger->saveToFile(globalLogger->lastPath,true);
+		globalLogger->saveToDisk(globalLogger->lastPath,true);
 	}
 	std::exit(signal);
 }
