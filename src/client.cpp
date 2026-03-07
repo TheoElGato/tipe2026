@@ -282,7 +282,8 @@ int simulate(SimTasker stk, Logger* logger, bool mc, bool headless,SimpleClient*
 					return 1;
 				break;
 
-				case 2: continue;
+				case 2:
+					if(threads_used == 0) continue;
 				break;
 
 				case 3:
@@ -483,6 +484,9 @@ int simulate(SimTasker stk, Logger* logger, bool mc, bool headless,SimpleClient*
 
 				// Avoid starting sub-sim that don't exist
 				if(sub_sim_started >= sub_sim_total) break;
+
+				// if on standby, don't start new sub-sim until we receive the nextgen command
+				if(mc && cl->state == 2) break;
 
 				// Find an available thread
 				int group_index = -1;
