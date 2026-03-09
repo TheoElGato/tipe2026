@@ -30,11 +30,11 @@ Logger* globalLogger = nullptr;;
 void crashHandler(int signal) {
 	if (globalLogger != nullptr) {
 		globalLogger->logm("Segmentation fault detected. Saving logs before exiting.","CRASH");
+		globalLogger->logm(globalLogger->lastPath, "DEBUG)");
 		globalLogger->saveToDisk(globalLogger->lastPath,true);
 	}
 	std::exit(signal);
 }
-
 
 /*
  * Main function of the program, to start either the client, the server or run a classic simulation.

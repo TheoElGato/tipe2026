@@ -170,7 +170,7 @@ void Logger::fatal(const std::string& message, const std::string& thread) {
  * @param filename The filename to write the cache
  */
 void Logger::saveToDisk(std::string filename, bool append) {
-    	std::ofstream file;
+    std::ofstream file;
 	if (append) {
 		file.open(filename, std::ios_base::app); // Open in append mode
 	} else {
