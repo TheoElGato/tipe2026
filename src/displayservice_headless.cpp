@@ -59,7 +59,7 @@ public:
 	void render(std::vector<int>* groups_avail,
 				std::vector<std::vector<Creature*>>* agentPartitions,
 				float fps, int agent_size, int generation, int sub_sim_started, float acu,
-				float simu_time, float evolution, sf::Vector2f start, const std::vector<sf::Vector2f>& goals, bool mc) override {
+				float simu_time, float evolution, sf::Vector2f start, const std::vector<std::vector<sf::Vector2f>>& goals, bool mc) override {
 		// Nothing to do here
 	}
 
