@@ -266,7 +266,7 @@ void SimDataStruct::addStatRow(float generation, float agent0score, float agent1
 				   float agent3score, float agent4score, float agent5score, float agent6score,
 				   float agent7score, float agent8score, float agent9score, float mean, float median,
 				   float bestAgentScore, float timeForOneGen, float timeWaitingClients,
-				   float timeForProcessing, float localTime, int nb_clients) {
+				   float timeForProcessing, float localTime, int nb_clients, int active_clients) {
 	generationV.push_back(generation);
 	agent0scoreV.push_back(agent0score);
 	agent1scoreV.push_back(agent1score);
@@ -286,6 +286,7 @@ void SimDataStruct::addStatRow(float generation, float agent0score, float agent1
 	timeForProcessingV.push_back(timeForProcessing);
 	localTimeV.push_back(localTime);
 	data["nb_clients"] = nb_clients;
+	data["active_clients"] = active_clients;
 }
 
 /*
