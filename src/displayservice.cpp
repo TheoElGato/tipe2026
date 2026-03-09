@@ -56,7 +56,7 @@ public:
 
 		inputdelayBase = 10;
 		inputdelay = (float)inputdelayBase;
-		selected_agents = 0;
+		selected_subgen = 0;
 		drawall = false;
 		agent_partitions_size = agentPartitionsSize;
 
@@ -128,13 +128,13 @@ public:
 	 * @param simu_time The time for one generation
 	 * @param evolution The current simulation parameter evolution
 	 * @param start A vector2f for the spawnpoint
-	 * @param goals A vector of vector2f of goals
+	 * @param goals A vector of vector of vector2f of goals
 	 * @param mc If true : run in client mode, else in classic mode
 	 */
 	void render(std::vector<int>* groups_avail,
 				std::vector<std::vector<Creature*>>* agentPartitions,
 				float fps, int agent_size, int generation, int sub_sim_started, float acu,
-				float simu_time, float evolution, sf::Vector2f start, const std::vector<sf::Vector2f>& goals, bool mc) override {
+				float simu_time, float evolution, sf::Vector2f start, const std::vector<std::vector<sf::Vector2f>>& goals, bool mc) override {
 		if (is_headless) return;
 
 		// Process events
@@ -148,11 +148,11 @@ public:
 		// Keyboard management (rate limited)
 		if (inputdelay == inputdelayBase) {
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A)) {
-				selected_agents = (selected_agents - 1 + agent_partitions_size) % agent_partitions_size;
+				selected_subgen = (selected_subgen - 1 + agent_partitions_size) % agent_partitions_size;
 				inputdelay = 0;
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::E)) {
-				selected_agents = (selected_agents + 1) % agent_partitions_size;
+				selected_subgen = (selected_subgen + 1) % agent_partitions_size;
 				inputdelay = 0;
 			}
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::F)) {
@@ -176,16 +176,16 @@ public:
 		window.draw(backgroundSprite);
 
 		// Draw start and item sprites
-		draw_items(window, startSprite, diamondSprite, start, goals[selected_agents], (*groups_avail)[selected_agents]);
+		draw_items(window, startSprite, diamondSprite, start, goals[selected_subgen], (*groups_avail)[selected_subgen]);
 
 		if (drawall) {
 			//logger->logm(std::to_string( (*agentPartitions)[0].size()),"DEBUG");
-			for (Creature* agent : (*agentPartitions)[selected_agents]) {
+			for (Creature* agent : (*agentPartitions)[selected_subgen]) {
 				draw_creature(agent);
 			}
 		}
 
-		drawStats(window, font, {{"FPS", std::round(fps)}, {"Nb agents", agent_size}, {"SGen Selected", (*groups_avail)[selected_agents]}, {"Current Gen", generation}, {"SGen started", sub_sim_started}});
+		drawStats(window, font, {{"FPS", std::round(fps)}, {"Nb agents", agent_size}, {"SGen Selected", (*groups_avail)[selected_subgen]}, {"Current Gen", generation}, {"SGen started", sub_sim_started}});
 		if (mc) window.draw(wifiSprite);
 
 		window.display();
@@ -294,18 +294,23 @@ private:
 	 * Draw all items to the screen
 	 * @param window The window object
 	 * @param sp The sprite for the spawnpoint
-	 * @param ob The sprite for the goal
+	 * @param ob The sprite for the goal (Unused)
 	 * @param start The Vector2f for the coordinate for the spawnpoint
-	 * @param goal The Vector2f for the coordinate for the goal
+	 * @param goal The vector of Vector2f for the coordinates for the goals
 	 * @param idssim An identifier of the current sub sim
 	 */
-	void draw_items(sf::RenderWindow& window, sf::Sprite sp, sf::Sprite ob, sf::Vector2f start, sf::Vector2f goal, int idsssim) {
+	void draw_items(sf::RenderWindow& window, sf::Sprite sp, sf::Sprite ob, sf::Vector2f start, std::vector<sf::Vector2f> goal, int idsssim) {
 		if (idsssim < 0) idsssim = 0;
 		
 		sp.setPosition(start);
-		ob.setPosition(goal);
+		diamondSprite.setPosition(goal[0]);
+		emeraldSprite.setPosition(goal[1]);
+		netherite_ingotSprite.setPosition(goal[2]);
+
 		window.draw(sp);
-		window.draw(ob);
+		window.draw(diamondSprite);
+		window.draw(emeraldSprite);
+		window.draw(netherite_ingotSprite);
 	}
 
 	// Logging
@@ -330,7 +335,7 @@ private:
 	bool* clean_exitptr = nullptr;
 	int inputdelayBase = 10;
 	float inputdelay = 0;
-	int selected_agents = 0;
+	int selected_subgen = 0;
 	bool drawall = false;
 	int agent_partitions_size = 0;
 };
