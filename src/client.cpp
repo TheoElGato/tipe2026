@@ -521,7 +521,7 @@ int simulate(SimTasker stk, Logger* logger, bool mc, bool headless,SimpleClient*
 
 		//// Window drawing block
 		if (!headless) {
-			dpl_srvc->render(&groups_avail, &agentPartitions, fps, agents.size(), generation, sub_sim_started, acu, sim_time, evolution, start, goals[0], mc);
+			dpl_srvc->render(&groups_avail, &agentPartitions, fps, agents.size(), generation, sub_sim_started, acu, sim_time, evolution, start, goals, mc);
 		}
 		////
 

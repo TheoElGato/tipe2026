@@ -232,7 +232,8 @@ void LogicServer::logic_loop() {
 			// Get a time stamp
 			started_at = std::time(nullptr);
 			gen_started_at = std::time(nullptr);
-			timeout = mstk->kick_factor*mstk->sim_time*mstk->sub_sim;  // 100% more time than the sim time
+
+			timeout = mstk->kick_factor*mstk->sim_time*mstk->sub_sim;
 
 			// Re-enable the client that got timed out
 			active_client = nb_client;
