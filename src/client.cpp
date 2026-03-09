@@ -85,8 +85,8 @@ void init_goals(std::vector<std::vector<sf::Vector2f>>* goals, sf::Vector2f star
 		for(int j=1; j<nb_goal; j+=1){
 			ran = dist(gen)*2*M_PI;  // [0,2*pi[
 			radius = (maxdist-mindist)*dist(gen) + mindist;
-			x += start.x + radius * cos(ran);
-			y += start.y + radius * sin(ran);
+			x += radius * cos(ran);
+			y += radius * sin(ran);
 			temp.emplace_back(sf::Vector2f(x, y));
 		}
 		(*goals).emplace_back(temp);
