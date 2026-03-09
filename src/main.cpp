@@ -36,6 +36,12 @@ void crashHandler(int signal) {
 }
 
 
+/*
+ * Main function of the program, to start either the client, the server or run a classic simulation.
+ * @param argc The number of arguments passed to the program.
+ * @param argv The array of arguments passed to the program.
+ * @return int 0 For a successfull execution.
+ */
 int main(int argc, char* argv[]) {
 	// Read args
 	int next_arg = 1;
