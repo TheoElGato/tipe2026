@@ -317,9 +317,8 @@ int simulate(SimTasker stk, Logger* logger, bool mc, bool headless,SimpleClient*
 						evolution = curve_a*std::exp(curve_b*generation+curve_c)+curve_d;
 					}
 					
-					if (mc) logger->saveToDisk(sds.getFullPath()+cl->srvid+"Log.log",false);
-					else logger->saveToDisk(sds.getFullPath()+"localLog.log",false);
-
+					logger->saveToDisk(sds.getFullPath()+cl->srvid+"Log.log",false);
+					
 					acu = 0;
 					cl->state = 1;
 				break;
@@ -461,6 +460,9 @@ int simulate(SimTasker stk, Logger* logger, bool mc, bool headless,SimpleClient*
 					if (use_evolution_curve) {
 						evolution = curve_a*std::exp(curve_b*generation+curve_c)+curve_d;
 					}
+
+					logger->saveToDisk(sds.getFullPath()+"localLog.log",false);
+
 					acu = 0;
 
 				} else { // We are in client mode so we save the brains here

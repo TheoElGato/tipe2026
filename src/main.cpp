@@ -45,8 +45,11 @@ int main(int argc, char* argv[]) {
 	std::string sbf_path = "sbf"; // Stand for Server Brain Files Path
 
 	// Create the main logger
-    	Logger* logger = new Logger();
+    Logger* logger = new Logger();
 	globalLogger = logger;
+
+	// Set up the crash handler
+	std::signal(SIGSEGV, crashHandler);
 
 	bool headless = false; // Allow to run without a window
 	if (argc==1) mode = 0;
