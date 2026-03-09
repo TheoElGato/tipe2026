@@ -316,9 +316,9 @@ int simulate(SimTasker stk, Logger* logger, bool mc, bool headless,SimpleClient*
 					if (use_evolution_curve) {
 						evolution = curve_a*std::exp(curve_b*generation+curve_c)+curve_d;
 					}
-					
+
 					logger->saveToDisk(sds.getFullPath()+cl->srvid+"Log.log",false);
-					
+
 					acu = 0;
 					cl->state = 1;
 				break;
@@ -424,7 +424,7 @@ int simulate(SimTasker stk, Logger* logger, bool mc, bool headless,SimpleClient*
 					sds.addStatRow(generationTemp, agent0scoreTemp, agent1scoreTemp, agent2scoreTemp,
 					   agent3scoreTemp, agent4scoreTemp, agent5scoreTemp, agent6scoreTemp,
 					   agent7scoreTemp, agent8scoreTemp, agent9scoreTemp, meanTemp, median,
-					   bestAgentScoreTemp, timeForOneGenTemp, 0, 0, std::time(nullptr), 0);
+					   bestAgentScoreTemp, timeForOneGenTemp, 0, 0, std::time(nullptr), 0, 0);
 
 					// Autosave check
 					if (autosave && generation % autosave_freq == 0) {

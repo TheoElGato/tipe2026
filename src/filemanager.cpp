@@ -25,11 +25,11 @@ std::string get_timestamp() {
     std::tm* lt = std::localtime(&now);
 
     // Fixed-size buffer on the stack (no heap allocation)
-    char buffer[12]; 
+    char buffer[12];
     // %H:%M:%S is exactly 8 chars + 2 brackets + null terminator = 11 chars
-    std::snprintf(buffer, sizeof(buffer), "[%02d:%02d:%02d]", 
+    std::snprintf(buffer, sizeof(buffer), "[%02d:%02d:%02d]",
                   lt->tm_hour, lt->tm_min, lt->tm_sec);
-    
+
     return std::string(buffer);
 }
 
@@ -234,7 +234,8 @@ SimDataStruct::SimDataStruct(std::string path, std::string name, int generation,
 		{"agents-number", agents_number},
 		{"total_trained_time", 0},
 		{"train_sessions",train_sessions},
-		{"nb_clients",0}
+		{"nb_clients",0},
+		{"active_clients",0}
 	};
 
 }
@@ -261,6 +262,7 @@ SimDataStruct::SimDataStruct(std::string path, std::string name, int generation,
  * @param timeForProcessing The time use to process and save data
  * @param localTime The local time of the device
  * @param nb_clients The number of client connected as this data is save.
+ * @param active_clients The number of client active as this data is save.
  */
 void SimDataStruct::addStatRow(float generation, float agent0score, float agent1score, float agent2score,
 				   float agent3score, float agent4score, float agent5score, float agent6score,
