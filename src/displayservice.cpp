@@ -176,7 +176,7 @@ public:
 		window.draw(backgroundSprite);
 
 		// Draw start and item sprites
-		draw_items(window, startSprite, diamondSprite, start, goals[selected_subgen], (*groups_avail)[selected_subgen]);
+		draw_items(window, startSprite, diamondSprite, start, goals[(*groups_avail)[selected_subgen]], (*groups_avail)[selected_subgen]);
 
 		if (drawall) {
 			//logger->logm(std::to_string( (*agentPartitions)[0].size()),"DEBUG");
