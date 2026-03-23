@@ -179,7 +179,6 @@ public:
 		draw_items(window, startSprite, diamondSprite, start, goals[(*groups_avail)[selected_subgen]], (*groups_avail)[selected_subgen]);
 
 		if (drawall) {
-			//logger->logm(std::to_string( (*agentPartitions)[0].size()),"DEBUG");
 			for (Creature* agent : (*agentPartitions)[selected_subgen]) {
 				draw_creature(agent);
 			}
