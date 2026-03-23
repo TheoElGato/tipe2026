@@ -57,3 +57,4 @@ Doxyfile
 task.json
 .nvim.lua
 compile_commands.json
+crash_no_name.log
