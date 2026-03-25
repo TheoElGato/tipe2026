@@ -27,8 +27,8 @@ Point::Point(float x, float y, float mass) {
 
 /*
  * Constructor of Link class used to give rigid connection
- * @param a int of the point index
- * @param b same
+ * @param a int of the a point index
+ * @param b int of the b point index
  * @param restLength The length of the link
  */
 Link::Link(int a, int b, float restLength) {
@@ -40,8 +40,8 @@ Link::Link(int a, int b, float restLength) {
 
 /*
  * Constructor of Spring class used to give spring connection
- * @param a int of the point index
- * @param b same
+ * @param a int of the a point index
+ * @param b int of the b point index
  * @param restLength The resting length of the spring
  * @param springStrength The force of the spring
  */
@@ -57,11 +57,11 @@ PhysicsWorker::PhysicsWorker() {}
 
 /*
  * Calculate the distance between two point
- * @param a Point object
- * @param b same
+ * @param a Point object number one
+ * @param b Point object number two
+ * @return The calculated distance
  */
 float PhysicsWorker::distance(Point a, Point b) {
-	// Calculate the distance beetween two point
 	float dx = b.position.x - a.position.x;
 	float dy = b.position.y - a.position.y;
 	return sqrt(dx * dx + dy * dy);
@@ -71,7 +71,7 @@ float PhysicsWorker::distance(Point a, Point b) {
  * Physic resolver using the Position Based Dynamic method
  * @param objects a vector of all the point in a physic object
  * @param links a vector of the link constituing the object
- * @param spings a vector of the spring constituing the object
+ * @param springs a vector of the spring constituing the object
  * @param numsubstep define the quality of the simulation
  * @param dt time since last call of this function
  */
@@ -155,10 +155,9 @@ void PhysicsWorker::PBD(std::vector<Point>* objects, std::vector<Link> links, st
  * @param b Point
  * @param springConstant The force of the spring
  * @param restLength
+ * @return The calculated force
  */
 sf::Vector2f PhysicsWorker::springForce(Point a, Point b, float springConstant, float restLength) {
-	//
-
 	float l = distance(a, b);
 	sf::Vector2f n;
 	if (l != 0) {

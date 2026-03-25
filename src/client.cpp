@@ -97,9 +97,9 @@ void init_goals(std::vector<std::vector<sf::Vector2f>>* goals, sf::Vector2f star
 /*
  * Main function for the simulation
  * @param stk The sim tasker use of the simulation
+ * @param logger The main logger
  * @param mc If true : run in client mode, else in classic mode
  * @param headless If true run in headless mode
- * @param logger The main logger
  * @param cl The pointer to the instance of the SimpleClient class
  * @return int 0 for a successfull simulation
  */
@@ -107,7 +107,7 @@ int simulate(SimTasker stk, Logger* logger, bool mc, bool headless,SimpleClient*
 
 	logger->logm("Welcome to the URSAF Sim");
 
-	/// SETTINGS FROM THE SIMTASKER ///
+	/// Getting settings from the simtasker stk object
 	std::string device = stk.device;
 	int threads = stk.threads;
 	bool load_from_file = stk.load_from_file;
@@ -135,13 +135,12 @@ int simulate(SimTasker stk, Logger* logger, bool mc, bool headless,SimpleClient*
 	float curve_b = stk.curve_b;
 	float curve_c = stk.curve_c;
 	float curve_d = stk.curve_d;
-	///////////////////
 
 	/// Time related variables
 	float ss_dt = 1/60.f;
 	float dt = 0.016f;
 
-	////// Variable related to the state of simulation ///////
+	/// Variables related to the state of simulation
 
 	// Var simulation gestion
 	int generation = 0;
@@ -260,7 +259,7 @@ int simulate(SimTasker stk, Logger* logger, bool mc, bool headless,SimpleClient*
 		evolution = curve_a*std::exp(curve_b*generation+curve_c)+curve_d;
 	}
 
-	logger->logm("All variable initialized. Starting main loop.", "INFO");
+	logger->logm("All variables initialized. Starting main loop.", "INFO");
 
 	// Main loop
 	while (running) {
@@ -268,7 +267,7 @@ int simulate(SimTasker stk, Logger* logger, bool mc, bool headless,SimpleClient*
 		if (dt < 1e-6f) dt = 1e-6f;
 		fps = 1.0f / dt;
 
-		// Stop program if it take to much time and in client mode
+		// Stop program if it take to much time and in classic mode
 		if (!is_infinite && !mc) {
 			if (acc > time_allowed) {
 			clean_exit = true;
@@ -519,11 +518,10 @@ int simulate(SimTasker stk, Logger* logger, bool mc, bool headless,SimpleClient*
 			}
 		}
 
-		//// Window drawing block
+		// Window drawing
 		if (!headless) {
 			dpl_srvc->render(&groups_avail, &agentPartitions, fps, agents.size(), generation, sub_sim_started, acu, sim_time, evolution, start, goals, mc);
 		}
-		////
 
 		acc += dt;
 		acu += dt;
@@ -539,6 +537,7 @@ int simulate(SimTasker stk, Logger* logger, bool mc, bool headless,SimpleClient*
  * Constructor for the SimpleClient class
  * @param uri The address of the websocket
  * @param path The path as a std::string of Server Brain Files Folder Path
+ * @param loggerptr The main logger pointer
  */
 SimpleClient::SimpleClient(const std::string &uri, const std::string path, Logger* loggerptr) {
 	sbfpath = path+"/";

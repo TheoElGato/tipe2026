@@ -35,6 +35,7 @@
 /*
  * Constructor for the LogicServer class
  * @param sbf_path The path as a std::string of Server Brain Files Folder Path
+ * @param loggerptr The main logger pointer
  */
 LogicServer::LogicServer(std::string sbf_path, Logger* loggerptr) {
 	this->logger = loggerptr;

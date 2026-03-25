@@ -159,6 +159,7 @@ void Logger::logm(const std::string& message ,const std::string& level, const st
 /*
  * Standardized fatal error function for the project
  * @param message The message to print will exiting
+ * @param thread The thread that print the message, by default Main
  */
 void Logger::fatal(const std::string& message, const std::string& thread) {
 	logm(message, "FATAL", thread);
@@ -168,6 +169,7 @@ void Logger::fatal(const std::string& message, const std::string& thread) {
 /*
  * Save the logger cache to disk
  * @param filename The filename to write the cache
+ * @param append If true then append the cache, else write over the file
  */
 void Logger::saveToDisk(std::string filename, bool append) {
     std::ofstream file;

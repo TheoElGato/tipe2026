@@ -19,6 +19,7 @@ class DisplayServiceHeadless : public DisplayService {
 public:
 	DisplayServiceHeadless() = default;
 	~DisplayServiceHeadless() override = default;
+
 	/*
 	 * Initialize the DisplayServiceSFML class
 	 * Because this is headless, it will do nothing
@@ -27,12 +28,9 @@ public:
 	 * @param clean_exitptr The pointer to the clean_exitptr to request a clean exit
 	 * @param agentPartitionsSize The size of one agent partition
 	 * @param mc If true : run in client mode, else in classic mode
+	 * @param loggerptr The main logger pointer
 	 */
 	void init(bool headless, bool* runningptr, bool* clean_exitptr, int agentPartitionsSize, bool mc, Logger* loggerptr) override {
-		// headless mode: do nothing, but we can set runningptr to true
-		if (runningptr_local_owned) {
-			// nothing
-		}
 		this->runningptr = runningptr;
 		this->clean_exitptr = clean_exitptr;
 		if (runningptr) *runningptr = true;
@@ -75,7 +73,6 @@ public:
 private:
 	bool* runningptr = nullptr;
 	bool* clean_exitptr = nullptr;
-	bool runningptr_local_owned = false;
 };
 
 /*

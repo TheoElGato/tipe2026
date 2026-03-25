@@ -35,6 +35,7 @@ public:
 	~SimpleClient();
 	void send(Packet pck);
 	void run(SimTasker* stk,bool hl);
+	
 	bool headless = false;
 	int state = 0;
 	std::string sbfpath = "";

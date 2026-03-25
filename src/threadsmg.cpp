@@ -15,8 +15,8 @@
 
 /*
  * Calculate the distance between two vector
- * @param a Vector2 object
- * @param b same
+ * @param a Vector2 object one
+ * @param b Vector2 object two
  * @return the distance
  */
 float distance(sf::Vector2f a, sf::Vector2f b) {

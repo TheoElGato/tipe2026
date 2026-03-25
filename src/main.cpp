@@ -61,6 +61,7 @@ int main(int argc, char* argv[]) {
 	else {
 		while (next_arg != argc) {
 			std::string arg = argv[next_arg];
+
 			if (arg=="-c") {	// Client mode
 				mode = 1;
 				ip = argv[next_arg+1];
@@ -95,11 +96,13 @@ int main(int argc, char* argv[]) {
 			mainSimTasker.loadTask(i);
 			simulate(mainSimTasker,logger,false,headless);
 		}
+
 	} else if (mode==1) {
 		// Start client on ip and port
 		logger->logm("Starting Client mode for "+std::to_string(mainSimTasker.len)+" simulations today.");
 		SimpleClient cl("ws://"+ip+":"+std::to_string(port),sbf_path,logger);
 		cl.run(&mainSimTasker,headless);
+
 	} else if (mode==2) {
 		// Start server on localhost and listening on port
 		logger->logm("Server mode for "+std::to_string(mainSimTasker.len)+" simulations today.");

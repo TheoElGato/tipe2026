@@ -142,7 +142,6 @@ void Creature::brainUpdate(sf::Vector2f target, Brain * brain) {
 
 /*
  * Update the direction of the creature
- * @param restLength
  */
 void Creature::update() {
 
@@ -163,8 +162,8 @@ void Creature::update() {
 
 /*
  * Move the creature to the provided point
- * @param x
- * @param y
+ * @param x The x coordinate of the point
+ * @param y The y coordinate of the point
  */
 void Creature::moveTo(float x, float y) {
 

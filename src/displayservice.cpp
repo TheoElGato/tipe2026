@@ -36,6 +36,7 @@ public:
 	 * @param clean_exitptr The pointer to the clean_exitptr to request a clean exit
 	 * @param agentPartitionsSize The size of one agent partition
 	 * @param mc If true : run in client mode, else in classic mode
+	 * @param loggerptr The main logger pointer
 	 */
 	void init(bool headless, bool* runningptr, bool* clean_exitptr, int agentPartitionsSize, bool mc, Logger* loggerptr) override {
 		this->logger = loggerptr;
@@ -116,6 +117,7 @@ public:
 		eyeBlack.setFillColor(sf::Color::Black);
 		eyeBlack.setOrigin({2, 2});
 	}
+
 	/*
 	 * Render a frame to the window
 	 * @param groups_avail The pointer to a vector of int representing which groups are available (see client.cpp)
@@ -176,7 +178,7 @@ public:
 		window.draw(backgroundSprite);
 
 		// Draw start and item sprites
-		draw_items(window, startSprite, diamondSprite, start, goals[(*groups_avail)[selected_subgen]], (*groups_avail)[selected_subgen]);
+		draw_items(window, startSprite, diamondSprite, start, goals[(*groups_avail)[selected_subgen]]);
 
 		if (drawall) {
 			for (Creature* agent : (*agentPartitions)[selected_subgen]) {
@@ -255,6 +257,7 @@ public:
 	}
 
 private:
+
 	/*
 	 * Render a stats as text to the screen
 	 * @param window The window object
@@ -296,9 +299,8 @@ private:
 	 * @param ob The sprite for the goal (Unused)
 	 * @param start The Vector2f for the coordinate for the spawnpoint
 	 * @param goal The vector of Vector2f for the coordinates for the goals
-	 * @param idssim An identifier of the current sub sim
 	 */
-	void draw_items(sf::RenderWindow& window, sf::Sprite sp, sf::Sprite ob, sf::Vector2f start, std::vector<sf::Vector2f> goal, int idsssim) {
+	void draw_items(sf::RenderWindow& window, sf::Sprite sp, sf::Sprite ob, sf::Vector2f start, std::vector<sf::Vector2f> goal) {
 		if (idsssim < 0) idsssim = 0;
 		
 		sp.setPosition(start);

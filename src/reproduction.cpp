@@ -14,7 +14,6 @@
 #include "reproduction.hpp"
 #include <random>
 
-
 /*
  * Perform a genetic algorithm reproduction step on a population of Brain agents.
  * The agents are first sorted by score in descending order, then a fraction of the
@@ -49,7 +48,6 @@ void reproduce(std::vector<Brain>* brain_agents, std::vector<float> score_agent,
 	if (num_selectable == 0) num_selectable = 1; // Avoid divide by zero
 
 	// Normalize scores
-
 	float total = 0.f;
 	for (int i = 0; i < num_selectable; ++i){
 		total += score_agent[i];

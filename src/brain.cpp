@@ -21,7 +21,7 @@
  * @param input_size The size of the input layer
  * @param output_size The size of the output layer
  * @param file If not a empty string, the brain file to load
- * @param nb_hidden_layer The number of hidden layer for a brain
+ * @param nb_hidden_neurones The number of neurones per hidden layer for a brain
  */
 Brain::Brain(int input_size, int output_size, std::string file, std::string device, int nb_hidden_neurones) {
 
@@ -64,7 +64,6 @@ Brain::Brain(int input_size, int output_size, std::string file, std::string devi
 	if (file!="") {
 		try {
 			this->loadFile(file);
-			//this->nb_hidden_neurones = this->fc1->weight.size(0);
 		} catch (const c10::Error& e) {
 			std::cerr << "Error loading the model from " << file << ": " << e.what() << std::endl;
 		}
@@ -73,7 +72,7 @@ Brain::Brain(int input_size, int output_size, std::string file, std::string devi
 
 /*
  * Save the weight and bias using to the designated file
- * @param file
+ * @param file The filename to save to
  */
 void Brain::saveFile(const std::string& file) {
 	torch::serialize::OutputArchive archive;
@@ -83,7 +82,7 @@ void Brain::saveFile(const std::string& file) {
 
 /*
  * Load the weight and bias using the provided file
- * @param file
+ * @param file The filename to load from
  */
 void Brain::loadFile(const std::string& file) {
 	torch::serialize::InputArchive archive;
@@ -95,7 +94,7 @@ void Brain::loadFile(const std::string& file) {
  * Calculate the ouput of the brain with the provided tensor.
  * It use the softsing activation function
  * @param x The tensor input
- * @return x The ouput of the brain as a tensor
+ * @return The ouput of the brain as a tensor
  */
 torch::Tensor Brain::forward(torch::Tensor x) {
 	x = x.to(this->device);
@@ -124,8 +123,8 @@ void Brain::mutate(float weight) {
 
 /*
  * This copy the associated brain.
- * This allow to not have referencing issues
- * @return new_brain the copy of the brain
+ * This allow to not have any referencing issues
+ * @return A copy of the brain
  */
 Brain Brain::copy() {
 	std::string device;

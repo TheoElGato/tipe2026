@@ -12,13 +12,13 @@
 #ifndef DISPLAYSERVICE_H
 #define DISPLAYSERVICE_H
 
-
 // DisplayService interface - NO SFML Graphics/Window includes here.
 // displayservice.ccp and displayservice_headless.cpp will include this file.
 
 #include <SFML/System/Vector2.hpp>
 #include <vector>
 #include <memory>
+
 #include "filemanager.hpp"
 
 class Creature; // forward
@@ -35,7 +35,7 @@ public:
 };
 
 // Each implementation file (graphical / headless) will provide its own CreateDisplayService()
-// and CMake will ensure only the correct one is compiled into each executable.
+// and CMake will use  the correct one.
 std::unique_ptr<DisplayService> CreateDisplayService();
 
 #endif // DISPLAYSERVICE_H

@@ -22,19 +22,19 @@ public:
 	void saveFile(const std::string& file);
 	void loadFile(const std::string& file);
 	void mutate(float weight);
-	int bid1 = 0;
-	int bid2 = 0;
 	Brain copy();
 
+	int bid1 = 0;
+	int bid2 = 0;
 
 private:
+	void manual_init();
 
 	torch::nn::Linear fc1 = nullptr, fc2 = nullptr, fc3 = nullptr, out = nullptr;
 	int input_size;
 	int output_size;
 	int nb_hidden_neurones;
 	int links;
-	void manual_init();
 	torch::Device device = torch::kCPU;
 };
 

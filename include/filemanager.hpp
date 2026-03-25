@@ -22,26 +22,16 @@
 using namespace csv;
 using namespace nlohmann::literals;
 
-
-std::string remove_zero_ts(float value);
-std::string getHostName();
-std::string vectf_to_jsonstring(std::vector<float> v);
-std::string vects_to_jsonstring(std::vector<std::string> v);
-std::vector<float> jsonstring_to_vectf(std::string s);
-std::vector<std::string> jsonstring_to_vects(std::string s);
-bool str_to_uint16(const char *str, uint16_t *res);
-float average(std::vector<float> v);
-std::string get_timestamp();
-
 class Logger {
   public:
 	  void logm(const std::string& message, const std::string& level = "INFO", const std::string& thread = "Main");
 	  void fatal(const std::string& message, const std::string& thread = "Main");
 	  void saveToDisk(std::string filename, bool append = false);
+
 	  std::string lastPath = "crash_no_name.log";
+
   private:
 	  std::vector<std::string> cache;
-	
 };
 
 class Packet {
@@ -49,11 +39,13 @@ class Packet {
 	  Packet(std::string c,std::string a1,std::string a2,std::string a3);
 	  Packet(std::string loads);
 	  std::string get_string();
+	  void update();
+	  
 	  std::string cmd = "";
 	  std::string arg1 = "";
 	  std::string arg2 = "";
 	  std::string arg3 = "";
-	  void update();
+	  
    private:
 	  nlohmann::json data;
 };
@@ -152,5 +144,14 @@ private:
    std::filesystem::path folder;
 };
 
+std::string remove_zero_ts(float value);
+std::string getHostName();
+std::string vectf_to_jsonstring(std::vector<float> v);
+std::string vects_to_jsonstring(std::vector<std::string> v);
+std::vector<float> jsonstring_to_vectf(std::string s);
+std::vector<std::string> jsonstring_to_vects(std::string s);
+bool str_to_uint16(const char *str, uint16_t *res);
+float average(std::vector<float> v);
+std::string get_timestamp();
 
 #endif // FILEMANAGER_H
