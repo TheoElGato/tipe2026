@@ -56,15 +56,13 @@ class SimTasker {
 	  void loadTask(int id);
 
 	  int len=0;
-
 	  std::string sim_name;
 	  std::string device;
 	  int threads;
-
 	  bool load_from_file;
 	  std::string load_name;
 
-	  // SIM //
+	  // SIM
 	  int sim_time;
 	  float evolution;
 	  float brain_acc;
@@ -75,20 +73,20 @@ class SimTasker {
 	  int best_keep;
 	  int selection_pol;
 
-	  // AUTOSAVE //
+	  // AUTOSAVE
 	  bool autosave;
 	  int autosave_freq;
 
-	  // GOAL //
+	  // GOALS
 	  int maxdist;
 	  int mindist;
 	  int nb_goal;
 
-	  // START POS//
+	  // START POS
 	  int startx;
 	  int starty;
 
-	  // OTHERS //
+	  // OTHERS
 	  bool use_evolution_curve;
 	  float curve_a;
 	  float curve_b;
@@ -101,7 +99,6 @@ class SimTasker {
 
    private:
 	  nlohmann::json allData;
-
 };
 
 class SimDataStruct {
@@ -110,7 +107,6 @@ public:
    void save();
    void loadFromFile(std::string load_name);
    std::string getFullPath();
-
    void addStatRow(float generation, float agent0score, float agent1score, float agent2score,
 				   float agent3score, float agent4score, float agent5score, float agent6score,
 				   float agent7score, float agent8score, float agent9score, float mean, float median,
@@ -136,7 +132,6 @@ public:
    std::vector<float> timeWaitingClientsV;
    std::vector<float> timeForProcessingV;
    std::vector<float> localTimeV;
-
 
 private:
    std::string name;

@@ -301,8 +301,6 @@ private:
 	 * @param goal The vector of Vector2f for the coordinates for the goals
 	 */
 	void draw_items(sf::RenderWindow& window, sf::Sprite sp, sf::Sprite ob, sf::Vector2f start, std::vector<sf::Vector2f> goal) {
-		if (idsssim < 0) idsssim = 0;
-		
 		sp.setPosition(start);
 		diamondSprite.setPosition(goal[0]);
 		emeraldSprite.setPosition(goal[1]);

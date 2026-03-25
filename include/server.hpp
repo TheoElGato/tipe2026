@@ -14,14 +14,15 @@
 
 #include <websocketpp/config/asio_no_tls.hpp>
 #include <websocketpp/server.hpp>
-#include "filemanager.hpp"
 #include <map>
 #include <string>
 #include <iostream>
 #include <unordered_map>
 #include <atomic>
+
 #include "brain.hpp"
 #include "reproduction.hpp"
+#include "filemanager.hpp"
 
 typedef websocketpp::server<websocketpp::config::asio> server;
 
@@ -29,9 +30,15 @@ class LogicServer {
 public:
 	LogicServer(std::string sbf_path, Logger* loggerptr);
 	void run(uint16_t port, SimTasker* mstk);
+
 	int timeout = 60;
 
 private:
+	void logic_loop();
+	void send_all(Packet pck);
+	void send(Packet pck, websocketpp::connection_hdl hdl);
+	void handle_input();
+
 	Logger* logger;
 	server m_server;
 	std::string sbfpath = "";
@@ -49,11 +56,6 @@ private:
 	std::vector<std::string> packageSelectionned;
 	std::vector<std::string> packageScores;
 	std::vector<std::pair<std::vector<float>,std::vector<Brain>>> genresults;
-	void logic_loop();
-	void send_all(Packet pck);
-	void send(Packet pck, websocketpp::connection_hdl hdl);
-	void handle_input();
-
 };
 
 #endif // SERVER_H
