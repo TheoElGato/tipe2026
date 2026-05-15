@@ -54,6 +54,10 @@ def clear_all():
     time_for_processing.clear()
     local_time.clear()
 
+def getDataFloat(rows, row):
+    try: return float(rows[row])
+    except: return -1
+
 def load_stats(path,name=""):
     global current_path
 
@@ -66,32 +70,27 @@ def load_stats(path,name=""):
         reader = csv.DictReader(file)
         next(reader)  # Skip the header row
         for row in reader:
-            generation.append((float(row["Generation"])))
-            agent0score.append(float(row["Agent0Score"]))
-            agent1score.append(float(row["Agent1Score"]))
-            agent2score.append(float(row["Agent2Score"]))
-            agent3score.append(float(row["Agent3Score"]))
-            agent4score.append(float(row["Agent4Score"]))
-            agent5score.append(float(row["Agent5Score"]))
-            agent6score.append(float(row["Agent6Score"]))
-            agent7score.append(float(row["Agent7Score"]))
-            agent8score.append(float(row["Agent8Score"]))
-            agent9score.append(float(row["Agent9Score"]))
-            mean.append(float(row["Mean"]))
-            median.append(float(row["Median"]))
-            best_agent_score.append(float(row["BestAgentScore"]))
-            time_for_one_gen.append(float(row["TimeForOneGen"]))
-            time_waiting_clients.append(float(row["TimeWaitingClients"]))
-            time_for_processing.append(float(row["TimeForProcessing"]))
-            local_time.append(float(row["LocalTime"]))
+            generation.append((getDataFloat(row,"Generation")))
+            agent0score.append(getDataFloat(row,"Agent0Score"))
+            agent1score.append(getDataFloat(row,"Agent1Score"))
+            agent2score.append(getDataFloat(row,"Agent2Score"))
+            agent3score.append(getDataFloat(row,"Agent3Score"))
+            agent4score.append(getDataFloat(row,"Agent4Score"))
+            agent5score.append(getDataFloat(row,"Agent5Score"))
+            agent6score.append(getDataFloat(row,"Agent6Score"))
+            agent7score.append(getDataFloat(row,"Agent7Score"))
+            agent8score.append(getDataFloat(row,"Agent8Score"))
+            agent9score.append(getDataFloat(row,"Agent9Score"))
+            mean.append(getDataFloat(row,"Mean"))
+            median.append(getDataFloat(row,"Median"))
+            best_agent_score.append(getDataFloat(row,"BestAgentScore"))
+            time_for_one_gen.append(getDataFloat(row,"TimeForOneGen"))
+            time_waiting_clients.append(getDataFloat(row,"TimeWaitingClients"))
+            time_for_processing.append(getDataFloat(row,"TimeForProcessing"))
+            local_time.append(getDataFloat(row,"LocalTime"))
     
     return generation, mean, best_agent_score, time_for_one_gen
 
-
-def save_stats(gen, agents, ba_score, ba_distance, goal, start, distance, fps, path):
-    print("DO NOT WORK NOR DO I CARE")
-    
-    
 def generate_scoreplot(path):
     gen = generation
     plt.figure()
@@ -181,14 +180,13 @@ def generate_time_for_processing_plot(path):
     plt.savefig(path)
     plt.close()
 
-def generate_total_ultimate_custom_super_cool_plot(path1, path2, path3, tg, tm, tb, tt, filenames):  
+def generate_total_plot(path1, path2, path3, tg, tm, tb, tt, filenames):  
 
     plt.figure()
     for i in range(len(filenames)): plt.plot(tg[i],tb[i],label=filenames[i])
     plt.title("Score du meilleur cerveau en fonction de la generation")
     plt.xlabel("Generation")
     plt.ylabel("Score")
-    plt.legend()
     plt.grid()
     plt.savefig(path1)
     plt.close()
@@ -198,7 +196,6 @@ def generate_total_ultimate_custom_super_cool_plot(path1, path2, path3, tg, tm, 
     plt.title("Moyenne des agents en fonction de la génération")
     plt.xlabel("Génération")
     plt.ylabel("Moyenne")
-    plt.legend()
     plt.grid()
     plt.savefig(path2)
     plt.close()
@@ -209,7 +206,6 @@ def generate_total_ultimate_custom_super_cool_plot(path1, path2, path3, tg, tm, 
     plt.title("Temps en moyenne en fonction de la generation")
     plt.xlabel("Generation")
     plt.ylabel("Temps")
-    plt.legend()
     plt.grid()
     plt.savefig(path3)
     plt.close()
@@ -219,4 +215,4 @@ def open_plot(path):
     webbrowser.get('windows-default').open('file://'+os.path.realpath(path))
 
 if __name__ == "__main__":
-    load_stats("/home/ely/Documents/prog/tipe2026/tools/saves/simu_0_20251128_180409/simu_0_20251128_180409.csv")
+    pass

@@ -10,6 +10,10 @@ OPATH = "rapports"
 def unfs(number):
         return (((50*number+96)%255)/255, ((69*number+24)%255)/255, ((42*number+93)%255)/255)
 
+def getDataError(data, wtg):
+    try: return data[wtg]
+    except: return -1
+
 def format_time(seconds):
     """
     Format time in seconds to a string
@@ -42,21 +46,13 @@ class PDF(FPDF):
         self.name = name
 
     def header(self):     
-        # Setting font: helvetica bold 15
         self.set_font("helvetica", style="B", size=26)
-        # Moving cursor to the right:
-        #self.cell(60)
-        # Printing title:
         self.cell(200, 10, self.name, border=1, align="C")
-        # Performing a line break:
         self.ln(20)
 
     def footer(self):
-        # Position cursor at 1.5 cm from bottom:
         self.set_y(-15)
-        # Setting font: helvetica italic 8
         self.set_font("helvetica", style="I", size=8)
-        # Printing page number:
         self.cell(0, 10, f"Page {self.page_no()}/{{nb}}", align="C")
 
 
@@ -64,8 +60,9 @@ def create_pdf(fname):
     
     FNAME = fname
     data = load_sim(FPATH, FNAME)
-    sg = data["Sgeneration"]
-    
+
+    sg = getDataError(data,"Sgeneration")
+
     raw_name = fname.split("_")
     date = raw_name[-2] + " " +raw_name[-1]
     del(raw_name[-1])
@@ -84,11 +81,8 @@ def create_pdf(fname):
     for i in range(0, 10):
         stats.generate_brainplot(f"{FPATH}/{FNAME}/brain{i}plot.png", i,unfs(i))
     
-    
-    # Instantiation of inherited class
     pdf = PDF(name)
     pdf.add_page()
-    
     
     # INFO
     pdf.set_font("Times", size=20, style="B")
@@ -97,12 +91,13 @@ def create_pdf(fname):
     pdf.ln(10)
     
     pdf.set_font("Times", size=18)
-    pdf.cell(0, 10, f"Nom de l'hote : {data['host_name']} ", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 10, f"Nom de l'hote : {getDataError(data,'host_name')} ", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Date : {date} ", new_x="LMARGIN", new_y="NEXT")
-    pdf.cell(0, 10, f"Nombre de generations :  {data['generation']}", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 10, f"Nombre de generations :  {getDataError(data, 'generation')}", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Nombre de sous-generations :  {sg}", new_x="LMARGIN", new_y="NEXT")
-    pdf.cell(0, 10, f"Nombre de sessions d'entrainements :  {data['train_sessions']}", new_x="LMARGIN", new_y="NEXT")
-    pdf.cell(0, 10, f"Temps total :  {format_time(data['total_trained_time'])}, en seconde : {data['total_trained_time']}", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 10, f"Nombre de sessions d'entrainements :  {getDataError(data, 'train_sessions')}", new_x="LMARGIN", new_y="NEXT")
+    ttt = getDataError(data,'total_trained_time')
+    pdf.cell(0, 10, f"Temps total :  {format_time(ttt)}, en seconde : {ttt}", new_x="LMARGIN", new_y="NEXT")
     
     # PARA
     pdf.set_font("Times", size=20, style="B")
@@ -111,11 +106,11 @@ def create_pdf(fname):
     pdf.ln(10)
     
     pdf.set_font("Times", size=18)
-    pdf.cell(0, 10, f"Nombre de cerveaux : {data['brains-number']} ", new_x="LMARGIN", new_y="NEXT")
-    pdf.cell(0, 10, f"Nombre d'agents : {data['agents-number']} ", new_x="LMARGIN", new_y="NEXT")
-    pdf.cell(0, 10, f"Temps par simulation : {data['simu_time']} ", new_x="LMARGIN", new_y="NEXT")
-    pdf.cell(0, 10, f"Facteur d'évolution : {data['evolution']} ", new_x="LMARGIN", new_y="NEXT")
-    pdf.cell(0, 10, f"Fréquence d'activation du cerveaux : {data['brain_acc']} ", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 10, f"Nombre de cerveaux : {getDataError(data,'brains-number')} ", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 10, f"Nombre d'agents : {getDataError(data,'agents-number')} ", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 10, f"Temps par simulation : {getDataError(data,'simu_time')} ", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 10, f"Facteur d'évolution : {getDataError(data,'evolution')} ", new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(0, 10, f"Fréquence d'activation du cerveaux : {getDataError(data,'brain_acc')} ", new_x="LMARGIN", new_y="NEXT")
     
     # Result
     pdf.set_font("Times", size=20, style="B")
@@ -197,4 +192,4 @@ for i in os.listdir("saves"):
     stats.clear_all()
 
 
-stats.generate_total_ultimate_custom_super_cool_plot(f"{OPATH}/scoremax.png",f"{OPATH}/scoremean.png",f"{OPATH}/timemax.png", tg, tm, tb, tt, filename)
+stats.generate_total_plot(f"{OPATH}/scoremax.png",f"{OPATH}/scoremean.png",f"{OPATH}/timemax.png", tg, tm, tb, tt, filename)
