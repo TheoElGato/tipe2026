@@ -45,6 +45,8 @@ build/*
 buildrun.sh
 task.json
 save/*
+saves/*
+rapports/*
 tools/myenv/
 tools/rapports/*
 tools/saves/*

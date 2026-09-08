@@ -22,7 +22,7 @@ def format_time(seconds):
         return f"{int(seconds // 60)} min {int(seconds % 60)} s"
     else:
         return f"{int(seconds // 3600)} h {int(seconds % 3600 // 60)} min {int(seconds % 60)} s"
-    
+
 
 
 def load_sim(path, name):
@@ -41,7 +41,7 @@ class PDF(FPDF):
         super().__init__()
         self.name = name
 
-    def header(self):     
+    def header(self):
         # Setting font: helvetica bold 15
         self.set_font("helvetica", style="B", size=26)
         # Moving cursor to the right:
@@ -61,18 +61,18 @@ class PDF(FPDF):
 
 
 def create_pdf(fname):
-    
+
     FNAME = fname
     data = load_sim(FPATH, FNAME)
     sg = data["Sgeneration"]
-    
+
     raw_name = fname.split("_")
     date = raw_name[-2] + " " +raw_name[-1]
     del(raw_name[-1])
     del(raw_name[-1])
 
     name = " ".join(raw_name)
-    
+
     generation, mean, best_agent_score, time_for_one_gen = stats.load_stats(f"{FPATH}/{FNAME}/{FNAME}.csv",raw_name[0])
     stats.generate_scoreplot(f"{FPATH}/{FNAME}/scoreplot.png")
     stats.generate_timeplot(f"{FPATH}/{FNAME}/timeplot.png")
@@ -80,22 +80,22 @@ def create_pdf(fname):
     stats.generate_medianplot(f"{FPATH}/{FNAME}/medianplot.png")
     stats.generate_time_waiting_clients_plot(f"{FPATH}/{FNAME}/time_waiting_clients_plot.png")
     stats.generate_time_for_processing_plot(f"{FPATH}/{FNAME}/time_for_processing_plot.png")
-    
+
     for i in range(0, 10):
         stats.generate_brainplot(f"{FPATH}/{FNAME}/brain{i}plot.png", i,unfs(i))
-    
-    
+
+
     # Instantiation of inherited class
     pdf = PDF(name)
     pdf.add_page()
-    
-    
+
+
     # INFO
     pdf.set_font("Times", size=20, style="B")
     pdf.cell(10)
     pdf.cell(30, 10, "Informations globales", border=0, align="C")
     pdf.ln(10)
-    
+
     pdf.set_font("Times", size=18)
     pdf.cell(0, 10, f"Nom de l'hote : {data['host_name']} ", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Date : {date} ", new_x="LMARGIN", new_y="NEXT")
@@ -103,46 +103,46 @@ def create_pdf(fname):
     pdf.cell(0, 10, f"Nombre de sous-generations :  {sg}", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Nombre de sessions d'entrainements :  {data['train_sessions']}", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Temps total :  {format_time(data['total_trained_time'])}, en seconde : {data['total_trained_time']}", new_x="LMARGIN", new_y="NEXT")
-    
+
     # PARA
     pdf.set_font("Times", size=20, style="B")
     pdf.cell(20)
     pdf.cell(30, 10, "Parametres de simulation", border=0, align="C")
     pdf.ln(10)
-    
+
     pdf.set_font("Times", size=18)
     pdf.cell(0, 10, f"Nombre de cerveaux : {data['brains-number']} ", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Nombre d'agents : {data['agents-number']} ", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Temps par simulation : {data['simu_time']} ", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Facteur d'évolution : {data['evolution']} ", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Fréquence d'activation du cerveaux : {data['brain_acc']} ", new_x="LMARGIN", new_y="NEXT")
-    
+
     # Result
     pdf.set_font("Times", size=20, style="B")
     pdf.cell(20)
     pdf.cell(30, 10, "Résultats", border=0, align="C")
     pdf.ln(10)
-    
+
     pdf.set_font("Times", size=18)
     pdf.cell(0, 10, f"Score maximal : {max(stats.best_agent_score)} ", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Score moyen : {max(stats.mean)} ", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Temps par simulation : {np.mean(stats.time_for_one_gen)} ", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Temps d'attente des clients par génération : {np.mean(stats.time_waiting_clients)} ", new_x="LMARGIN", new_y="NEXT")
     pdf.cell(0, 10, f"Temps de traitement par génération : {np.mean(stats.time_for_processing)} ", new_x="LMARGIN", new_y="NEXT")
-    
+
     h=30
     pdf.add_page()
     pdf.set_y(h)
     pdf.image(f"{FPATH}/{FNAME}/scoreplot.png",w=100)
     pdf.set_y(h)
     pdf.image(f"{FPATH}/{FNAME}/timeplot.png",x=110,w=100)
-    
+
     h+=80
     pdf.set_y(h)
     pdf.image(f"{FPATH}/{FNAME}/meanplot.png",w=100)
     pdf.set_y(h)
     pdf.image(f"{FPATH}/{FNAME}/medianplot.png",x=110,w=100)
-    
+
     h+=80
     pdf.set_y(h)
     pdf.image(f"{FPATH}/{FNAME}/time_waiting_clients_plot.png",w=100)
@@ -166,7 +166,7 @@ def create_pdf(fname):
     pdf.image(f"{FPATH}/{FNAME}/brain4plot.png",w=100)
     pdf.set_y(h)
     pdf.image(f"{FPATH}/{FNAME}/brain5plot.png",x=110,w=100)
-    
+
     pdf.add_page()
     h=30
     pdf.set_y(h)
@@ -178,7 +178,7 @@ def create_pdf(fname):
     pdf.image(f"{FPATH}/{FNAME}/brain8plot.png",w=100)
     pdf.set_y(h)
     pdf.image(f"{FPATH}/{FNAME}/brain9plot.png",x=110,w=100)
-    
+
     pdf.output(OPATH+"/"+FNAME+".pdf")
     return generation.copy(), mean.copy(), best_agent_score.copy(), time_for_one_gen.copy()
 
@@ -187,7 +187,7 @@ tg, tm, tb, tt, filename = [], [], [], [], []
 for i in os.listdir("saves"):
     print(i)
 
-    filename.append(i[5:i.rfind("2025")-1])
+    filename.append(i[5:i.rfind("2026")-1])
 
     g, m, b, t = create_pdf(i)
     tg.append(g)
